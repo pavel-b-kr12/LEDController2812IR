@@ -12,11 +12,13 @@ In save/load presets by press numbers buttons in  "settings mode" / "working mod
 
 ### Hardware and reference design:
 
-pro mini or orher
+pro mini or other
 
 VS1838 (pins: D6, GND, VCC)
 
 switch (pins: A4, GND)
+
+LED stripe of WS2812  (pins: D2, GND)
 
 ### Characteristics
 
