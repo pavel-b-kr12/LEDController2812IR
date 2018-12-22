@@ -21,7 +21,7 @@ switch (pins: A4, GND)
 LED stripe of WS2812  (pins: D2, GND)
 
 3x7 IR keypad
-![Infrared keypad](3x7 ir m s.jpgg)
+![Infrared keypad](IR_3x7.jpg)
 
 ### Characteristics
 
