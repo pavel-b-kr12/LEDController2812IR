@@ -1,4 +1,5 @@
 # LEDController2812IR
+![](0.jpg)
 
 Simple controller for ws2812b ws2811 stripes with IR control, includes a lot of effects.
 
@@ -32,5 +33,8 @@ atmega168 for 130-150 LEDs
 atmega328 for 300 LEDs
 
 atmega2560 for 1500-2000 LEDs
+
+### basic instructions
+![Flashing with CP2102](Flashing_pro_mini_with_CP2102.jpg)
 
 
