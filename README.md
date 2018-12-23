@@ -28,11 +28,11 @@ LED stripe of WS2812  (pins: D2, GND)
 
 power on 5v (VCC) can be as low as 3.3v LED also working.
 
-atmega168 for 130-150 LEDs
+atmega168 for 60-150 LEDs
 
-atmega328 for 300 LEDs
+atmega328 for 150-300 LEDs
 
-atmega2560 for 1500-2000 LEDs
+atmega2560 for 1000-2000 LEDs
 
 ### basic instructions
 0. Assemble the device
