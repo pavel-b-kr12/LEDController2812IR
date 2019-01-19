@@ -11,22 +11,22 @@ You can build it with hardware options:
 ```C
 //#define keypad1602 //free D0..3, D11..13, A1..
 #define IRkeypad	//3*7, ask me about support other types
-//#define key5x
+//#define key5x		//all main options has button
 //#define key3x		//central btn switch mode (settings). Side btns are +-, i.e. effN, speed, length, gamma
 //#define SerialControl //USB protocol for external GUI //! TODO software for PC, android
 //#define SerialSelect //enter effect № in terminal
 //#define LCD2004_i2c						//A4 A5
 ```
 
-*With IRkeypad:
+* With IRkeypad:
 At power up Switch between "settings"  (IR) and "working" (faster) modes.
 Choose effect, each has many settings to customize. It saves last.
 It save/load presets by press numbers buttons in  "settings mode" / "working mode".
 
-*With keypad1602 or key3x: you have to press select button to select option (effect, speed, length, chennels), than change it with +- keys
+* With keypad1602 or key3x: you have to press select button to select option (effect, speed, length, chennels), than change it with +- keys
 ![](keypad.jpg)
-*With key5x: all main options has button.
-*With USBcontrol: create presets in PC software, fast load it with buttons
+
+* With USBcontrol: create presets in PC software, fast load it with buttons
 
 TODO
 Presets are the first 10 effect slots:
