@@ -24,6 +24,7 @@ Choose effect, each has many settings to customize. It saves last.
 It save/load presets by press numbers buttons in  "settings mode" / "working mode".
 
 *With keypad1602 or key3x: you have to press select button to select option (effect, speed, length, chennels), than change it with +- keys
+![](keypad.jpg)
 *With key5x: all main options has button.
 *With USBcontrol: create presets in PC software, fast load it with buttons
 
