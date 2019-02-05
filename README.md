@@ -13,7 +13,7 @@ You can build it with hardware options:
 #define IRkeypad	//3*7, ask me about support other types
 //#define key5x		//all main options has button
 //#define key3x		//central btn switch mode (settings). Side btns are +-, i.e. effN, speed, length, gamma
-//#define SerialControl //USB protocol for external GUI //! TODO software for PC, android
+//#define SerialControl //USB external GUI //! TODO software for android
 //#define SerialSelect //enter effect № in terminal
 //#define LCD2004_i2c						//A4 A5
 ```
@@ -26,14 +26,15 @@ It save/load presets by press numbers buttons in  "settings mode" / "working mod
 * With keypad1602 or key3x: you have to press select button to select option (effect, speed, length, chennels), than change it with +- keys
 ![](keypad.jpg)
 
-* With USBcontrol: create presets in PC software, fast load it with buttons
+* With SerialControl (USB, bluetooth): create presets in PC software, fast load it with buttons
+![](USB_serial_control_settings.png)
 
 TODO
 Presets are the first 10 effect slots:
 * slot 0 - auto-saved last used effect and settings
 * slots 1..9 you can manually save/load to EEPROM
-* slots 10...254  constant links to effect and settings set for it
-* slot 252 endless different effect switch (so if your customer ask about over 9000 effects - you can use this :)
+* slots 10...255  constant links to effect and settings set for it
+* slot 252 endless different effect switch (when change effN in reverse direction) (so if your customer ask about over 9000 effects - you can use this :)
 * slot 253 predefined show sequence
 * slot 254 random demo
 * slot 255 random demo fast
@@ -55,9 +56,9 @@ LED stripe of WS2812  (pins: D2, GND)
 
 power on 5v (VCC) can be as low as 3.3v LED also working.
 
-atmega168 for 60-150 LEDs
+atmega168 for 60-140 LEDs
 
-atmega328 for 90-300 LEDs
+atmega328 for 90-250 LEDs
 
 atmega2560 for 1000-2000 LEDs
 
