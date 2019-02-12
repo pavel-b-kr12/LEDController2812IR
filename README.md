@@ -10,10 +10,10 @@ There are save/load slots, many effects, each rich of settings.
 You can build it with hardware options:
 ```C
 //#define keypad1602 //free D0..3, D11..13, A1..
-#define IRkeypad	//3*7, ask me about support other types
+//#define IRkeypad	//3*7, ask me about support other types
 //#define key5x		//all main options has button
 //#define key3x		//central btn switch mode (settings). Side btns are +-, i.e. effN, speed, length, gamma
-//#define SerialControl //USB external GUI //! TODO software for android
+#define SerialControl //USB external GUI //! TODO software for android
 //#define SerialSelect //enter effect № in terminal
 //#define LCD2004_i2c						//A4 A5
 ```
@@ -26,18 +26,22 @@ It save/load presets by press numbers buttons in  "settings mode" / "working mod
 * With keypad1602 or key3x: you have to press select button to select option (effect, speed, length, chennels), than change it with +- keys
 ![](keypad.jpg)
 
-* With SerialControl (USB, bluetooth): create presets in PC software, fast load it with buttons
+* With SerialControl (USB, bluetooth): create presets in PC software, fast load it with buttons. Easy to test new effects
 ![](USB_serial_control_settings.png)
 
-TODO
 Presets are the first 10 effect slots:
-* slot 0 - auto-saved last used effect and settings
+* slot 0 - auto-saved last used effect and settings. excluding № 248..255
 * slots 1..9 you can manually save/load to EEPROM
-* slots 10...255  constant links to effect and settings set for it
-* slot 252 endless different effect switch (when change effN in reverse direction) (so if your customer ask about over 9000 effects - you can use this :)
-* slot 253 predefined show sequence
-* slot 254 random demo
-* slot 255 random demo fast
+* slot 10 off
+* slots 11...247  constant links to effect and settings set for it
+* slot 248 endless different effect switch (when change effN in reverse direction) (so if your customer ask about over 9000 effects - you can use this :)
+* slot 249 random
+* slot 250 () random demo and animated
+* slot 251 animate to settings in slot 1
+* slot 252 () animate 
+* slot 253 predefined show sequence  //TODO
+* slot 254 () random demo fast
+* slot 255 () random demo
 
 ### Hardware and reference design:
 
@@ -56,13 +60,13 @@ LED stripe of WS2812  (pins: D2, GND)
 
 power on 5v (VCC) can be as low as 3.3v LED also working.
 
-atmega168 for 60-140 LEDs
+atmega168 for 60-150 LEDs
 
-atmega328 for 90-250 LEDs
+atmega328 for 120-330 LEDs
 
 atmega2560 for 1000-2000 LEDs
 
-IRkeypad eat a lot of memory
+Some effects and test modes eat a lot of memory - disable it and use "#define saveMem" to use atmega168
 
 ### basic instructions
 0. Assemble the device
@@ -79,4 +83,23 @@ IRkeypad eat a lot of memory
 * Don't see on bright Blue LEDs (or white because it is from Blue) while testing if you need your eyes for a long life. Use diffuser, dim power, itc.
 ### Hints
 * to maintain max quality (bit depth) regulate brightness not by program but via DC-DC down modules like XL4005 (without current limit)
+
+### TODO
+* map action to btn
+* control , save  NUM_LEDS
+* control , save  BRIGHTNESS
+* SerialControl BlueFilter
+* animate demo - setings range related to eff
+* delay(){  input ,  FastLED.delay}
+* wemos-Xi
+* STM32
+* ESP8266
+* wifi android
+* uniform speed of effects
+* implement colorize function, lengthH, speedH, set main gColor and BG colors. Rewrite effects that use existing settings for it.
+* save to file
+* group effect related to (circular) stripe ring
+* fix g4p clicks (with movement | drag)
+"//!" - in code this mean need to write new, recheck of fix existing
+
 

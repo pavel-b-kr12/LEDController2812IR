@@ -1,0 +1,25 @@
+----------------- refactor old
+/*
+setPixel\((.*?),
+leds[\1]=CRGB\(
+*/
+
+
+for(\s
+for(
+
+for(int
+for(byte
+for(NUM_LEDS_type
+----------------- clean
+
+\n\n\n
+\n\n
+
+//.*
+
+/\*.*\*/
+
+/\*.*(\s.*?)*?\*\/
+
+\/\/.*
