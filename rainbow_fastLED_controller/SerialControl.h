@@ -31,7 +31,7 @@ void setValueFromMsg(byte msgType, byte value)
 	{
 		case messageEffN:
 			//effN=value;
-			//change_mode(effN);
+			//change_slot(effN);
 		 effN_set(value);
 		break;
 		case messageSpeed:
@@ -68,8 +68,8 @@ void setValueFromMsg(byte msgType, byte value)
 		break;
 		case messageReset:
 		 if(value==0)
-		  resetSetiings_and_change_mode();//!
-		 else change_mode(effN);
+		  resetSetiings_and_change_slot();//!
+		 else change_slot(effN);
 		break;
 		case messageAction:
 		 switch(value) //! btn
@@ -86,7 +86,6 @@ void setValueFromMsg(byte msgType, byte value)
 		 	break;
 		 	
 		 	case 3: flashAndBackLEDs(); break;
-
 		 	case 4: fadeOut_continued(); break;
 		 	case 5: moveOut_continued(); break;
 		 	case 6: offPixel_continued(); break;

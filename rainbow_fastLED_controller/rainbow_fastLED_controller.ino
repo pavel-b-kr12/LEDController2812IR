@@ -148,7 +148,7 @@ bool brandom_demo=false;
 #endif
 bool banimate=false;
 
-//#define btnReset_p		A3 //resetSetiings_and_change_mode()
+//#define btnReset_p		A3 //resetSetiings_and_change_slot()
 
 //#include "Arduino.h"                                          // FastLED library.
 //#include "C:\Users\asd\Documents\Arduino\hardware\WAV\avr\cores\lgt8f\hooks.c"      //! wemos-Xi FastLED library.
@@ -273,13 +273,13 @@ const byte effDisableChennel_addr = 7;
 
 void saveAfter2s();
 
-void resetSetiings_and_change_mode() //! or changeEff(effN)
+void resetSetiings_and_change_slot() //! or changeEff(effN)
 {
 	effN=10;
 	effSpeed=1;
 	effLength=16;
 	effDisableChennel=0;
-	change_mode(effN);
+	change_slot(effN);
 	SET_UPD_Display //saveAfter2s();
 
 	// #ifdef demo_enable
@@ -324,12 +324,12 @@ void load(byte N)
 											if(N>9)  {Serial.println("!!!!! >9"); return; }
 		#endif
 	int saved=EEPROM.readInt(EEPROM_saved_flag_addr);
-	if(saved!=55) resetSetiings_and_change_mode();
+	if(saved!=55) resetSetiings_and_change_slot();
 	else
 	{
-		effN = EEPROM.readByte(effN_addr+N*5); //!!  change_mode(effN);  before other opt apply, but SET_UPD_Display after all
+		effN = EEPROM.readByte(effN_addr+N*5); //!!  change_slot(effN);  before other opt apply, but SET_UPD_Display after all
 		if(effN<10) effN+=10; //return; //0-9 is slots, bot not effects //this for update old wrighten, normally it can't occur
-		change_mode(effN);
+		change_slot(effN);
 		effSpeed=EEPROM.readByte(effSpeed_addr+N*5);
 		effLength=EEPROM.readByte(effLength_addr+N*5);
 		effDisableChennel=EEPROM.readByte(effDisableChennel_addr+N*5);
@@ -414,7 +414,7 @@ void  effN_set(byte N)
 	 else 
 	 {
 	 	effN = N;
-		change_mode(effN);
+		change_slot(effN);
 		SET_UPD_Display 
 	}
 	//saveAfter2s(); //this can only called by Serial, so not need auto save
@@ -431,7 +431,7 @@ void  effN_add()
 	#endif
 	banimate=false;
 
-	change_mode(effN);
+	change_slot(effN);
 	SET_UPD_Display saveAfter2s(); 
 }
 void  effN_sub()
@@ -446,7 +446,7 @@ void  effN_sub()
 	#endif
 	banimate=false;
 
-	change_mode(effN);
+	change_slot(effN);
 	SET_UPD_Display saveAfter2s();
 }
 
@@ -664,7 +664,7 @@ pinMode(IR_mode_sw_p, INPUT_PULLUP);
 
 delay(1);
 
-//if(!digitalRead(btnReset_p))	resetSetiings_and_change_mode(); else //!
+//if(!digitalRead(btnReset_p))	resetSetiings_and_change_slot(); else //!
 load(effN);
 
 #ifdef IRkeypad
@@ -815,12 +815,12 @@ Serial.print("IRcommand:"); Serial.println(IRcommand);
       break;
 	  //-------------- 0 100 200
       case 0x16:
-	  change_mode(); //clear off
+	  change_slot(); //clear off
 	  saveAfter2s(); SET_UPD_Display
       break;
 	  
       case 0x19:
-		resetSetiings_and_change_mode();
+		resetSetiings_and_change_slot();
       break;
 	  
       case 0xD:

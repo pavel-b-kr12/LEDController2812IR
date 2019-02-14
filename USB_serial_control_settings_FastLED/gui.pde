@@ -166,21 +166,9 @@ public void button_animateRandom_click1(GButton source, GEvent event) { //_CODE_
 } //_CODE_:button_animateRandom:917506:
 
 public void button_codeGen_click(GButton source, GEvent event) { //_CODE_:button_codeGen:274298:
-
-// copyToClipboard(
-// 	"case 1"+
-// 	Integer.toString(settingsVals.get("effN").value)+
-// 	": anim_f=??;				effSpeed="+
-// 	Integer.toString(settingsVals.get("speed").value)+
-// 	";	effLength="+
-// 	Integer.toString(settingsVals.get("length").value)+
-// 	";	RGB="+
-// 	Integer.toString(settingsVals.get("RGB").value)+
-// 	";	break;"
-// );
 copyToClipboard(
 	"	case "+
-	Integer.toString(settingsVals.get("effN").valueSlider.getValueI())+  //!fix values has to be setted by Serial, not only slider pos. Bus seems it has not
+	Integer.toString(settingsVals.get("effN").valueSlider.getValueI())+  //!fix values has to be setted by Serial, not only slider pos. Bus seems it has not //settingsVals.get("effN").value
 	": anim_f=??;				effSpeed="+
 	Integer.toString(settingsVals.get("speed").valueSlider.getValueI())+
 	";		effLength="+
@@ -201,14 +189,14 @@ public void createGUI(){
   G4P.setGlobalColorScheme(GCScheme.BLUE_SCHEME);
   G4P.setMouseOverEnabled(false);
   surface.setTitle("Sketch Window");
-  btn3_L = new GButton(this, 20, 130, 80, 30);
+  btn3_L = new GButton(this, 20, 110, 80, 30);
   btn3_L.setText("L");
   btn3_L.addEventHandler(this, "btn3_L_click1");
-  btn3_M = new GButton(this, 110, 130, 130, 30);
+  btn3_M = new GButton(this, 110, 110, 130, 30);
   btn3_M.setText("Mode");
   btn3_M.setLocalColorScheme(GCScheme.CYAN_SCHEME);
   btn3_M.addEventHandler(this, "btn3_M_click1");
-  btn3_R = new GButton(this, 250, 130, 80, 30);
+  btn3_R = new GButton(this, 250, 110, 80, 30);
   btn3_R.setText("R");
   btn3_R.addEventHandler(this, "btn3_R_click1");
   btn5_select = new GButton(this, 20, 40, 130, 30);
@@ -227,10 +215,10 @@ public void createGUI(){
   btn5_D = new GButton(this, 200, 70, 80, 30);
   btn5_D.setText("D");
   btn5_D.addEventHandler(this, "btn5_D_click1");
-  button_pause = new GButton(this, 200, 200, 80, 30);
+  button_pause = new GButton(this, 510, 130, 70, 30);
   button_pause.setText("pause");
   button_pause.addEventHandler(this, "button_pause_click1");
-  button_clear = new GButton(this, 110, 200, 80, 30);
+  button_clear = new GButton(this, 510, 100, 70, 20);
   button_clear.setText("clear");
   button_clear.addEventHandler(this, "button_clear_click1");
   slider_effN = new GSlider(this, 20, 260, 560, 40, 10.0);
@@ -262,11 +250,11 @@ public void createGUI(){
   slider_RGB.setNumberFormat(G4P.INTEGER, 0);
   slider_RGB.setOpaque(false);
   slider_RGB.addEventHandler(this, "slider_RGB_change1");
-  button_action = new GButton(this, 410, 160, 170, 30);
+  button_action = new GButton(this, 410, 170, 170, 30);
   button_action.setText("Action");
   button_action.setLocalColorScheme(GCScheme.ORANGE_SCHEME);
   button_action.addEventHandler(this, "button_action_click1");
-  button_reset = new GButton(this, 20, 200, 80, 30);
+  button_reset = new GButton(this, 430, 100, 70, 20);
   button_reset.setText("Reset");
   button_reset.addEventHandler(this, "button_reset_click1");
   button_effNsub = new GButton(this, 70, 240, 30, 20);
@@ -331,13 +319,13 @@ public void createGUI(){
   slider_action.setLocalColorScheme(GCScheme.ORANGE_SCHEME);
   slider_action.setOpaque(false);
   slider_action.addEventHandler(this, "slider_action_change");
-  label_SerialSpeed = new GLabel(this, 490, 10, 80, 20);
+  label_SerialSpeed = new GLabel(this, 500, 10, 80, 20);
   label_SerialSpeed.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
   label_SerialSpeed.setText("0");
   label_SerialSpeed.setTextItalic();
   label_SerialSpeed.setLocalColorScheme(GCScheme.PURPLE_SCHEME);
   label_SerialSpeed.setOpaque(false);
-  button_disconnect = new GButton(this, 490, 40, 80, 20);
+  button_disconnect = new GButton(this, 500, 40, 80, 20);
   button_disconnect.setText("disconnect");
   button_disconnect.setLocalColorScheme(GCScheme.PURPLE_SCHEME);
   button_disconnect.addEventHandler(this, "button_disconnect_click");
@@ -363,7 +351,7 @@ public void createGUI(){
   button_animateRandom = new GButton(this, 480, 210, 100, 20);
   button_animateRandom.setText("animate random");
   button_animateRandom.addEventHandler(this, "button_animateRandom_click1");
-  button_codeGen = new GButton(this, 390, 70, 180, 20);
+  button_codeGen = new GButton(this, 400, 70, 180, 20);
   button_codeGen.setText("generate code for switch(mode)");
   button_codeGen.setLocalColorScheme(GCScheme.GOLD_SCHEME);
   button_codeGen.addEventHandler(this, "button_codeGen_click");

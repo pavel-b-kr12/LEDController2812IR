@@ -50,7 +50,7 @@ void nodo()
 } //! ifdef tst && serial  -> sendall data, EEPROM
 #endif
 
-void change_mode(byte);
+void change_slot(byte);
 
 void randomSet()
 {
@@ -61,7 +61,7 @@ Serial.println("randomSet");
    
    //effN=random8(1,250);
 	realEffN=random8(11,90);
-   change_mode(realEffN); //!! random8 range
+   change_slot(realEffN); //!! random8 range
    
 	effSpeed=random8(1,90); //40
 	effLength=random8(5,120); //60
@@ -76,7 +76,7 @@ Serial.println("randomSet");
 }
 
 byte effNt=0;
-void change_mode(byte newmode)
+void change_slot(byte effSlot)
 {
 effDisableChennel=0;
 
@@ -84,17 +84,17 @@ idex=0;
 thissat = 255;
 bouncedirection = 0;
 			#ifdef tst2
-				Serial.print("newmode="); Serial.println(newmode);
+				Serial.print("slot:"); Serial.println(effSlot);
 			#endif
 bCurrentEff_IsRandom_AndNotSlotN=false;
- if(newmode<=9)
+ if(effSlot<=9)
  {
  	//effNt=effN; 
- 	load(newmode); 
+ 	load(effSlot); 
  	//effN=effNt;
  }
  else
-  switch (newmode) {
+  switch (effSlot) {
 	#include "switch_slot.h"
 
   case effN_random_endless: //randomEff endless when press btn left 
@@ -164,8 +164,8 @@ bCurrentEff_IsRandom_AndNotSlotN=false;
 	banimate=false;
 	//if( brandom_demo)
 	{
-		random_demo_sw_speed_td_m=(newmode<effN_random_demo_SW)?1: ( 2+effLength/32 ); //*1000
-		random_demo_sw_speed_td_M=(newmode<effN_random_demo_SW)?6: ( 8+effLength/4 ); 
+		random_demo_sw_speed_td_m=(effSlot<effN_random_demo_SW)?1: ( 2+effLength/32 ); //*1000
+		random_demo_sw_speed_td_M=(effSlot<effN_random_demo_SW)?6: ( 8+effLength/4 ); 
 		// random_demo_sw_speed_td_m=8+effLength/32; //*1000
 		// random_demo_sw_speed_td_M=10+effLength/4; 
 		randomSet();
