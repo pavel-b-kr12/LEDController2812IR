@@ -279,7 +279,7 @@ void confetti() {                                             // Random colored 
   fadeToBlackBy(leds, NUM_LEDS, effSpeed);
   for(byte i = 0; i < effLength; i++)
   {
-      int pos = random16(NUM_LEDS);
+      NUM_LEDS_type pos = random16(NUM_LEDS);
       leds[pos] += CHSV(gHue + random8(64), 200, 255);
   }
 
@@ -287,7 +287,7 @@ void confetti() {                                             // Random colored 
 } // confetti()
 
 void random_color_pop() {                         //-m25-RANDOM COLOR POP
-  //fillBlack();
+  //clear();
   leds[idex]=0;
   idex =random8(NUM_LEDS);
   leds[idex] = CHSV(random8(), 255, 255);
@@ -296,7 +296,7 @@ void random_color_pop() {                         //-m25-RANDOM COLOR POP
 void sinelon() {                                              // A colored dot sweeping back and forth, with fading trails.
 
   fadeToBlackBy(leds, NUM_LEDS, effLength);
-  int pos = beatsin16(effSpeed,0,NUM_LEDS-1);
+  NUM_LEDS_type pos = beatsin16(effSpeed,0,NUM_LEDS-1);
   leds[pos] += CHSV(gHue, 255, 192);
   
 } // sinelon()

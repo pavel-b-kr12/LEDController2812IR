@@ -19,6 +19,9 @@ fix load btn must not call effSet msg.   Avoid double event
 import java.util.Map;
 import java.util.LinkedHashMap;
 
+import java.util.Date;
+
+//==================================================== Clipboard
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.datatransfer.*;
@@ -26,13 +29,13 @@ import javax.swing.*;
 import java.io.*;
 void copyToClipboard(String selection) //https://forum.processing.org/one/topic/what-is-the-simplest-way-to-copy-to-the-clipboard-from-processing.html
 {
-	println(selection);
- StringSelection data = new StringSelection(selection);
- Clipboard clipboard = 
- Toolkit.getDefaultToolkit().getSystemClipboard();
- clipboard.setContents(data, data);
+		if(bDebugPrint) println(selection);
+	StringSelection data = new StringSelection(selection);
+	Clipboard clipboard = 
+	Toolkit.getDefaultToolkit().getSystemClipboard();
+	clipboard.setContents(data, data);
 }
-
+//====================================================
 
 boolean bDebugPrint=false;
 static int serialSpeed=115200;//57600
@@ -84,16 +87,27 @@ class settingsVal
 		if(value>value_M) value=0;
 		else
 		if(value<value_m) value=value_M;
-
+//----------------------------------------------------------- upd GUI
 		if(valueSlider!=null)
 		{
 			//bSkipEvent=true;
 			//bSkipEvent_off_t=millis()+10;
 			valueSlider.setValue(value);
 		}
-		if(nm=="effN") label_effN_val.setText(Integer.toString(value));
+		if(nm=="effN") 
+		{
+			label_effN_val.setText(Integer.toString(value));
+
+			if(mouseX<effParsedList_btns_posX+40)
+			for (int i=0; i<effParsedList_btns_i-1; i++)
+			{
+				GButton btn=effParsedList_btns[i];
+				if(btn.tagNo==value) scroll_effParsedList_btns_toTopFor(i);
+			}
+		}
 		else
 		if(nm=="RGB") drawRGB(value);
+//-----------------------------------------------------------
 
 		SendMsg(message_code, value);
 	}
@@ -153,7 +167,7 @@ void modeChanged()
 	if(mode_last!=mode) 
 	{
 		GLabel lab=getsettingsVal_by_mode_N(mode_last).valueLabel;
-		if(lab!=null)lab.setTextPlain();
+		if(lab!=null) lab.setTextPlain();
 		
 		mode_last=mode;
 	}
@@ -174,33 +188,25 @@ void modeChanged()
 
 
 
-public void slots_click(GButton source, GEvent event) { //_CODE_:slot1s:349728:
+public void slots_click(GButton source, GEvent event) {
 	if ( event != GEvent.CLICKED) return;
 	int slot_N=-1;
-	int msgCode=-1;									
-	for (int i=0; i<10; i++)
-	 {
-		if (source == slots_s[i] )
-		{
-			slots_s[i].setText(Integer.toString(settingsVals.get("effN").value));
+	int msgCode=-1;		
 
-   			slot_N=i;
-   			msgCode=settingsVals.get("save").message_code;
+	if(source.tag.equals("s")) //serial commant to save
+	{
+		source.setText(Integer.toString(settingsVals.get("effN").value));
 
-   			bModeSent=true;
-   			SendMsg(msgCode, slot_N);
-			 break;
-		}
+		msgCode=settingsVals.get("save").message_code;
 
-		if (source == slots[i] )
-		{
-			slot_N=i;
-			//msgCode=settingsVals.get("load").message_code; //! not need, del load mesage. Because slots 0...9 loads
-			settingsVals.get("effN").setValue(slot_N);
-			break;
-		}
+		bModeSent=true;
+		SendMsg(msgCode, source.tagNo);
 	}
-	
+	else // commant to load
+	{
+		//msgCode=settingsVals.get("load").message_code; // not need because slots 0...9 loads
+		settingsVals.get("effN").setValue( source.tagNo);
+	}
 }
 
 void SendMsg(int msgCode, int val)
@@ -208,9 +214,10 @@ void SendMsg(int msgCode, int val)
 	//if(!bModeSent  //!!
 	if(myPort==null)
 	{
-			return;
+		button_disconnect.setText("not sent");
+		return;
 	}
-		if(bDebugPrint){ print(msgCode);print(": ");println(val);  println("-------------------------------");}
+		if(bDebugPrint){ println(msgCode,": ",val, "--------------->>>");}
 	myPort.write(msgCode);
 	myPort.write(msgCode);
 
@@ -225,12 +232,10 @@ void  put(String n, int v, int vm, int vM, int code, GLabel label, GSlider slide
 
 
 public void setup(){
-  size(690, 590);
-  createGUI();
-  customGUI();
+	size(920, 590);
+	createGUI();
+	customGUI();
   
-
-  // Place your setup code here
 
   	put("effN",		0,0,255,241,label_effN,slider_effN);
 	put("speed",	1,0,255,242,label_speed,slider_speed); //! uniform names
@@ -258,22 +263,26 @@ public void setup(){
 
 	label_SerialSpeed.setText(Integer.toString(serialSpeed));
 
-
 	
-  modeChanged(); //draw initial val
+	modeChanged(); //draw initial val
 
-setupValues();
+	setupValues();
 
- for (int i=0; i<10; i++) {
- 	slots_s[i]= new GButton(this, 20+45*i, 510, 30, 30);
- 	slots_s[i].setLocalColorScheme(GCScheme.PURPLE_SCHEME);
-    slots_s[i].addEventHandler(this, "slots_click");
+	for (int i=0; i<10; i++) {
+		slots_s[i]= new GButton(this, 20+45*i, 510, 30, 30);
+		slots_s[i].setLocalColorScheme(GCScheme.PURPLE_SCHEME);
+		slots_s[i].addEventHandler(this, "slots_click");
+		slots_s[i].tag="s";
+		slots_s[i].tagNo=i;
 
- 	slots[i]= new GButton(this, 20+45*i, 550, 30, 30);
- 	slots[i].setText(Integer.toString(i));
-    slots[i].setLocalColorScheme(GCScheme.GREEN_SCHEME);
-    slots[i].addEventHandler(this, "slots_click");
- }
+		slots[i]= new GButton(this, 20+45*i, 550, 30, 30);
+		slots[i].setText(Integer.toString(i));
+		slots[i].setLocalColorScheme(GCScheme.GREEN_SCHEME);
+		slots[i].addEventHandler(this, "slots_click");
+		slots[i].tagNo=i;
+	}
+
+	search_animh();
 }
 
 void serialEvent(Serial cPort){
@@ -281,63 +290,106 @@ void serialEvent(Serial cPort){
   if(comPortString != null) {
     comPortString=trim(comPortString);
     
-    if(bDebugPrint)
-    {
-     println(comPortString);
- 	}
+    if(bDebugPrint) System.err.println(comPortString);
+
      String[] parts = comPortString.split(" ");
 	if(parts.length==4)
 	{
 		bSkipEvent=true;
-		settingsVals.get("effN").valueSlider.setValue(Integer.parseInt(parts[0])); //! not upd if slider move over 0..9 slots or set some marker
-		settingsVals.get("speed").valueSlider.setValue(Integer.parseInt(parts[1]));
-		settingsVals.get("length").valueSlider.setValue(Integer.parseInt(parts[2]));
-		settingsVals.get("RGB").valueSlider.setValue(Integer.parseInt(parts[3]));
-		bSkipEvent_off_t=millis()+20; //! test lower or different approach
+		settingsVals.get("effN").	valueSlider.setValue(Integer.parseInt(parts[0])); //! not upd if slider move over 0..9 slots or set some marker
+		settingsVals.get("speed").	valueSlider.setValue(Integer.parseInt(parts[1]));
+		settingsVals.get("length").	valueSlider.setValue(Integer.parseInt(parts[2]));
+		settingsVals.get("RGB").	valueSlider.setValue(Integer.parseInt(parts[3]));
+		bSkipEvent_off_t=millis()+120; //! test lower or different approach
 	}
   }
 }
 
 
-
+int BGcolor=200;
 public void draw(){
 	if(bSkipEvent && millis()>bSkipEvent_off_t) bSkipEvent=false;
 
+	background(BGcolor);
 
-  background(200);
-
+	//---------------------------------------- RGB option state
 	fill(rCh?255:0, gCh?255:0, bCh?255:0); 
 	if(rCh)	ellipse(496, 405, 8, 8);
 	if(gCh)	ellipse(526, 405, 8, 8);
 	if(bCh)	ellipse(556, 405, 8, 8);
 
-  
-  if( Serial.list().length<1)
-  {
-    text("plug USB or update driver",10,10);
-    myPort=null;
-    button_disconnect.setText("Connect");
-    delay(50); return; 
-  }
+	fill(255, 255, 88); stroke(128, 0, 128);
+  	polygon(3,  effParsedList_btns_posX-12, 8+effParsedList_btn_h*2 +10, 11);  //mark on current eff N (scroll list to this pos)
 
-  
-  if(myPort==null && bConnected==1)
-  {
-  	try{
-    myPort = new Serial(this, Serial.list()[0], serialSpeed); 
-    }catch(Exception e){    	button_disconnect.setText("err");    }
+  	stroke(255, BGcolor, 255); //stroke(0);//stroke(BGcolor-40);
+  	line(effParsedList_btns_posX+40,0,effParsedList_btns_posX+40, height); //GUI scroll area markers
+  	line(width-scroll_effParsedList_scrollWidth,0,width-scroll_effParsedList_scrollWidth, height);
 
-	if(myPort!=null) 
+	//---------------------------------------- serial
+	try
 	{
-		if(bSetBrightnessAtConnect)		settingsVals.get("bright").setValue(25);
-		bConnected=2;
-		button_disconnect.setText("Disonnect");
+		if(Serial.list().length<1)
+		{
+			text("plug USB or update driver",10,10);
+			myPort=null;
+			button_disconnect.setText("Connect");
+			delay(50); return; 
+		}
+	}catch(Exception e){ button_disconnect.setText("err"); }
+
+	if(myPort==null && bConnected==1)
+	{
+		try
+		{
+			myPort = new Serial(this, Serial.list()[0], serialSpeed); 
+		}catch(Exception e){ button_disconnect.setText("err"); }
+
+		if(myPort!=null) 
+		{
+			if(bSetBrightnessAtConnect)	settingsVals.get("bright").setValue(25);
+			bConnected=2;
+			button_disconnect.setText("Disonnect");
+		}
 	}
-  }
 }
+
+
+
+void arrow(int x1, int y1, int x2, int y2) {
+  line(x1, y1, x2, y2);
+  pushMatrix();
+  translate(x2, y2);
+  float a = atan2(x1-x2, y2-y1);
+  rotate(a);
+  line(0, 0, -10, -10);
+  line(0, 0, 10, -10);
+  popMatrix();
+} 
+
+void polygon(int n, float cx, float cy, float r) {
+  float angle = 360.0 / n;
+
+  beginShape();
+  for (int i = 0; i < n; i++) {
+    vertex(cx + r * cos(radians(angle * i)),
+      cy + r * sin(radians(angle * i)));
+  }
+  endShape(CLOSE);
+}
+
 
 // Use this method to add additional statements
 // to customise the GUI controls
 public void customGUI(){
+
+}
+
+void mouseMoved()
+{
+	if(mouseX>width-scroll_effParsedList_scrollWidth)
+	{
+		scroll_effParsedList_btns( mouseY);
+	}
+	//line(mouseX, 20, mouseX, 80);
 
 }

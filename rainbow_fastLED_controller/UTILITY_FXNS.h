@@ -1,7 +1,5 @@
 CRGB gColor;
 
-void fillBlack(){fill_solid(leds, NUM_LEDS, CRGB::Black);}
-
 void fillAll(byte r, byte g, byte b) {
   fill_solid(leds, NUM_LEDS, CRGB(r,g,b)); 
   FastLED.show();

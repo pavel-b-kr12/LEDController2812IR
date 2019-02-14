@@ -736,7 +736,7 @@ void ems_lightsSTROBE() {                  //-m26-EMERGENCY LIGHTS (STROBE LEFT/
       leds[i] = CHSV(thishue, 255, 255);
     }
     FastLED.show(); delay(effSpeed/32);
-    fillBlack();
+    FastLED.clear();
     FastLED.show(); delay(effSpeed/32);
   }
   for(byte x = 0 ; x < 5; x++ ) {
@@ -744,7 +744,7 @@ void ems_lightsSTROBE() {                  //-m26-EMERGENCY LIGHTS (STROBE LEFT/
       leds[i] = CHSV(thathue, 255, 255);
     }
     FastLED.show(); delay(effSpeed/32);
-    fillBlack();
+    FastLED.clear();
     FastLED.show(); delay(effSpeed/32);
   }
 }
@@ -837,7 +837,7 @@ void colorWipe() //!
 void CylonBounce(byte red, byte green, byte blue, byte EyeSize, byte SpeedDelay, byte ReturnDelay) { //
 
   for(NUM_LEDS_type i = 0; i < NUM_LEDS - EyeSize - 2; i++) {
-    fillBlack(); 
+    FastLED.clear();
     leds[i]=CRGB(red / 10, green / 10, blue / 10);
     for(byte j = 1; j <= EyeSize; j++) {
       leds[i+j]=CRGB( red, green, blue);
@@ -862,7 +862,7 @@ void CylonBounce(byte red, byte green, byte blue, byte EyeSize, byte SpeedDelay,
 	#endif
 
   for(NUM_LEDS_type i = NUM_LEDS - EyeSize - 2; i > 0; i--) {
-    fillBlack();
+    FastLED.clear();
     leds[i]=CRGB( red / 10, green / 10, blue / 10);
     for(byte j = 1; j <= EyeSize; j++) {
       leds[i + j]=CRGB(red, green, blue);
@@ -949,7 +949,7 @@ void Fire() {
 
 void CenterToOutside(byte red, byte green, byte blue, int EyeSize, int SpeedDelay, int ReturnDelay) {
   for(NUM_LEDS_type i = ((NUM_LEDS - EyeSize) / 2); i >= 0; i--) {
-    fillBlack();
+    FastLED.clear();
 
     leds[i]=CRGB( red / 10, green / 10, blue / 10);
     for(byte j = 1; j <= EyeSize; j++) {
@@ -971,7 +971,7 @@ void CenterToOutside(byte red, byte green, byte blue, int EyeSize, int SpeedDela
 
 void OutsideToCenter(byte red, byte green, byte blue, int EyeSize, int SpeedDelay, int ReturnDelay) {
   for(NUM_LEDS_type i = 0; i <= ((NUM_LEDS - EyeSize) / 2); i++) {
-    fillBlack();
+    FastLED.clear();
 
     leds[i]=CRGB( red / 10, green / 10, blue / 10);
     for(byte j = 1; j <= EyeSize; j++) {
@@ -993,7 +993,7 @@ void OutsideToCenter(byte red, byte green, byte blue, int EyeSize, int SpeedDela
 
 void LeftToRight(byte red, byte green, byte blue, int EyeSize, int SpeedDelay, int ReturnDelay) {
   for(NUM_LEDS_type i = 0; i < NUM_LEDS - EyeSize - 2; i++) {
-	fillBlack();
+	FastLED.clear();
     leds[i]=CRGB( red / 10, green / 10, blue / 10);
     for(byte j = 1; j <= EyeSize; j++) {
       leds[i + j]=CRGB( red, green, blue);
@@ -1007,7 +1007,7 @@ void LeftToRight(byte red, byte green, byte blue, int EyeSize, int SpeedDelay, i
 
 void RightToLeft(byte red, byte green, byte blue, int EyeSize, int SpeedDelay, int ReturnDelay) {
   for(NUM_LEDS_type i = NUM_LEDS - EyeSize - 2; i > 0; i--) {
-    fillBlack();
+    FastLED.clear();
     leds[i]=CRGB( red / 10, green / 10, blue / 10);
     for(byte j = 1; j <= EyeSize; j++) {
       leds[i + j]=CRGB( red, green, blue);
@@ -1052,14 +1052,14 @@ void NewKITT()
 
 //-------------------------------TwinkleRandom---------------------------------------
 // void TwinkleRandom(int Count, int SpeedDelay, boolean OnlyOne) {
-//  // fillBlack();
+//  // FastLED.clear();
 
 //  // for(NUM_LEDS_type i = 0; i < Count; i++) {
 //     leds[random(NUM_LEDS)]=CRGB( random(0, 255), random(0, 255), random(0, 255));
 //     // FastLED.show();
 //     // delay(SpeedDelay);
 //     // if (OnlyOne) {
-//       // fillBlack();
+//       // FastLED.clear();
 //     // }
 //   //}
 // }
@@ -1193,7 +1193,7 @@ void Strobe(int StrobeCount, int FlashDelay, int endDelay) {
     fillAll();
     FastLED.show();
     delay(FlashDelay);
-    fillBlack();
+    FastLED.clear();
     FastLED.show();
     delay(FlashDelay);
   }
@@ -1247,7 +1247,7 @@ void BouncingBalls(byte red, byte green, byte blue, int BallCount) {
       leds[Position[i]]=CRGB( red, green, blue);
     }
     FastLED.show();
-    fillBlack();
+    FastLED.clear();
 	
 	#ifdef IRkeypad //!
 	EVERY_N_MILLISECONDS( 20 )
@@ -1304,7 +1304,7 @@ void BouncingColoredBallsSim(int BallCount, byte colors[][3]) {
       leds[Position[i]]=CRGB( colors[i][0], colors[i][1], colors[i][2]); //!opt CRGB
     }
     FastLED.show();
-    fillBlack();
+    FastLED.clear();
 	
 	#ifdef IRkeypad //!
 	EVERY_N_MILLISECONDS( 30 )

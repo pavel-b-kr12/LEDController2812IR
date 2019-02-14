@@ -8,7 +8,7 @@
 		//#endif
 //#define legacy_pinout
 
-//#define LEDpCustom				2 //this redefine any. del to use reference hardware schematics
+#define LEDpCustom				2 //this redefine any. del to use reference hardware schematics
 
 #ifdef saveMem
 	#define NUM_LEDS 			144 //60
@@ -17,6 +17,8 @@
 	#define NUM_LEDS 			100 //300 
      //!   if NUM_LEDS>255
 	#define NUM_LEDS_type 		int //int //>255 NUM_LEDS  for(NUM_LEDS_type i=0; i<NUM_LEDS  //! fix random8(NUM_LEDS), effLength and other
+
+	#define eff_setX
 #endif
 
 #define demo_enable
@@ -24,7 +26,7 @@
 //#define tst
 // tst2  //detailed print of functions call
 //#define BlueFilter
-#define tst_BRIGHTNESS 		24 // to dimm AND see good colors use lower voltage but not software brightness
+#define tst_BRIGHTNESS 		77 // to dimm AND see good colors use lower voltage but not software brightness
 #ifdef tst
 	#define tst_POW_LIM	1000 //!? nw
 #endif

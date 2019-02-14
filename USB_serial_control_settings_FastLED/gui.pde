@@ -82,9 +82,6 @@ public void slider_RGB_change1(GSlider source, GEvent event) { //_CODE_:slider_R
 	settingsVals.get("RGB").setValue(source.getValueI());
 } //_CODE_:slider_RGB:881653:
 
-public void dropList_effNm_click(GDropList source, GEvent event) { //_CODE_:dropList_effNm:518471:
-} //_CODE_:dropList_effNm:518471:
-
 public void button_action_click1(GButton source, GEvent event) { //_CODE_:button_action:399269:
 	SendMsg(settingsVals.get("action").message_code, settingsVals.get("action").value);
 } //_CODE_:button_action:399269:
@@ -265,10 +262,6 @@ public void createGUI(){
   slider_RGB.setNumberFormat(G4P.INTEGER, 0);
   slider_RGB.setOpaque(false);
   slider_RGB.addEventHandler(this, "slider_RGB_change1");
-  dropList_effNm = new GDropList(this, 580, 530, 100, 80, 3, 10);
-  dropList_effNm.setItems(loadStrings("list_518471"), 0);
-  dropList_effNm.setLocalColorScheme(GCScheme.SCHEME_8);
-  dropList_effNm.addEventHandler(this, "dropList_effNm_click");
   button_action = new GButton(this, 410, 160, 170, 30);
   button_action.setText("Action");
   button_action.setLocalColorScheme(GCScheme.ORANGE_SCHEME);
@@ -282,7 +275,7 @@ public void createGUI(){
   button_effNAdd = new GButton(this, 110, 240, 30, 20);
   button_effNAdd.setText("+");
   button_effNAdd.addEventHandler(this, "button_effNAdd_click1");
-  slider_brightness = new GSlider(this, 681, 10, 490, 41, 10.0);
+  slider_brightness = new GSlider(this, 671, 10, 490, 41, 10.0);
   slider_brightness.setShowValue(true);
   slider_brightness.setRotation(PI/2, GControlMode.CORNER);
   slider_brightness.setLimits(33, 255, 1);
@@ -303,27 +296,21 @@ public void createGUI(){
   slider_lengthH.setOpaque(false);
   slider_lengthH.addEventHandler(this, "slider_lengthH_change1");
   label_effN = new GLabel(this, 580, 270, 50, 20);
-  label_effN.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
   label_effN.setText("eff №");
   label_effN.setOpaque(false);
   label_speed = new GLabel(this, 580, 310, 50, 20);
-  label_speed.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
   label_speed.setText("speed");
   label_speed.setOpaque(false);
   label_length = new GLabel(this, 580, 350, 50, 20);
-  label_length.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
   label_length.setText("length");
   label_length.setOpaque(false);
-  label_RGB = new GLabel(this, 580, 400, 50, 20);
-  label_RGB.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label_RGB = new GLabel(this, 580, 396, 50, 20);
   label_RGB.setText("RGB");
   label_RGB.setOpaque(false);
   label_speedH = new GLabel(this, 580, 440, 60, 20);
-  label_speedH.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
-  label_speedH.setText(" speed H");
+  label_speedH.setText("speed H");
   label_speedH.setOpaque(false);
   label_lengthH = new GLabel(this, 580, 480, 60, 20);
-  label_lengthH.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
   label_lengthH.setText("length H");
   label_lengthH.setOpaque(false);
   label_brightness = new GLabel(this, 620, 500, 60, 20);
@@ -380,6 +367,22 @@ public void createGUI(){
   button_codeGen.setText("generate code for switch(mode)");
   button_codeGen.setLocalColorScheme(GCScheme.GOLD_SCHEME);
   button_codeGen.addEventHandler(this, "button_codeGen_click");
+  label_instruction1 = new GLabel(this, 610, 544, 90, 10);
+  label_instruction1.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label_instruction1.setText("need fix");
+  label_instruction1.setTextBold();
+  label_instruction1.setLocalColorScheme(GCScheme.RED_SCHEME);
+  label_instruction1.setOpaque(true);
+  label_instruction2 = new GLabel(this, 610, 560, 90, 10);
+  label_instruction2.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label_instruction2.setText("best");
+  label_instruction2.setTextBold();
+  label_instruction2.setLocalColorScheme(GCScheme.GOLD_SCHEME);
+  label_instruction2.setOpaque(true);
+  label_instruction3 = new GLabel(this, 610, 576, 90, 12);
+  label_instruction3.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label_instruction3.setText("less interesting");
+  label_instruction3.setOpaque(false);
 }
 
 // Variable declarations 
@@ -398,7 +401,6 @@ GSlider slider_effN;
 GSlider slider_speed; 
 GSlider slider_length; 
 GSlider slider_RGB; 
-GDropList dropList_effNm; 
 GButton button_action; 
 GButton button_reset; 
 GButton button_effNsub; 
@@ -425,3 +427,6 @@ GButton effN_demoRandom_fast;
 GButton button_effN_seq; 
 GButton button_animateRandom; 
 GButton button_codeGen; 
+GLabel label_instruction1; 
+GLabel label_instruction2; 
+GLabel label_instruction3; 
