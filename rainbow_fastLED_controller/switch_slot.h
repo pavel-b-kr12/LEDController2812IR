@@ -1,6 +1,7 @@
  	//!		mark for testing (buton color in GUI)
 	//:)	mark best
 	//:/	mark experiental, legasy and other stuff that can be skipped
+	//oo	effect related to (circular) stripe ring
 
  	#ifndef saveMem
     case effN_off: anim_f=nodo; FastLED.clear(); break; //---ALL OFF
@@ -24,7 +25,7 @@
 	case 21: anim_f=rainbow_fade;			effSpeed=13;	effLength=14; break;	//Hue on all or rare LEDs
 #endif
 
-	case 22: anim_f=rainbow_loop;			effSpeed=10;	effLength=1; break; //---RAINBOW LOOP // slow rainbow fill with shift
+	case 22: anim_f=rainbow_fill_slow;			effSpeed=10;	effLength=1; break; //---RAINBOW LOOP // slow rainbow fill with shift
 	//case 12: anim_f=rainbow_vertical; break; //---VERITCAL RAINBOW (circular)
 	
 	
@@ -38,7 +39,8 @@
 	case 28: anim_f=rainbowSegments_shiftSin; break; //i_eff_continued
 	//case 29: anim_f=rainbowSegments2; break;
 
-	case 30: anim_f=rainbowCycle; 			effSpeed=44; 	effLength=1;break;      // rainbowCycle
+	case 29: anim_f=rainbowCycle; 			effSpeed=44; 	effLength=1;	break;
+	case 30: anim_f=rainbowCycle;			effSpeed=35;	effLength=59;	break;
 
 	case 31: anim_f=sinelon;				effSpeed=10; 	effLength=28; break;	//moving, fade
 	case 32: anim_f=bpm;					effSpeed=3;		effLength=62; break;	//move here-there
@@ -101,30 +103,28 @@
 	case 73: anim_f=rule30;  break;  //:/ //---CELL AUTO - RULE 30 (RED)      //!slo
 #endif
 	//TwinkleRandom(20, thisdelay, 1); break;                                
-	case 74: anim_f=rainbow_vertical; break; // rainbowTwinkle 0-all, 1-random 1 //slow fill, shift
+	case 74: anim_f=rainbow_vertical; break; //:/	// rainbowTwinkle 0-all, 1-random 1 //slow fill, shift
 	case 75: anim_f=randomBlink; effLength=3; break;
 
 	//!action case 79: Strobe(10, 5, 0); gColor=CRGB(255,255,255);  break;
-	case 79: anim_f=Strobe; gColor=CRGB(255,255,255); 	effSpeed=5*16; break;
+	case 79: anim_f=Strobe; gColor=CRGB(255,255,255); 	effSpeed=5*16; break;	//:/
 #ifndef saveMem
     case 80: anim_f=pulse_one_color_all;  thishue = 0; break;        //---PULSE COLOR BRIGHTNESS single color
     case 81: anim_f=pulse_one_color_all_rev;  thishue = 0; break;    //---PULSE COLOR SATURATION
 
-    case 82: anim_f=fade_vertical;  thishue = 180; break;      //---VERTICAL SOMETHING (circular) bright change
+    case 82: anim_f=fade_vertical;  thishue = 180; break;      //:/ //! //---VERTICAL SOMETHING (circular) bright change
 
     case 83: anim_f=radiation;  thishue = 95; break;      //:/ //---RADIATION SYMBOL
 
-    case 84: anim_f=white_temps; break;
-    case 85: anim_f=sin_bright_wave;  thishue = 180; break;   //---SIN WAVE BRIGHTNESS //fix 
+    case 84: anim_f=white_temps; break;	//:/
+    case 85: anim_f=sin_bright_wave;  thishue = 180; break;   //:/	//---SIN WAVE BRIGHTNESS //fix 
     //case 86: anim_f=pop_horizontal;  break;      //!fix 		//---POP LEFT/RIGHT moving LED
-    case 87: anim_f=quad_bright_curve;		effSpeed=0;	effLength=17; break;  		//---QUADRATIC BRIGHTNESS CURVE / полумесяц
+    case 87: anim_f=quad_bright_curve;		effSpeed=0;	effLength=17; break;  //:/		//---QUADRATIC BRIGHTNESS CURVE / полумесяц
     case 88: anim_f=flame; break;
-    case 89: anim_f=Fire; 			effSpeed=22; effLength=75; break;          // Fire  //! R-G swap
-
-    
+    case 89: anim_f=Fire; 			effSpeed=22; effLength=75; break;          //:)  //! R-G swap
 
     //case 89: anim_f=pacman;  break;    //fix move                 //---PACMAN
-    //case 90: anim_f=BouncingColoredBalls;			effSpeed=16; effLength=3; break;    //!! ret, ballColors // прыгающие мячики
+    case 90: anim_f=BouncingColoredBalls;			effSpeed=16; effLength=3; break;    //!! ret, ballColors // прыгающие мячики
 		//  case 98: //BouncingBalls(0xff, 0, 0, 3); break;                   //fix ret
 
 	// case 91:  break;                    //---MARCH STRIP NOW CCW //strip_march_ccw(); break; //!       // move current ccw
@@ -135,7 +135,6 @@
 	//case 95: SnowSparkle(thisdelay, random(100, 1000)); gColor=CRB(10,10,10);   break;  //!! SnowSparkle wuth background
 	//case 96: theaterChase(0xff, 0, 0, thisdelay); break;  // theaterChase //бегущие каждые 3 (NUM_LEDS ДОЛЖНО БЫТЬ НЕЧЁТНОЕ)
 	//case 97: //theaterChaseRainbow(thisdelay);  break;   // theaterChaseRainbow //fix ret  //бегущие каждые 3 радуга (NUM_LEDS ДОЛЖНО БЫТЬ КРАТНО 3)
-
 
 	// case 888: anim_f=demo_modeA; break;             // short
 	// case 889: anim_f=demo_modeB; break;             // long
@@ -148,13 +147,22 @@
 
   #endif
 
-    case 111: anim_f=fillStriped;				effSpeed=45;	effLength=186;	effDisableChennel=8;	break;
+    case 101: anim_f=Twinkle;					break;
+    case 102: anim_f=beatWave;					break;
+
+
+
+    
 
 //==============================================================================================================================
 #ifdef eff_setX
-	case 160: anim_f=testPower;					effSpeed=10;	effLength=24; break; //E, setBrightness
-	case 161: anim_f=test_gDelay;				effSpeed=40;	 break; //!
-	case 165: anim_f=iterateRAWint; break;
+	case 160: anim_f=testPower;					effSpeed=10;	effLength=24; break;	//:/	//E, setBrightness
+	case 161: anim_f=test_gDelay;				effSpeed=40;	 break;	//:/
+	case 165: anim_f=iterateRAWint; break;	//:/
 #endif
+
+//==============================================================================================================================
+	case 211: anim_f=fillStriped;				effSpeed=45;	effLength=186;	effDisableChennel=8;	break;
+	case 239: anim_f=fadeEvenUneven;			effSpeed=84;		effLength=70;		effDisableChennel=2; break; //!
 
 //max N is 240

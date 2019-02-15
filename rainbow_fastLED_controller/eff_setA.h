@@ -151,7 +151,7 @@ void rainbow_fade() //Hue on all or rare LEDs
   }
 }
 #endif
-void rainbow_loop() {                        //-m3-LOOP HSV RAINBOW
+void rainbow_fill_slow() {
   idex++;
   ihue += effSpeed;
   if (idex >= NUM_LEDS)    idex = 0;

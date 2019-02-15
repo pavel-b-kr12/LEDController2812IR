@@ -60,11 +60,11 @@ LED stripe of WS2812  (pins: D2, GND)
 
 power on 5v (VCC) can be as low as 3.3v LED also working.
 
-atmega168 for 60-150 LEDs
+atmega168 for 60-150 LEDs, main effects
 
-atmega328 for 120-330 LEDs
+atmega328 for 120-320 LEDs, all not heavy effects
 
-atmega2560 for 1000-2000 LEDs
+atmega2560 for 1000-1200 LEDs, all effects
 
 Some effects and test modes eat a lot of memory - disable it and use "#define saveMem" to use atmega168
 

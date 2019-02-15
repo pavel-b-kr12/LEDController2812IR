@@ -4,7 +4,6 @@ fix load btn must not call effSet msg.   Avoid double event
  eff names list
 */
 /*
-12 70 70 0
 18 35 108 0
 33 8 12 3
 23 130 1 1

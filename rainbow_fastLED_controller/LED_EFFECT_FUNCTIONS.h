@@ -1,5 +1,3 @@
-unsigned long randomShow_next_effN_sw_t=0;
-
 /* break long eff with input check:
 #if defined(SerialSelect) || defined(SerialControl)
   checkSerial();

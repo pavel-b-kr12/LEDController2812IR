@@ -14,9 +14,9 @@
 	#define NUM_LEDS 			144 //60
 	#define NUM_LEDS_type byte
 #else
-	#define NUM_LEDS 			100 //300 
+	#define NUM_LEDS 			60 //300  //1024
      //!   if NUM_LEDS>255
-	#define NUM_LEDS_type 		int //int //>255 NUM_LEDS  for(NUM_LEDS_type i=0; i<NUM_LEDS  //! fix random8(NUM_LEDS), effLength and other
+	#define NUM_LEDS_type 		byte //int //>255 NUM_LEDS  for(NUM_LEDS_type i=0; i<NUM_LEDS  //! fix random8(NUM_LEDS), effLength and other
 
 	#define eff_setX
 #endif

@@ -17,10 +17,21 @@ byte EVENODD = NUM_LEDS % 2;
 CRGB ledsX[NUM_LEDS];//!opt     //-ARRAY FOR COPYING WHATS IN THE LED STRIP CURRENTLY (FOR CELL-AUTOMATA, MARCH, ETC)
 //int ledsX[NUM_LEDS][3];
 #endif
-//byte thisdelay = 20;          //-FX LOOPS DELAY VAR
-byte thisstep = 10;           //-FX LOOPS DELAY VAR
-byte thishue = 0;             //-FX LOOPS DELAY VAR
-byte thissat = 255;           //-FX LOOPS DELAY VAR
+//byte thisdelay = 20;
+byte thisstep = 10;
+
+CRGB gColor;
+
+unsigned long randomShow_next_effN_sw_t=0;
+
+// Define variables used by the sequences.
+uint8_t  twinkrate = 100;                                     // The higher the value, the lower the number of twinkles.
+uint8_t  thisdelay =  10;                                     // A delay value for the sequence(s).
+uint8_t   thisfade =   8;                                     // How quickly does it fade? Lower = slower fade rate.
+uint8_t    thishue =  50;                                     // The hue.
+uint8_t    thissat = 255;                                     // The saturation, where 255 = brilliant colours.
+uint8_t    thisbri = 255;                                     // Brightness of a sequence.
+bool       randhue =   1;                                     // Do we want random colours all the time? 1 = yes.
 
 NUM_LEDS_type idex = 0;       //-LED INDEX (0 to NUM_LEDS-1
 NUM_LEDS_type idex_last = 0;  //-LED INDEX (0 to NUM_LEDS-1
@@ -31,6 +42,11 @@ bool bouncedirection = 0;     //-SWITCH FOR COLOR BOUNCE (0-1)
 float tcount = 0.0;          //-INC VAR FOR SIN LOOPS
 byte lcount = 0;              //-ANOTHER COUNTING VAR
 
+// Palette definitions
+CRGBPalette16 currentPalette;
+CRGBPalette16 targetPalette;
+TBlendType    currentBlending = LINEARBLEND;
+
 void (*anim_f)();
 void (*anim_f_last)();
 
@@ -38,6 +54,8 @@ void (*anim_f_last)();
 #include "LED_EFFECT_FUNCTIONS.h"
 #include "eff_setA.h"
 #include "eff_setB.h"
+#include "eff_setAT\aatemplate.h"
+#include "eff_setAT\beatwave.h"
 
 #ifdef eff_setX
 	#include "eff_setX.h"
@@ -61,7 +79,7 @@ Serial.println("randomSet");
    
    //effN=random8(1,250);
 	realEffN=random8(11,90);
-   change_slot(realEffN); //!! random8 range
+	change_slot(realEffN); //!! random8 range
    
 	effSpeed=random8(1,90); //40
 	effLength=random8(5,120); //60
@@ -214,6 +232,9 @@ byte gDelayH=20;
 
 void LED_anim()
 {
+	#ifdef tstFPS
+	Serial.println(LEDS.getFPS());
+	#endif
 	if(bPause) return; //!! ifdef 
 
 //EVERY_N_MILLISECONDS(  )  //not working when argument changed

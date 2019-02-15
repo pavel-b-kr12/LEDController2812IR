@@ -14,7 +14,7 @@ void movingBlendRGB()
       leds[i] = CRGB(red, green, blue* beatsin8(effSpeed/8)/255);
   }
 }
-void movingBlendRGB_A()
+void movingBlendRGB_A() //aanimations
 {
   for (NUM_LEDS_type i = 0; i < NUM_LEDS; i++)
   {

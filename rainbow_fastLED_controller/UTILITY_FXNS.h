@@ -1,4 +1,6 @@
-CRGB gColor;
+#define qsubd(x, b) ((x>b)?b:0)                               // Clip. . . . A digital unsigned subtraction macro. if result <0, then x=0. Otherwise, x=b.
+#define qsuba(x, b) ((x>b)?x-b:0)                             // Level shift. . . Unsigned subtraction macro. if result <0, then x=0. Otherwise x=x-b.
+
 
 void fillAll(byte r, byte g, byte b) {
   fill_solid(leds, NUM_LEDS, CRGB(r,g,b)); 
