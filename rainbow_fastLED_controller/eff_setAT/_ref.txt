@@ -1,0 +1,7 @@
+# FastLED-Demos
+
+**By:** Andrew Tuline
+
+**Email:** atuline@gmail.com
+
+**Date:** February, 2019

@@ -1,3 +1,4 @@
+// This is a simple non-blocking FastLED display sequence template.
 void twinkle() {
   if (random8() < twinkrate) leds[random16(NUM_LEDS)] += ColorFromPalette(currentPalette, (randhue ? random8() : thishue), 255, currentBlending);
   fadeToBlackBy(leds, NUM_LEDS, thisfade);
@@ -36,5 +37,3 @@ void Twinkle()
   twinkle() ;
 
 }
-
-

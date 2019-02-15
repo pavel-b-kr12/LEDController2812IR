@@ -1,3 +1,4 @@
+//This sketch demonstrates how to blend between two animations running at the same time.
 void beatwave() {
   
   uint8_t wave1 = beatsin8(9, 0, 255);                        // That's the same as beatsin8(9);

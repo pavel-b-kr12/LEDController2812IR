@@ -37,14 +37,14 @@ void copyToClipboard(String selection) //https://forum.processing.org/one/topic/
 //====================================================
 
 boolean bDebugPrint=false;
-static int serialSpeed=115200;//57600
-boolean bSetBrightnessAtConnect=true;
+static int serialSpeed=115200; //57600
+int bSetBrightnessAtConnect=77; //-1 for not set
 
 
 int bConnected=1; //0 off, 1 try connect, 2 connected
 boolean bSkipEvent=false;
 
-void setupValues()  //set and display
+void setupValues() //set and display
 {
 	//settingsVals.get("effN").setValue(0);
 	bSkipEvent=true;
@@ -113,14 +113,14 @@ class settingsVal
 
 	void add()
 	{
-	  setValue(value+1);
+		setValue(value+1);
 	}
 
 	void sub()
 	{
-	  setValue(value-1);
+		setValue(value-1);
 	}
-  
+
 	public int value_m;
 	public int value_M;
 	public int message_code;
@@ -156,7 +156,7 @@ void modeChanged()
 	if(mode>mode_M) mode=0;
 	else
 	if(mode<0) mode=mode_M;
-  
+
 	 settingsVal sett=getsettingsVal_by_mode_N(mode);
 
 	btn3_M.setText("Mode:"+sett.nm);
@@ -176,12 +176,12 @@ void modeChanged()
 
 	void add(int mode_N)
 	{
-	  getsettingsVal_by_mode_N(mode_N).add();
+		getsettingsVal_by_mode_N(mode_N).add();
 	}
 
 	void sub(int mode_N)
 	{
-	  getsettingsVal_by_mode_N(mode_N).sub();
+		getsettingsVal_by_mode_N(mode_N).sub();
 	}
 
 
@@ -234,9 +234,8 @@ public void setup(){
 	size(920, 590);
 	createGUI();
 	customGUI();
-  
 
-  	put("effN",		0,0,255,241,label_effN,slider_effN);
+	put("effN",		0,0,255,241,label_effN,slider_effN);
 	put("speed",	1,0,255,242,label_speed,slider_speed); //! uniform names
 	put("length",	9,1,255,243,label_length,slider_length);
 	put("RGB",		0,0, 18,244,label_RGB,slider_RGB);
@@ -282,30 +281,46 @@ public void setup(){
 	}
 
 	search_animh();
+
+	fontFPS= createFont("Monospaced", 32);
+	//fontFPS= createFont("SourceCodePro-Regular.ttf", 26);
 }
 
 void serialEvent(Serial cPort){
   String comPortString = cPort.readStringUntil('\n');
   if(comPortString != null) {
-    comPortString=trim(comPortString);
-    
-    if(bDebugPrint) System.err.println(comPortString);
-
-     String[] parts = comPortString.split(" ");
-	if(parts.length==4)
-	{
-		bSkipEvent=true;
-		settingsVals.get("effN").	valueSlider.setValue(Integer.parseInt(parts[0])); //! not upd if slider move over 0..9 slots or set some marker
-		settingsVals.get("speed").	valueSlider.setValue(Integer.parseInt(parts[1]));
-		settingsVals.get("length").	valueSlider.setValue(Integer.parseInt(parts[2]));
-		settingsVals.get("RGB").	valueSlider.setValue(Integer.parseInt(parts[3]));
-		bSkipEvent_off_t=millis()+120; //! test lower or different approach
-	}
+	comPortString=trim(comPortString);
+	
+	if(bDebugPrint) System.err.println(comPortString);
+	try{
+	 String[] parts = comPortString.split(" ");
+	
+		if(parts.length==4)
+		{
+			bSkipEvent=true;
+			settingsVals.get("effN").	valueSlider.setValue(Integer.parseInt(parts[0])); //! not upd if slider move over 0..9 slots or set some marker
+			settingsVals.get("speed").	valueSlider.setValue(Integer.parseInt(parts[1]));
+			settingsVals.get("length").	valueSlider.setValue(Integer.parseInt(parts[2]));
+			settingsVals.get("RGB").	valueSlider.setValue(Integer.parseInt(parts[3]));
+			bSkipEvent_off_t=millis()+120; //! test lower or different approach
+		}
+		else
+		if(parts.length==1) //FPS
+		{
+			bDrawFPSnow=Integer.parseInt(parts[0]);
+			bDrawFPS_until_t=millis()+1000;
+		}
+		else bDrawFPSnow=-1;
+	} catch(Exception e){ System.err.println(comPortString); }
+	
   }
 }
 
 
 int BGcolor=200;
+int bDrawFPSnow=-1;
+PFont fontFPS;
+int bDrawFPS_until_t=0;
 public void draw(){
 	if(bSkipEvent && millis()>bSkipEvent_off_t) bSkipEvent=false;
 
@@ -316,14 +331,20 @@ public void draw(){
 	if(rCh)	ellipse(496, 405, 8, 8);
 	if(gCh)	ellipse(526, 405, 8, 8);
 	if(bCh)	ellipse(556, 405, 8, 8);
-
+	//----------------------------------------
 	fill(255, 255, 88); stroke(128, 0, 128);
-  	polygon(3,  effParsedList_btns_posX-12, 8+effParsedList_btn_h*2 +10, 11);  //mark on current eff N (scroll list to this pos)
+	polygon(3,  effParsedList_btns_posX-12, 8+effParsedList_btn_h*2 +10, 11);  //mark on current eff N (scroll list to this pos)
 
-  	stroke(255, BGcolor, 255); //stroke(0);//stroke(BGcolor-40);
-  	line(effParsedList_btns_posX+40,0,effParsedList_btns_posX+40, height); //GUI scroll area markers
-  	line(width-scroll_effParsedList_scrollWidth,0,width-scroll_effParsedList_scrollWidth, height);
+	stroke(255, BGcolor, 255); //stroke(0);//stroke(BGcolor-40);
+	line(effParsedList_btns_posX+40,0,effParsedList_btns_posX+40, height); //GUI scroll area markers
+	line(width-scroll_effParsedList_scrollWidth,0,width-scroll_effParsedList_scrollWidth, height);
 
+	if(bDrawFPSnow>-1 && millis()<bDrawFPS_until_t)
+	{
+			//textSize(32); g.textSize
+			textFont(fontFPS);
+			text(bDrawFPSnow, 440, 155);
+	}
 	//---------------------------------------- serial
 	try
 	{
@@ -345,7 +366,7 @@ public void draw(){
 
 		if(myPort!=null) 
 		{
-			if(bSetBrightnessAtConnect)	settingsVals.get("bright").setValue(25);
+			if(bSetBrightnessAtConnect>-1)	settingsVals.get("bright").setValue(bSetBrightnessAtConnect);
 			bConnected=2;
 			button_disconnect.setText("Disonnect");
 		}
@@ -370,8 +391,8 @@ void polygon(int n, float cx, float cy, float r) {
 
   beginShape();
   for (int i = 0; i < n; i++) {
-    vertex(cx + r * cos(radians(angle * i)),
-      cy + r * sin(radians(angle * i)));
+	vertex(	cx + r * cos(radians(angle * i)),
+			cy + r * sin(radians(angle * i)));
   }
   endShape(CLOSE);
 }

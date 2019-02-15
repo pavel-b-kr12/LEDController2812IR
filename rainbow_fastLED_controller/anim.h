@@ -232,10 +232,10 @@ byte gDelayH=20;
 
 void LED_anim()
 {
+	if(bPause) return; //!! ifdef 
 	#ifdef tstFPS
 	Serial.println(LEDS.getFPS());
 	#endif
-	if(bPause) return; //!! ifdef 
 
 //EVERY_N_MILLISECONDS(  )  //not working when argument changed
 //  EVERY_N_MILLIS_I(thistimer, gDelay) { //!test

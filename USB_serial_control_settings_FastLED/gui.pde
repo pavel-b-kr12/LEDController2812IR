@@ -168,7 +168,7 @@ public void button_animateRandom_click1(GButton source, GEvent event) { //_CODE_
 public void button_codeGen_click(GButton source, GEvent event) { //_CODE_:button_codeGen:274298:
 	int effN=settingsVals.get("effN").valueSlider.getValueI(); //!fix values has to be setted by Serial, not only slider pos. Bus seems it has not //settingsVals.get("effN").value
 	int effDisableChennel=settingsVals.get("RGB").valueSlider.getValueI();
-	String s="	case "+
+	String s="case "+
 	Integer.toString(effN)+ 
 	": anim_f="+EffNms[effN]+
 	";				effSpeed="+	Integer.toString(settingsVals.get("speed").valueSlider.getValueI())+
@@ -344,7 +344,7 @@ public void createGUI(){
   effN_demoRandom_fast = new GButton(this, 390, 240, 110, 20);
   effN_demoRandom_fast.setText("demo random fast");
   effN_demoRandom_fast.addEventHandler(this, "effN_demoRandom_fast_click");
-  button_effN_seq = new GButton(this, 150, 240, 40, 20);
+  button_effN_seq = new GButton(this, 270, 240, 40, 20);
   button_effN_seq.setText("seq");
   button_effN_seq.setLocalColorScheme(GCScheme.SCHEME_8);
   button_effN_seq.addEventHandler(this, "button_effN_seq_click");

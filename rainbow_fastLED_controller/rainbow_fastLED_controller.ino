@@ -23,6 +23,7 @@
 
 #define demo_enable
 
+#define tstFPS
 //#define tst
 // tst2  //detailed print of functions call
 //#define BlueFilter
