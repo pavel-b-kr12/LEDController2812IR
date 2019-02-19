@@ -275,16 +275,88 @@ void spawnPixel_moveAll() //!
 //----------------------------------------------------
 
 void confetti() {                                             // Random colored speckles that blink in and fade smoothly.
-
   fadeToBlackBy(leds, NUM_LEDS, effSpeed);
   for(byte i = 0; i < effLength; i++)
   {
       NUM_LEDS_type pos = random16(NUM_LEDS);
       leds[pos] += CHSV(gHue + random8(64), 200, 255);
   }
-
   
-} // confetti()
+}
+void confetti_move() {
+  EVERY_N_MILLISECONDS(40)
+  {
+	moveOutAll();
+	//moveOutAllRemainFirst(); //! with blend blend
+  }
+  thishue++;
+  
+  fadeToBlackBy(leds, NUM_LEDS, effSpeed);
+  for(byte i = 0; i < 1+effSpeed/64; i++)
+  {
+      NUM_LEDS_type pos = random16(NUM_LEDS);
+      leds[pos] = CHSV(thishue + random8(effLength/2), 200, 255); 
+      //leds[pos] += CHSV(thishue + random8(effLength/4), 200, 255); 
+  }
+}
+void confetti_moveRemainFirstAdd() {                                             // Random colored speckles that blink in and fade smoothly.
+  EVERY_N_MILLISECONDS(40)
+  {
+	//moveOutAll();
+	moveOutAllRemainFirst(); //! with blend blend
+  }
+  thishue++;
+  
+  fadeToBlackBy(leds, NUM_LEDS, effSpeed);
+  for(byte i = 0; i < 1+effSpeed/64; i++)
+  {
+      NUM_LEDS_type pos = random16(NUM_LEDS);
+      //leds[pos] = CHSV(thishue + random8(effLength/4), 200, 255); 
+      leds[pos] += CHSV(thishue + random8(effLength/4), 200, 255); 
+      //leds[pos] =blend(leds[pos], CHSV(thishue + random8(effLength/4), 200, 255), sin8(i_eff));   
+  }
+}
+void confetti_moveRemainFirstBlend() {                                             // Random colored speckles that blink in and fade smoothly.
+  EVERY_N_MILLISECONDS(40)
+  {
+	//moveOutAll();
+	moveOutAllRemainFirst(); //! with blend blend
+  }
+  thishue++;
+  
+  fadeToBlackBy(leds, NUM_LEDS, effSpeed/8);
+  for(byte i = 0; i < 1+effSpeed/64; i++)
+  {
+      NUM_LEDS_type pos = random16(NUM_LEDS);
+      //leds[pos] = CHSV(thishue + random8(effLength/4), 200, 255); 
+      //leds[pos] += CHSV(thishue + random8(effLength/4), 200, 255); 
+	  CRGB colNew=CHSV(thishue + random8(beatsin8(4)), 200, 255); //effLength<6?effLength*20: effLength/4
+	  if(pos==0) leds[pos]=colNew;
+	  else
+      leds[pos] =blend(leds[pos], colNew, (effLength<6)?sin8(i_eff):effLength);
+  }
+}
+void confetti_moveRemainFirstBlendByPos() {                                             // Random colored speckles that blink in and fade smoothly.
+  EVERY_N_MILLISECONDS(40)
+  {
+	//moveOutAll();
+	moveOutAllRemainFirst(); //! with blend blend
+  }
+  thishue++;
+  
+  fadeToBlackBy(leds, NUM_LEDS, effSpeed/8);
+  for(byte i = 0; i < 1+effSpeed/64; i++)
+  {
+	NUM_LEDS_type pos = random16(NUM_LEDS);
+	//leds[pos] = CHSV(thishue + random8(effLength/4), 200, 255); 
+	//leds[pos] += CHSV(thishue + random8(effLength/4), 200, 255); 
+	CRGB colNew=CHSV(thishue + random8(effLength/4) , 200, 255); //+pos/16
+	if(pos==0)
+		leds[pos]=colNew;
+	else
+		leds[pos]=blend(leds[pos], colNew, map(pos,0,NUM_LEDS,8,128));
+  }
+}
 
 void random_color_pop() {                         //-m25-RANDOM COLOR POP
   //clear();

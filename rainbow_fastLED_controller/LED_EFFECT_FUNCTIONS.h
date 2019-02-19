@@ -519,7 +519,7 @@ void radiation() {                   //-m16-SORT OF RADIATION SYMBOLISH- //!fix 
 void candycane() //!
 {
   idex++;
-  byte thisbright=255;
+  byte thisbri=255;
   //NUM_LEDS_type N3  = NUM_LEDS_type(NUM_LEDS/3);
   NUM_LEDS_type N6  = NUM_LEDS_type(NUM_LEDS/6);  
   NUM_LEDS_type N12 = NUM_LEDS_type(NUM_LEDS/12);  
@@ -530,12 +530,12 @@ void candycane() //!
     NUM_LEDS_type j3 = (j2+N6) % NUM_LEDS;
     NUM_LEDS_type j4 = (j3+N6) % NUM_LEDS;
     NUM_LEDS_type j5 = (j4+N6) % NUM_LEDS;
-    leds[j0] = CRGB(255, 255, 255).nscale8_video(thisbright*.75);
-    leds[j1] = CRGB(255, 0, 0).nscale8_video(thisbright);
-    leds[j2] = CRGB(255, 255, 255).nscale8_video(thisbright*.75);
-    leds[j3] = CRGB(255, 0, 0).nscale8_video(thisbright);
-    leds[j4] = CRGB(255, 255, 255).nscale8_video(thisbright*.75);
-    leds[j5] = CRGB(255, 0, 0).nscale8_video(thisbright);   
+    leds[j0] = CRGB(255, 255, 255).nscale8_video(thisbri*.75);
+    leds[j1] = CRGB(255, 0, 0).nscale8_video(thisbri);
+    leds[j2] = CRGB(255, 255, 255).nscale8_video(thisbri*.75);
+    leds[j3] = CRGB(255, 0, 0).nscale8_video(thisbri);
+    leds[j4] = CRGB(255, 255, 255).nscale8_video(thisbri*.75);
+    leds[j5] = CRGB(255, 0, 0).nscale8_video(thisbri);   
   }
 }
 
@@ -612,7 +612,7 @@ void white_temps() {                            //-m18-SHOW A SAMPLE OF BLACK BO
 }
 #endif
 
-void sin_bright_wave() {        //-m19-BRIGHTNESS SINE WAVE
+void sin_bright_wave() {
     tcount = tcount + .1;
     if (tcount > 3.14) {
       tcount = 0.0;
@@ -832,7 +832,7 @@ void colorWipe() //!
 
 //==================================== moving
 
-void CylonBounce(byte red, byte green, byte blue, byte EyeSize, byte SpeedDelay, byte ReturnDelay) { //
+void CylonBounce(byte red, byte green, byte blue, byte EyeSize, byte SpeedDelay, byte ReturnDelay) { //!! compare speed
 
   for(NUM_LEDS_type i = 0; i < NUM_LEDS - EyeSize - 2; i++) {
     FastLED.clear();

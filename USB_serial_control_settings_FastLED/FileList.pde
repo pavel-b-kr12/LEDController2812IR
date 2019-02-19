@@ -1,3 +1,4 @@
+boolean bSkipCommentedCases= true;//false;
 int effParsedList_btns_posX=692;
 int effParsedList_btns_i=0;
 int effParsedList_btn_h=21;
@@ -20,58 +21,67 @@ void search_animh()
 			effParsedList_btns_i=0;
 			while ((line = br.readLine()) != null) 
 			{
-				String[] commented = match(line, "^[\\s\\t]*//s*?case"); //^[\s\t]*\\\\
+				String[] commented = match(line, "^\\s*//[\\s/]*case"); //^[\s\t]*\\\\
 				if(commented!=null) 
 				{
-					if(bDebugPrint) System.err.println(line);
-				}
-				else
-				{
-					String[] m = match(line, "case\\s*?(\\d+)\\s*?\\:\\s*?anim_f=(.*?)\\s*?;"); //!opt cashe compiled regex
-					if(m!=null)
-					{
-							if(bDebugPrint)
-							{
-								for (int i = 0; i < m.length; i++)	println( m[i] );
-								println("-----------------");
-							}
-						int effN=Integer.parseInt(m[1]);
-						if(effN>250) continue;
+					//if(bDebugPrint) System.err.println(line);
+					if(bSkipCommentedCases) continue;
 
-						GButton btn= new GButton(this, effParsedList_btns_posX, 10+effParsedList_btn_h*effParsedList_btns_i, width-effParsedList_btns_posX-2, 18);
-						btn.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
-						
-						
-						btn.tagNo=effN;
-						btn.setText(m[1]+":"+m[2]);
+				}
+
+				String[] m = match(line, "case\\s*?(\\d+)\\s*?\\:\\s*?anim_f=(.*?)\\s*?;"); //!opt cashe compiled regex
+				if(m!=null)
+				{
+						if(bDebugPrint)
+						{
+							for (int i = 0; i < m.length; i++)	println( m[i] );
+							println("-----------------");
+						}
+					int effN=Integer.parseInt(m[1]);
+					if(effN>250) continue;
+
+					GButton btn= new GButton(this, effParsedList_btns_posX, 10+effParsedList_btn_h*effParsedList_btns_i, width-effParsedList_btns_posX-2, 18);
+					btn.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
+					
+					
+					btn.tagNo=effN;
+					btn.setText(m[1]+":"+m[2]);
+					if(commented==null)
+					{
 						btn.setLocalColorScheme(GCScheme.PURPLE_SCHEME);
 						btn.addEventHandler(this, "effParsedList_btns_click");
-						effParsedList_btns[effParsedList_btns_i]=btn;
-						EffNms[effN]=m[2];
+					}
+					else
+					{
+						btn.setLocalColor(4, color(BGcolor));
+						btn.setLocalColor(2, color(BGcolor-40));
+					}
+					effParsedList_btns[effParsedList_btns_i]=btn;
+					EffNms[effN]=m[2];
 
-						effParsedList_btns_i++;
+					effParsedList_btns_i++;
 
-						String[] effQualityMark = match(line, "//\\!");
+					String[] effQualityMark = match(line, "//\\!");
 
 
-						if(effQualityMark!=null)
-						{
-							btn.setLocalColorScheme(GCScheme.RED_SCHEME);
-						}
+					if(effQualityMark!=null)
+					{
+						btn.setLocalColorScheme(GCScheme.RED_SCHEME);
+					}
 
-						effQualityMark = match(line, "//\\:\\)");
-						if(effQualityMark!=null)
-						{
-							btn.setLocalColorScheme(GCScheme.GOLD_SCHEME);
-						}
+					effQualityMark = match(line, "//\\:\\)");
+					if(effQualityMark!=null)
+					{
+						btn.setLocalColorScheme(GCScheme.GOLD_SCHEME);
+					}
 
-						effQualityMark = match(line, "//\\:/");
-						if(effQualityMark!=null)
-						{
-							btn.setLocalColor(4, color(BGcolor)); //palette index 4=bg 2=text
-						}
+					effQualityMark = match(line, "//\\:/");
+					if(effQualityMark!=null)
+					{
+						btn.setLocalColor(4, color(BGcolor)); //palette index 4=bg 2=text
 					}
 				}
+
 			}
 		} catch(Exception e){}
 		}
@@ -82,12 +92,20 @@ void search_animh()
 String[] EffNms = new String[255];
 
 GButton[] effParsedList_btns = new GButton[255];
-
+float yStart_last=10;
+float smothScroll=0.15;//0.03
 void scroll_effParsedList_btns(int yStart)
 {
+	if(abs(yStart-yStart_last)>20)
+	{
+	 yStart_last= yStart_last*(1-smothScroll)+yStart*smothScroll;
+	}
+	else
+	yStart_last=yStart;
+
 	for (int i=0; i<effParsedList_btns_i-1; i++) {
 		GButton btn=effParsedList_btns[i];
-		btn.moveTo(btn.getX(),  map(yStart,0,height,0,-effParsedList_btns_i*effParsedList_btn_h) +10+effParsedList_btn_h*i);
+		btn.moveTo(btn.getX(),  map((int)yStart_last,0,height,0,-effParsedList_btns_i*effParsedList_btn_h) +10+effParsedList_btn_h*i);
 	}
 }
 void scroll_effParsedList_btns_toTopFor(int btnsE) //btnsE is  btn N in effParsedList_btns array
@@ -109,7 +127,7 @@ public void effParsedList_btns_click(GButton source, GEvent event) {
 }
 
 
-
+//================================================================================== file
 
 // This function returns all the files in a directory as an array of Strings  
 String[] listFileNames(String dir) {

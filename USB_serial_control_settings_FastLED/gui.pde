@@ -15,6 +15,7 @@
  */
 
 public void btn3_L_click1(GButton source, GEvent event) { //_CODE_:btn3_L:695180:
+																		//source.setText(event.toString());
  sub(mode);
 } //_CODE_:btn3_L:695180:
 
@@ -170,7 +171,7 @@ public void button_codeGen_click(GButton source, GEvent event) { //_CODE_:button
 	int effDisableChennel=settingsVals.get("RGB").valueSlider.getValueI();
 	String s="case "+
 	Integer.toString(effN)+ 
-	": anim_f="+EffNms[effN]+
+	":anim_f="+EffNms[effN]+
 	";				effSpeed="+	Integer.toString(settingsVals.get("speed").valueSlider.getValueI())+
 	";		effLength="+		Integer.toString(settingsVals.get("length").valueSlider.getValueI());
 
@@ -250,7 +251,7 @@ public void createGUI(){
   slider_RGB.setNumberFormat(G4P.INTEGER, 0);
   slider_RGB.setOpaque(false);
   slider_RGB.addEventHandler(this, "slider_RGB_change1");
-  button_action = new GButton(this, 410, 170, 170, 30);
+  button_action = new GButton(this, 320, 170, 260, 30);
   button_action.setText("Action");
   button_action.setLocalColorScheme(GCScheme.ORANGE_SCHEME);
   button_action.addEventHandler(this, "button_action_click1");

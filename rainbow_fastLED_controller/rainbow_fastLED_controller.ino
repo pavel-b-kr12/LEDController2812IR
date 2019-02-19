@@ -15,13 +15,16 @@
 	#define NUM_LEDS_type byte
 #else
 	#define NUM_LEDS 			60 //300  //1024
-     //!   if NUM_LEDS>255
+	 //!	if NUM_LEDS>255
 	#define NUM_LEDS_type 		byte //int //>255 NUM_LEDS  for(NUM_LEDS_type i=0; i<NUM_LEDS  //! fix random8(NUM_LEDS), effLength and other
 
 	#define eff_setX
 #endif
 
+#define save_load_enable //to EEPROM
 #define demo_enable
+#define default_effN_Randon // switch default to randomSet() or FastLED.clear();
+
 
 #define tstFPS
 //#define tst
@@ -53,7 +56,7 @@
 
 #define SerialSpeed		115200 //57600
 
-//#define LEDp  								11 //6 if matrix keypad
+//#define LEDp									11 //6 if matrix keypad
 
 //#define adj_pot								A0
 #ifdef adj_pot
@@ -65,7 +68,7 @@
 	#define IR_mode_sw_p 					2 //! btn (IR save while press) //! LRD at start => toggle this with LDR
 	#define IRp 							3
 	#ifdef legacy_pinout
-		#define IR_mode_sw_p 				A4 //! switch effN+- speed+  || length+- RGB+    VS switch 
+		#define IR_mode_sw_p 				A4 //! switch effN+- speed+  || length+- RGB+	VS switch 
 		#define IRp 						6
 	#endif
 	
@@ -82,7 +85,7 @@
 #endif
 
 #ifdef key3x
-	#define LEDp  							11
+	#define LEDp								11
 	#define btnAdd							A1
 	#define btnSelectMode					A2
 	#define btnSub							A3
@@ -94,7 +97,7 @@
 	#define btnEffNAdd 					4
 	#define btnEffLengthAdd				5
 	#define btnEffDisableChennel		7 //GRB RG GB BG R G B
-		//A5 //смещение каналов R-G-B вдлину  
+		//A5 //смещение каналов R-G-B вдлину
 		//A6  //смещение hue вдлину 
 		
 /*
@@ -151,14 +154,14 @@ bool banimate=false;
 
 //#define btnReset_p		A3 //resetSetiings_and_change_slot()
 
-//#include "Arduino.h"                                          // FastLED library.
-//#include "C:\Users\asd\Documents\Arduino\hardware\WAV\avr\cores\lgt8f\hooks.c"      //! wemos-Xi FastLED library.
+//#include "Arduino.h"										  // FastLED library.
+//#include "C:\Users\asd\Documents\Arduino\hardware\WAV\avr\cores\lgt8f\hooks.c"	  //! wemos-Xi FastLED library.
 #include "FastLED.h"
-CRGB leds[NUM_LEDS];
+CRGB leds[NUM_LEDS+1]; //!! del +1
 //=========================================================================
 
 byte effN=			0; // = eff SLOT at start
-byte effSpeed=1; //EVERY_N_MILLISECONDS( 20 ) gHue+=effSpeed;
+byte effSpeed; //EVERY_N_MILLISECONDS( 20 ) gHue+=effSpeed;
 	byte effSpeed_last=1; //for animate eff
 byte effLength=16;
 	byte effLength_last=16;
@@ -167,7 +170,7 @@ byte effDisableChennel=0; //1 => disable R, 2 => disable G ,  7 => fast cycle di
 #define effDisableChennel_M	17
 byte effSpeedH=1; //!!
 byte effLengthH=16;
-CRGB gColorBg=CRGB::Black; //! gHueBG == 0 ? White   == 255 ? black
+CRGB gColorBg=CRGB::Black; //! gHueBG == 0 ? White	== 255 ? black
 
 //=========================================================================
 bool bCurrentEff_IsRandom_AndNotSlotN=false;
@@ -186,9 +189,13 @@ int i_eff=0;
 // #ifdef adjType_LDR
  // byte ambientLight;
 // #endif
-
+#ifdef save_load_enable
 void load(byte);
+#endif
+#if defined(SerialSelect) || defined(SerialControl)
 void checkSerial();
+#endif
+
 #include "anim.h"
 
 //============================================= display LCD
@@ -226,21 +233,21 @@ void display_upd()
   
   EVERY_N_MILLISECONDS( 400 )
   {
-   lcd.setCursor(0,0);
-   lcd.print(effN);				lcd.print("  ");	lcd.setCursor(6,0); lcd.print("eff N"); 
-   lcd.setCursor(0,1);
-   lcd.print(effSpeed);			lcd.print("  ");  	lcd.setCursor(6,1); lcd.print(" speed");
-   lcd.setCursor(0,2);
-   lcd.print(effLength); 		lcd.print("  ");	lcd.setCursor(6,2);lcd.print("length"); 
-   lcd.setCursor(0,3);
-   lcd.print(effDisableChennel); lcd.print("  ");	lcd.setCursor(6,3); lcd.print(" RGBs");
-   //lcd.print(anim_d);lcd.print("  ");
+	lcd.setCursor(0,0);
+	lcd.print(effN);				lcd.print("  ");	lcd.setCursor(6,0); lcd.print("eff N"); 
+	lcd.setCursor(0,1);
+	lcd.print(effSpeed);			lcd.print("  ");  	lcd.setCursor(6,1); lcd.print(" speed");
+	lcd.setCursor(0,2);
+	lcd.print(effLength); 		lcd.print("  ");	lcd.setCursor(6,2);lcd.print("length"); 
+	lcd.setCursor(0,3);
+	lcd.print(effDisableChennel); lcd.print("  ");	lcd.setCursor(6,3); lcd.print(" RGBs");
+	//lcd.print(anim_d);lcd.print("  ");
   }
   #endif
   
   #ifdef SerialSelect
   		#define SET_UPD_Display	 /*bNeed_display_upd=true;*/ display_upd();
-   #endif
+	#endif
 
   #ifdef SerialControl
 	#define SET_UPD_Display	 /*bNeed_display_upd=true;*/ display_upd();
@@ -271,9 +278,9 @@ const byte effDisableChennel_addr = 7;
 // byte effSpeed_toSave;
 // byte effLength_toSave;
 // byte effDisableChennel_toSave;
-
+#ifdef save_load_enable
 void saveAfter2s();
-
+#endif
 void resetSetiings_and_change_slot() //! or changeEff(effN)
 {
 	effN=10;
@@ -290,7 +297,7 @@ void resetSetiings_and_change_slot() //! or changeEff(effN)
 }
 
 bool bIRcommandRepeated=false;
-
+#ifdef save_load_enable
 void save(byte N)
 {
 	byte effNum=bCurrentEff_IsRandom_AndNotSlotN?realEffN:effN;
@@ -395,6 +402,7 @@ void save_load_preset(byte N)
 	}
 }
 #endif
+#endif
 //=============================================================================================
 
 void  effN_set(byte N)
@@ -410,7 +418,9 @@ void  effN_set(byte N)
 
 	 if(N<=9)
 	 {
-	 	load(N); 
+	 	#ifdef save_load_enable
+	 	load(N);
+	 	#endif
 	 }
 	 else 
 	 {
@@ -433,7 +443,10 @@ void  effN_add()
 	banimate=false;
 
 	change_slot(effN);
-	SET_UPD_Display saveAfter2s(); 
+	SET_UPD_Display
+	#ifdef save_load_enable
+	saveAfter2s();
+	#endif
 }
 void  effN_sub()
 {
@@ -448,7 +461,10 @@ void  effN_sub()
 	banimate=false;
 
 	change_slot(effN);
-	SET_UPD_Display saveAfter2s();
+	SET_UPD_Display
+	#ifdef save_load_enable
+	 saveAfter2s();
+	#endif
 }
 
 // #ifdef SerialControl
@@ -461,17 +477,23 @@ void  effN_sub()
 // #endif
 void  effSpeed_add()
 {
-      effSpeed+=(effSpeed<12)?1:4; 
-	  //if(effSpeed>55) effSpeed=0;
-	  if(effSpeed>100) effSpeed+=10;
-	  SET_UPD_Display saveAfter2s();
+	effSpeed+=(effSpeed<12)?1:4; 
+	//if(effSpeed>55) effSpeed=0;
+	if(effSpeed>100) effSpeed+=10;
+	SET_UPD_Display
+	#ifdef save_load_enable
+	 saveAfter2s();
+	#endif
 }
 void  effSpeed_sub()
 {
-      effSpeed-=(effSpeed<15)?1:4; 
-	  //if(effSpeed>200) effSpeed=50;
-	  if(effSpeed>100) effSpeed-=20;
-	  SET_UPD_Display saveAfter2s();
+	effSpeed-=(effSpeed<15)?1:4; 
+	//if(effSpeed>200) effSpeed=50;
+	if(effSpeed>100) effSpeed-=20;
+	SET_UPD_Display
+	#ifdef save_load_enable
+	 saveAfter2s();
+	#endif
 }
 
 // #ifdef SerialControl
@@ -491,24 +513,33 @@ void  effLength_add()
 
 	if(effLength==0) effLength=NUM_LEDS;
 
-	  SET_UPD_Display saveAfter2s();
+	  SET_UPD_Display
+	#ifdef save_load_enable
+	 saveAfter2s();
+	#endif
 }
 void  effLength_sub()
 {
 	if(effLength==1) effLength=NUM_LEDS;
 	else
-    if(effLength<10) effLength--;
+	if(effLength<10) effLength--;
 	else
 	if(effLength<50) effLength-=5;
 	else effLength-=20;
-	  SET_UPD_Display saveAfter2s();
+	  SET_UPD_Display
+	#ifdef save_load_enable
+	 saveAfter2s();
+	#endif
 }
 	  
 void  effDisableChennel_add()
 {
-		effDisableChennel++;
-		if(effDisableChennel>effDisableChennel_M) effDisableChennel=0;
-		SET_UPD_Display saveAfter2s();
+	effDisableChennel++;
+	if(effDisableChennel>effDisableChennel_M) effDisableChennel=0;
+	SET_UPD_Display
+	#ifdef save_load_enable
+	 saveAfter2s();
+	#endif
 }
 
 //--------- for keypad, 3btn
@@ -552,7 +583,7 @@ void switch_LCDoption_selected_value_sub()
 	Serial.print("switch_LCDoption_selected:"); Serial.println(LCDoption_selected);
 	#endif
 
-     switch(LCDoption_selected)
+	 switch(LCDoption_selected)
 		 {
 			case effN_OPTION:
 			 effN_sub();
@@ -583,6 +614,8 @@ void switch_LCDoption_selected_value_sub()
 //=========================================================================
 void setup()
 {
+	delay(1000); //!!
+	
 #ifdef LEDpCustom
 	#define LEDp	LEDpCustom
 #endif
@@ -590,7 +623,7 @@ void setup()
 #ifdef ESP
   FastLED.addLeds<WS2812B, 14>(leds, NUM_LEDS);//D5 6 7 8
 #else
-  //Nano   9 7 5 3 *2* 4 6 8 10
+  //Nano	9 7 5 3 *2* 4 6 8 10
   FastLED.addLeds<WS2812B, LEDp, GRB>(leds, NUM_LEDS);
 #endif
 FastLED.clear();
@@ -618,7 +651,9 @@ FastLED.show();
 
 #if defined(tst) || defined(SerialSelect) || defined(SerialControl)
 Serial.begin(SerialSpeed);
-#include "version.h"
+	#ifdef tst
+	#include "version.h"
+	#endif
 #endif
 
   #ifdef tst_POW_LIM
@@ -628,7 +663,6 @@ Serial.begin(SerialSpeed);
 #ifdef tst
 	//Serial.println(F("test"));
 	#ifdef LDR
-	
 	#endif
 #endif
 
@@ -666,7 +700,9 @@ pinMode(IR_mode_sw_p, INPUT_PULLUP);
 delay(1);
 
 //if(!digitalRead(btnReset_p))	resetSetiings_and_change_slot(); else //!
+#ifdef save_load_enable
 load(effN);
+#endif
 
 #ifdef IRkeypad
 if(!digitalRead(IR_mode_sw_p))
@@ -697,6 +733,8 @@ if(!digitalRead(IR_mode_sw_p))
   FastLED.clear();
   FastLED.show();
   #endif
+
+  delay(100); //!!
 }
  
 //=============================================================================================
@@ -713,7 +751,9 @@ if(bIR_mode)
 {
 	if (!IRLremote.receiving()) {  // Check if we are currently receiving data
 		LED_anim();
-		saveIfNeed();
+		#ifdef save_load_enable
+		 saveIfNeed();
+		#endif
 	}
  
   if (IRLremote.available()) // Check if new IR protocol data is available
@@ -724,7 +764,7 @@ if(bIR_mode)
 			Serial.println(IRcommand, HEX);
 			digitalWrite(LED_BUILTIN, LOW);
 				//auto data = IRLremote.read();
-			    // Serial.print(F("Address: 0x"));
+				// Serial.print(F("Address: 0x"));
 				// Serial.println(data.address, HEX);
 				// Serial.print(F("IRcommand: 0x"));
 				// Serial.println(data.command, HEX);
@@ -752,7 +792,7 @@ c 18 5e
 		  if(!bIRcommandRepeated)
 		  {
 			IRcommand_last = IRcommand;
-			  
+			#ifdef save_load_enable
 			switch(IRcommand)
 				{
 				  //-------------- 1 2 3
@@ -768,69 +808,73 @@ c 18 5e
 				  case 0x52:		save_load_preset(8);				  break;
 				  case 0x4A:		save_load_preset(9);				  break;
 				  default: break;
-				  }
+				}
 		  }
+		  #endif
 	  }
 	#ifdef tst2
 Serial.print("IRcommand:"); Serial.println(IRcommand);
 	#endif
 	  					
-    switch(IRcommand)
-    {
+	switch(IRcommand)
+	{
 	  //-------------- CH- CH CH+
-      case 0x45:		if(millis()<nextCanChangeByIr) break;
+	  case 0x45:		if(millis()<nextCanChangeByIr) break;
 	  effLength_sub();
-      break;
+	  break;
 
-      case 0x46:		if(millis()<nextCanChangeByIr) break;
+	  case 0x46:		if(millis()<nextCanChangeByIr) break;
 	  effDisableChennel_add();
-      break;
+	  break;
 	  
-      case 0x47:		if(millis()<nextCanChangeByIr) break;
+	  case 0x47:		if(millis()<nextCanChangeByIr) break;
 	  effLength_add();
-      break;
+	  break;
 	  //-------------- |<< >>| >||
-      case 0x44:		if(millis()<nextCanChangeByIr) break;
+	  case 0x44:		if(millis()<nextCanChangeByIr) break;
 	  effN_sub();
-      break;
+	  break;
 
-      case 0x40:		if(millis()<nextCanChangeByIr) break;
+	  case 0x40:		if(millis()<nextCanChangeByIr) break;
 		effN_add();
-      break;
+	  break;
 	  
-      case 0x43:		if(millis()<nextCanChangeByIr) break;
+	  case 0x43:		if(millis()<nextCanChangeByIr) break;
 	  bPause=!bPause;//pause anim
-      break;
+	  break;
 	  //-------------- - + EQ
-      case 0x7:			if(millis()<nextCanChangeByIr) break;
+	  case 0x7:			if(millis()<nextCanChangeByIr) break;
 	  effSpeed_sub();
-      break;
+	  break;
 	  
-      case 0x15:		if(millis()<nextCanChangeByIr) break;
+	  case 0x15:		if(millis()<nextCanChangeByIr) break;
 	  effSpeed_add();
-      break;
+	  break;
 	  
-      case 0x9:
+	  case 0x9:
 											
 	  
-      break;
+	  break;
 	  //-------------- 0 100 200
-      case 0x16:
+	  case 0x16:
 	  change_slot(); //clear off
-	  saveAfter2s(); SET_UPD_Display
-      break;
+	  #ifdef save_load_enable
+	  saveAfter2s();
+	  #endif
+	  SET_UPD_Display
+	  break;
 	  
-      case 0x19:
+	  case 0x19:
 		resetSetiings_and_change_slot();
-      break;
+	  break;
 	  
-      case 0xD:
+	  case 0xD:
 										//!! autopaly 
-      break;
+	  break;
 	  
-      default:
-      break;
-    }
+	  default:
+	  break;
+	}
   }
 }
 else
@@ -839,7 +883,9 @@ else
 }
 #else
 	LED_anim();
-	saveIfNeed(); //^
+	#ifdef save_load_enable
+	 saveIfNeed(); //^
+	#endif
 #endif
 	
 #ifdef keypad1602
@@ -848,35 +894,35 @@ EVERY_N_MILLISECONDS( 220 )
  switch (read_LCD_buttons())
  {
 	case btnRIGHT:
-     {
+	 {
 		effN_add();
-     break;
-     }
+	 break;
+	 }
 	case btnLEFT:
-     {
+	 {
 		effN_sub();						
-     break;
-     }
+	 break;
+	 }
 	case btnUP:
-     {
+	 {
 		switch_LCDoption_selected_value_add();
-     break;
-     }
+	 break;
+	 }
 	case btnDOWN:
-     {
+	 {
 		 switch_LCDoption_selected_value_sub();
-     break;
-     }
+	 break;
+	 }
 	case btnSELECT:
-     {
+	 {
 		 LCDoption_selected_add();
 		 break;
-     }
-     // case btnNONE:
-     // {
-     // 
-     // break;
-     // }
+	 }
+	 // case btnNONE:
+	 // {
+	 // 
+	 // break;
+	 // }
  }
 }
 #else
@@ -888,44 +934,44 @@ EVERY_N_MILLISECONDS( 220 )
 	{
 		switch_LCDoption_selected_value_add();
 	}
-    else
+	else
 	if(!digitalRead(btnSub))
 	{
 		switch_LCDoption_selected_value_sub();
 	}
-    else
+	else
 	if(!digitalRead(btnSelectMode))
 	{ //!!! also flash
 		LCDoption_selected_add();
 	}
 
  #elif defined (key5x)
-    if(!digitalRead(btnSpeedAdd))
-    {
-      //anim_d-=5;//nw
+	if(!digitalRead(btnSpeedAdd))
+	{
+		//anim_d-=5;//nw
 		effSpeed_add();					
-    }
-    else
-    if(!digitalRead(btnSpeedSub)) 
-    {
-      //anim_d+=5;
+	}
+	else
+	if(!digitalRead(btnSpeedSub)) 
+	{
+		//anim_d+=5;
 		effSpeed_sub();					
-    }
-    else
-    if(!digitalRead(btnEffNAdd))
+	}
+	else
+	if(!digitalRead(btnEffNAdd))
 	{
 		effN_add();						
 	}
-    else
-    if(!digitalRead(btnEffLengthAdd))
-    {
-		effLength_add();				
-    }
 	else
-    if(!digitalRead(btnEffDisableChennel))
-    {
+	if(!digitalRead(btnEffLengthAdd))
+	{
+		effLength_add();				
+	}
+	else
+	if(!digitalRead(btnEffDisableChennel))
+	{
 		effDisableChennel_add();		
-    }
+	}
 	#endif
   }
  

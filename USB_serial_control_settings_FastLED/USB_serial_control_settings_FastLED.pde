@@ -36,9 +36,9 @@ void copyToClipboard(String selection) //https://forum.processing.org/one/topic/
 }
 //====================================================
 
+int bSetBrightnessAtConnect=55; //-1 for not set
 boolean bDebugPrint=false;
 static int serialSpeed=115200; //57600
-int bSetBrightnessAtConnect=77; //-1 for not set
 
 
 int bConnected=1; //0 off, 1 try connect, 2 connected
@@ -60,7 +60,8 @@ Serial myPort;
 static int effN_PAUSE=0;
 
 private LinkedHashMap<String, settingsVal> settingsVals = new LinkedHashMap<String, settingsVal>();
-String actionNm[]={"flashLEDs","invertLEDs","addGlitter","flashAndBackLEDs","fadeOut_continued","moveOut_continued","offPixel_continued","","","","","",""}; //upd arr size at put("action",
+String actionNm[]={"flashLEDs","invertLEDs","addGlitter","flashAndBackLEDs","scroll1cycle_continued","scroll1cycle_continuedRev","fadeOut_continued","moveOut_continued","offPixel_continued","","","","","",""}; //upd arr size at put("action",
+int actionsM=10;
 
 boolean rCh=true,gCh=true,bCh=true;
 void drawRGB(int chen)
@@ -174,15 +175,15 @@ void modeChanged()
 	bModeSent=false;
 }
 
-	void add(int mode_N)
-	{
-		getsettingsVal_by_mode_N(mode_N).add();
-	}
+void add(int mode_N)
+{
+	getsettingsVal_by_mode_N(mode_N).add();
+}
 
-	void sub(int mode_N)
-	{
-		getsettingsVal_by_mode_N(mode_N).sub();
-	}
+void sub(int mode_N)
+{
+	getsettingsVal_by_mode_N(mode_N).sub();
+}
 
 
 
@@ -221,7 +222,6 @@ void SendMsg(int msgCode, int val)
 	myPort.write(msgCode);
 
 	myPort.write(val);
-
 }
 
 void  put(String n, int v, int vm, int vM, int code, GLabel label, GSlider slider)
@@ -256,8 +256,8 @@ public void setup(){
 	slider_RGB.setLimits(0, 0, valM);
 
 	valM=		settingsVals.get("action").value_M;
-	slider_action.setNbrTicks(valM+1);
-	slider_action.setLimits(0, 0, valM);
+	slider_action.setNbrTicks(actionsM+1);
+	slider_action.setLimits(0, 0, actionsM);
 
 	label_SerialSpeed.setText(Integer.toString(serialSpeed));
 
@@ -284,7 +284,15 @@ public void setup(){
 
 	fontFPS= createFont("Monospaced", 32);
 	//fontFPS= createFont("SourceCodePro-Regular.ttf", 26);
+
+
+
+//btn3_L.fireAllEvents(true); //not work in G4P bug //!@ttt
 }
+// //fireAllEvents
+// public void handleButtonEvents(GButton button, GEvent event) {
+//   System.out.println("Recieved " + event + " event from " + button.getText());
+// }
 
 void serialEvent(Serial cPort){
   String comPortString = cPort.readStringUntil('\n');
@@ -312,7 +320,6 @@ void serialEvent(Serial cPort){
 		}
 		else bDrawFPSnow=-1;
 	} catch(Exception e){ System.err.println(comPortString); }
-	
   }
 }
 
@@ -339,11 +346,28 @@ public void draw(){
 	line(effParsedList_btns_posX+40,0,effParsedList_btns_posX+40, height); //GUI scroll area markers
 	line(width-scroll_effParsedList_scrollWidth,0,width-scroll_effParsedList_scrollWidth, height);
 
+	textFont(fontFPS);
+
 	if(bDrawFPSnow>-1 && millis()<bDrawFPS_until_t)
 	{
 			//textSize(32); g.textSize
 			textFont(fontFPS);
 			text(bDrawFPSnow, 440, 155);
+	}
+
+	if(mouseX>(width-scroll_effParsedList_scrollWidth-200) && (mouseY<20 || mouseY>height-20))
+	{
+		 if(mouseY<20) 
+		 {
+		 	if(yStart_last>0) yStart_last--;
+		 }
+		 else
+		 if(mouseY>height-20) 
+		 {
+		 	if(yStart_last<height-50) yStart_last++;
+		 }
+
+		scroll_effParsedList_btns( (int)yStart_last);
 	}
 	//---------------------------------------- serial
 	try
@@ -404,12 +428,34 @@ public void customGUI(){
 
 }
 
-void mouseMoved()
+void mouseMoved() //! only if not big dY, if big - anim or nothing do
 {
+	if(mouseX>(width-scroll_effParsedList_scrollWidth-200) && (mouseY<20 || mouseY>height-20))
+	{
+		//  if(mouseY<20) 
+		//  {
+		//  	if(yStart_last>0) yStart_last--;
+		//  }
+		//  else
+		//  if(mouseY>height-20) 
+		//  {
+		//  	if(yStart_last<height-50) yStart_last++;
+		//  }
+
+		// scroll_effParsedList_btns( (int)yStart_last);
+	}
+	else
 	if(mouseX>width-scroll_effParsedList_scrollWidth)
 	{
 		scroll_effParsedList_btns( mouseY);
 	}
-	//line(mouseX, 20, mouseX, 80);
 
 }
+
+// void mouseDragged() 
+// {
+// 	//if(mouseX>width-scroll_effParsedList_scrollWidth)
+// 	{
+// 		scroll_effParsedList_btns( height-mouseY);
+// 	}
+// }

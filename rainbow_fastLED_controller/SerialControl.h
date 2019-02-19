@@ -54,7 +54,9 @@ void setValueFromMsg(byte msgType, byte value)
 		 //!! save tst_BRIGHTNESS=value;
 		break;
 		case messageSave:
+		#ifdef save_load_enable
 		 save(value);
+		#endif
 		break;
 		// case messageLoad:
 		//  load(value);
@@ -86,9 +88,11 @@ void setValueFromMsg(byte msgType, byte value)
 		 	break;
 		 	
 		 	case 3: flashAndBackLEDs(); break;
-		 	case 4: fadeOut_continued(); break;
-		 	case 5: moveOut_continued(); break;
-		 	case 6: offPixel_continued(); break;
+		 	case 4: scroll1cycle_continued(); break;
+		 	case 5: scroll1cycle_continuedRev(); break;
+		 	case 6: fadeOut_continued(); break;
+		 	case 7: moveOut_continued(); break;
+		 	case 8: offPixel_continued(); break;
 		 }
 		break;
 

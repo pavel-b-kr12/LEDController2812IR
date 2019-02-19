@@ -22,6 +22,35 @@ void test_gDelay()
 	idex++;	if(idex>=NUM_LEDS) idex=0;
 }
 
+void palette_pipette()
+{
+	
+}
+
+void test_palettes()
+{
+	
+}
+
+void test_gradient()
+{
+	
+}
+
+void test_blend()
+{
+	
+}
+
+void test_easing()
+{
+	
+}
+
+void test_RAWcolorMath()
+{
+	
+}
 
 
 

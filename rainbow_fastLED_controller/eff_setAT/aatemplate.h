@@ -1,18 +1,18 @@
 // This is a simple non-blocking FastLED display sequence template.
-void twinkle() {
+void twinkle_() {
   if (random8() < twinkrate) leds[random16(NUM_LEDS)] += ColorFromPalette(currentPalette, (randhue ? random8() : thishue), 255, currentBlending);
   fadeToBlackBy(leds, NUM_LEDS, thisfade);
 } 
 
 
-void ChangeMe() {                                             // A time (rather than loop) based demo sequencer. This gives us full control over the length of each sequence.
+void twinkle_ChangeMe() {                                             // A time (rather than loop) based demo sequencer. This gives us full control over the length of each sequence.
   uint8_t secondHand = (millis() / 1000) % 10;                // IMPORTANT!!! Change '15' to a different value to change duration of the loop.
   static uint8_t lastSecond = 99;                             // Static variable, means it's only defined once. This is our 'debounce' variable.
   if (lastSecond != secondHand) {                             // Debounce to make sure we're not repeating an assignment.
     lastSecond = secondHand;
     switch(secondHand) {
-      case 0: thisdelay = 10; randhue = 1; thissat=255; thisfade=8; twinkrate=150; break;  // You can change values here, one at a time , or altogether.
-      case 5: thisdelay = 100; randhue = 0;  thishue=random8(); thisfade=2; twinkrate=20; break;
+      case 0: gDelay = 10; randhue = 1; thissat=255; thisfade=8; twinkrate=150; break;  // You can change values here, one at a time , or altogether.
+      case 5: gDelay = 100; randhue = 0;  thishue=random8(); thisfade=2; twinkrate=20; break;
       case 10: break;
     }
   }
@@ -21,11 +21,9 @@ void ChangeMe() {                                             // A time (rather 
 
 void Twinkle()
 {
-
-  ChangeMe();                                                 // Check the demo loop for changes to the variables.
+  twinkle_ChangeMe();                                                 // Check the demo loop for changes to the variables.
 
   EVERY_N_MILLISECONDS(100) {
-    uint8_t maxChanges = 24; 
     nblendPaletteTowardPalette(currentPalette, targetPalette, maxChanges);   // AWESOME palette blending capability.
   }
 
@@ -34,6 +32,5 @@ void Twinkle()
     targetPalette = CRGBPalette16(CHSV(random8(), 255, random8(128,255)), CHSV(random8(), 255, random8(128,255)), CHSV(random8(), 192, random8(128,255)), CHSV(random8(), 255, random8(128,255)));
   }
 
-  twinkle() ;
-
+  twinkle_() ;
 }

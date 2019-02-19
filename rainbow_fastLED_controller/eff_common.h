@@ -21,6 +21,37 @@ void moveAll() //cyclic
 	leds[0]=t;
 }
 
+void moveOutAllRemainFirst()
+{
+	for(NUM_LEDS_type i = NUM_LEDS-1; i >0 ; i--) 
+	{
+		leds[i]=leds[i-1];
+	}
+}
+void moveOutAll()
+{
+	moveOutAllRemainFirst();
+	leds[0]=0;
+}
+	
+void moveOutAll_fade()
+{
+	for(NUM_LEDS_type i = NUM_LEDS-1; i >0 ; i--) 
+	{
+		leds[i]=leds[i-1];
+		leds[i].nscale8(253);
+	}
+}
+void moveOutAll_fadeN() //!tst
+{
+	for(NUM_LEDS_type i = NUM_LEDS-1; i >0 ; i--) 
+	{
+		leds[i]=leds[i-1];
+		leds[i].nscale8(map(i,0,NUM_LEDS,0,255));
+	}
+}
+
+
 void addGlitter(byte chanceOfGlitter)
 {
 	if(random8() < chanceOfGlitter) {
@@ -89,6 +120,37 @@ void offPixel_continued()
 	}
 }
 
+void scroll1cycle_continued()
+{
+	for(NUM_LEDS_type j = 0; j < NUM_LEDS; j++)
+	{
+		CRGB led0=leds[0];
+
+		for(NUM_LEDS_type i = 0; i < NUM_LEDS-1; i++)
+		{
+			leds[i]=leds[i+1];
+		}
+		leds[NUM_LEDS-1]=led0;
+		FastLED.show(); 
+		delay(abs(NUM_LEDS/2-j)/4); //start and stop slower  //! || beatsin
+	}
+}
+
+void scroll1cycle_continuedRev()
+{
+	for(NUM_LEDS_type j = 0; j < NUM_LEDS; j++)
+	{
+		CRGB led_last=leds[NUM_LEDS-1];
+
+		for(NUM_LEDS_type i = NUM_LEDS-1; i >0 ; i--)
+		{
+			leds[i]=leds[i-1];
+		}
+		leds[0]=led_last;
+		FastLED.show(); 
+		delay(abs(NUM_LEDS/2-j)/2); //start and stop slower  //! || beatsin
+	}
+}
 void moveOut_continued()
 {
 	leds[0]=CRGB::Black;
