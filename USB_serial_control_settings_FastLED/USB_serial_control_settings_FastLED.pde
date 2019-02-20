@@ -1,8 +1,9 @@
 /* TODO
 fix load btn must not call effSet msg.   Avoid double event
 
- eff names list
+ask again for fix g4p event for press because bo fix absense  of dragg toleranse in Java-Swing (de-facto, he also confirm) and no other event available in current g4p version to workout this
 */
+
 /*
 18 35 108 0
 33 8 12 3
@@ -14,6 +15,25 @@ fix load btn must not call effSet msg.   Avoid double event
 31 10 28 13
 21 2 3 8
 */
+
+int bSetBrightnessAtConnect=55; //-1 for not set
+boolean bDebugPrint=true;
+static int serialSpeed=115200; //57600
+
+
+
+
+
+String DebugPrint_str_last="";
+void  bDebugPrint_notSame_bRed(String str, boolean bRed)
+{
+	if(!bDebugPrint || str.equals(DebugPrint_str_last)) return;
+	
+	if(bRed) System.err.println(str);
+	else				println(str);
+	
+	DebugPrint_str_last=str;
+}
 
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -28,7 +48,7 @@ import javax.swing.*;
 import java.io.*;
 void copyToClipboard(String selection) //https://forum.processing.org/one/topic/what-is-the-simplest-way-to-copy-to-the-clipboard-from-processing.html
 {
-		if(bDebugPrint) println(selection);
+		bDebugPrint_notSame_bRed(selection, false);
 	StringSelection data = new StringSelection(selection);
 	Clipboard clipboard = 
 	Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -36,9 +56,7 @@ void copyToClipboard(String selection) //https://forum.processing.org/one/topic/
 }
 //====================================================
 
-int bSetBrightnessAtConnect=55; //-1 for not set
-boolean bDebugPrint=false;
-static int serialSpeed=115200; //57600
+
 
 
 int bConnected=1; //0 off, 1 try connect, 2 connected
@@ -60,7 +78,9 @@ Serial myPort;
 static int effN_PAUSE=0;
 
 private LinkedHashMap<String, settingsVal> settingsVals = new LinkedHashMap<String, settingsVal>();
-String actionNm[]={"flashLEDs","invertLEDs","addGlitter","flashAndBackLEDs","scroll1cycle_continued","scroll1cycle_continuedRev","fadeOut_continued","moveOut_continued","offPixel_continued","","","","","",""}; //upd arr size at put("action",
+String actionNm[]={
+"flashLEDs","invertLEDs","addGlitter","flashAndBackLEDs","scroll1cycle_continued","scroll1cycle_continuedRev","fadeOut_continued","moveOut_continued","offPixel_continued","","","","","",""
+}; //upd arr size at put("action",
 int actionsM=10;
 
 boolean rCh=true,gCh=true,bCh=true;
@@ -299,7 +319,8 @@ void serialEvent(Serial cPort){
   if(comPortString != null) {
 	comPortString=trim(comPortString);
 	
-	if(bDebugPrint) System.err.println(comPortString);
+
+	bDebugPrint_notSame_bRed(comPortString, true);
 	try{
 	 String[] parts = comPortString.split(" ");
 	
@@ -324,14 +345,14 @@ void serialEvent(Serial cPort){
 }
 
 
-int BGcolor=200;
+int gColorBg=200;
 int bDrawFPSnow=-1;
 PFont fontFPS;
 int bDrawFPS_until_t=0;
 public void draw(){
 	if(bSkipEvent && millis()>bSkipEvent_off_t) bSkipEvent=false;
 
-	background(BGcolor);
+	background(gColorBg);
 
 	//---------------------------------------- RGB option state
 	fill(rCh?255:0, gCh?255:0, bCh?255:0); 
@@ -342,7 +363,7 @@ public void draw(){
 	fill(255, 255, 88); stroke(128, 0, 128);
 	polygon(3,  effParsedList_btns_posX-12, 8+effParsedList_btn_h*2 +10, 11);  //mark on current eff N (scroll list to this pos)
 
-	stroke(255, BGcolor, 255); //stroke(0);//stroke(BGcolor-40);
+	stroke(255, gColorBg, 255); //stroke(0);//stroke(gColorBg-40);
 	line(effParsedList_btns_posX+40,0,effParsedList_btns_posX+40, height); //GUI scroll area markers
 	line(width-scroll_effParsedList_scrollWidth,0,width-scroll_effParsedList_scrollWidth, height);
 

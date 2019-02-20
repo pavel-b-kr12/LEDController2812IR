@@ -32,11 +32,11 @@ void search_animh()
 				String[] m = match(line, "case\\s*?(\\d+)\\s*?\\:\\s*?anim_f=(.*?)\\s*?;"); //!opt cashe compiled regex
 				if(m!=null)
 				{
-						if(bDebugPrint)
-						{
-							for (int i = 0; i < m.length; i++)	println( m[i] );
-							println("-----------------");
-						}
+						// if(bDebugPrint)
+						// {
+						// 	for (int i = 0; i < m.length; i++)	println( m[i] );
+						// 	println("-----------------");
+						// }
 					int effN=Integer.parseInt(m[1]);
 					if(effN>250) continue;
 
@@ -53,8 +53,8 @@ void search_animh()
 					}
 					else
 					{
-						btn.setLocalColor(4, color(BGcolor));
-						btn.setLocalColor(2, color(BGcolor-40));
+						btn.setLocalColor(4, color(gColorBg));
+						btn.setLocalColor(2, color(gColorBg-40));
 					}
 					effParsedList_btns[effParsedList_btns_i]=btn;
 					EffNms[effN]=m[2];
@@ -78,7 +78,7 @@ void search_animh()
 					effQualityMark = match(line, "//\\:/");
 					if(effQualityMark!=null)
 					{
-						btn.setLocalColor(4, color(BGcolor)); //palette index 4=bg 2=text
+						btn.setLocalColor(4, color(gColorBg)); //palette index 4=bg 2=text
 					}
 				}
 

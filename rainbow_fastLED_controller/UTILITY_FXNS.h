@@ -3,9 +3,9 @@
 #define qsuba(x, b) ((x>b)?x-b:0)                             // Level shift. . . Unsigned subtraction macro. if result <0, then x=0. Otherwise x=x-b.
 
 
-void fillAll(byte r, byte g, byte b) {
+void fillAll_(byte r, byte g, byte b) {
   fill_solid(leds, NUM_LEDS, CRGB(r,g,b)); 
-  FastLED.show();
+  //FastLED.show();
 }
 
 void fillAll()

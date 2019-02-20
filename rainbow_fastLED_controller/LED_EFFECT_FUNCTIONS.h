@@ -472,7 +472,7 @@ void rwb_march() {                    //-m15-R,W,B MARCH CCW
 
 byte colorize()
 {
-  if(effLength>250) return idex; //* //! lerp cColor bgColor
+  if(effLength>250) return idex; //* //! lerp cColor gColorBg
   else
   if(effLength<5)   return gHue; //*
   else              return effLength;
@@ -1122,12 +1122,14 @@ void RunningLights()
 }
 
 //-------------------------------Sparkle---------------------------------------
-void Sparkle(byte red, byte green, byte blue, int SpeedDelay) {
-  int Pixel = random(NUM_LEDS);
-  leds[Pixel]=CRGB( red, green, blue);
-  FastLED.show();
-  delay(SpeedDelay);
-  leds[Pixel]=CRGB( 0, 0, 0);
+
+void Sparkle()
+{
+	leds[idex]=CRGB( 0, 0, 0);
+	idex = random(NUM_LEDS);
+	leds[idex]=gColor;
+	FastLED.show();
+	delay(effSpeed/8);
 }
 
 //-------------------------------SnowSparkle---------------------------------------
@@ -1141,6 +1143,18 @@ void SnowSparkle(int SparkleDelay, int SpeedDelay) {
   leds[Pixel]=gColor;
   FastLED.show();
   delay(SpeedDelay);
+}
+void SnowSparkle() {
+	gDelay=effLength/8;
+  fillAll();
+
+  int Pixel = random(NUM_LEDS);
+  leds[Pixel]=CRGB::White;
+  FastLED.show();
+  delay(effSpeed/8);
+  leds[Pixel]=gColor;
+  FastLED.show();
+  //delay(SpeedDelay);
 }
 
 //-------------------------------theaterChase---------------------------------------

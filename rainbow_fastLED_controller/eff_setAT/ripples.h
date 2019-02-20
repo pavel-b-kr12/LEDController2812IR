@@ -18,11 +18,6 @@
 //----------------- Ripple structure definition ----------------------------------------------------------------
 
 struct ripple {                                                                 // Reko Meriö's structures
-
-// Local definitions
-
-// Persistent local variables
-
 // Temporary local variables
   uint8_t brightness;                                   // 0 to 255
   int8_t color;                                         // 0 to 255
@@ -34,8 +29,8 @@ struct ripple {                                                                 
   bool exist;                                           // 0 to 1
 
   
-  Move() {
-    
+  void MovePos()
+ {
     pos += velocity;
     life++;
     
@@ -52,12 +47,9 @@ struct ripple {                                                                 
     brightness = scale8(brightness, fade);              // Adjust brightness accordingly to strip length
 
     if (life > maxLife) exist = false;                  // Kill it once it's expired.
-    
   }
 
-  
-  Init(uint8_t Fade, uint8_t MaxLife) {                 // Typically 216, 20
-    
+  void Init(uint8_t Fade, uint8_t MaxLife) {                 // Typically 216, 20
     pos = random8(NUM_LEDS/8, NUM_LEDS-NUM_LEDS/8);     // Avoid spawning too close to edge.
     velocity = 1;                                       // -1 or 1
     life = 0;                                           // 0 to Maxlife
@@ -66,9 +58,7 @@ struct ripple {                                                                 
     brightness = 255;                                   // 0 to 255
     color = millis();                                   // hue;
     fade = Fade;                                        // 192 called
-    
-  } // Init()
-  
+  }
 }; // struct ripple
 
 typedef struct ripple Ripple;
@@ -89,12 +79,11 @@ void rippless_() {
   for (int i = 0; i < maxRipples; i++) {                                          // Move the ripple if it exists
     if (ripples[i].exist) {
       leds[ripples[i].pos] = ColorFromPalette(currentPalette, ripples[i].color, ripples[i].brightness, LINEARBLEND);
-      ripples[i].Move();
+      ripples[i].MovePos();
     }
   }
 
   fadeToBlackBy(leds, NUM_LEDS, effLength);
-  
 }
 
 
@@ -108,8 +97,8 @@ void SetupMySimilar4Palette() {                                                 
                                 CHSV(thishue+random8(32), 255, random8(128,255)));
 }
 
-void Ripples() {
-
+void Ripples()
+{
   EVERY_N_MILLISECONDS(50) {                                                      // Smooth palette transitioning runs continuously.
     uint8_t maxChanges = 24; 
       nblendPaletteTowardPalette(currentPalette, targetPalette, maxChanges);  
@@ -120,5 +109,4 @@ void Ripples() {
   }
 
     rippless_();                                                                   // Run the ripple routine.
-
 }

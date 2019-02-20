@@ -26,9 +26,17 @@
 #define default_effN_Randon // switch default to randomSet() or FastLED.clear();
 
 
+ 
+//https://arduino-esp8266.readthedocs.io/en/latest/libraries.html?highlight=eeprom%20
+#define use_ESP
+#ifdef use_ESP
+	#include "ESP8266WiFi.h"
+	#define FASTLED_ESP8266_RAW_PIN_ORDER
+#endif
+
 #define tstFPS
 //#define tst
-// tst2  //detailed print of functions call
+//#define tst2  //detailed print of functions call
 //#define BlueFilter
 #define tst_BRIGHTNESS 		77 // to dimm AND see good colors use lower voltage but not software brightness
 #ifdef tst
@@ -39,10 +47,8 @@
  byte random_demo_sw_speed_td_m=2; //s  //!!
  byte random_demo_sw_speed_td_M=12;
 
-//#define ESP
-#ifdef ESP
-#define FASTLED_ESP8266_RAW_PIN_ORDER
-#endif
+
+
 
 //#define keypad1602 //free D0..3, D11..13, A1..  http://wiki.keyestudio.com/Ks0256_keyestudio_LCD1602_Expansion_Shield
 											//https://www.dfrobot.com/wiki/index.php/Arduino_LCD_KeyPad_Shield_(SKU:_DFR0009)
@@ -96,7 +102,7 @@
 	#define btnSpeedSub 				3 //!del, add EffSub
 	#define btnEffNAdd 					4
 	#define btnEffLengthAdd				5
-	#define btnEffDisableChennel		7 //GRB RG GB BG R G B
+	#define btneffRGB		7 //GRB RG GB BG R G B
 		//A5 //смещение каналов R-G-B вдлину
 		//A6  //смещение hue вдлину 
 		
@@ -120,7 +126,7 @@ A0 - яркость, влияет при старте. резистор к GND
 #define effN_OPTION					0 //min
 #define effSpeed_OPTION				1
 #define effLength_OPTION			2
-#define effDisableChennel_OPTION	3
+#define effRGB_OPTION	3
 #define brightness_OPTION			4 //max
 byte LCDoption_selected=effN_OPTION;
 #ifdef keypad1602
@@ -160,17 +166,60 @@ bool banimate=false;
 CRGB leds[NUM_LEDS+1]; //!! del +1
 //=========================================================================
 
-byte effN=			0; // = eff SLOT at start
-byte effSpeed; //EVERY_N_MILLISECONDS( 20 ) gHue+=effSpeed;
+
+struct SaveObj
+{
+	//public:
+	byte effN; // = eff SLOT at start
+	byte effSpeed;
+	byte effSpeedH; //! //EVERY_N_MILLISECONDS( 20 ) gHue+=effSpeed;
+	byte effLength;
+	byte effLengthH;
+	byte effRGB;//1 => disable chennel R, 2 => disable G ,  7 => fast cycle diferent , //!comment other
+	byte effFade;
+	CRGB gColor; 
+	CRGB gColorBg;//! gHueBG == 0 ? White	== 255 ? black
+	byte gDelay;
+	byte gFade; //apply before eff
+};
+#define effRGB_M	17
+/*
+	SaveObj saveObj = {
+		effN,
+		effSpeed,
+		effSpeedH,
+		effLength,
+		effLengthH,
+		effRGB,
+		effFade,
+		gColor,
+		gColorBg,
+		gDelay,
+		gFade
+	};
+*/
+struct SaveObj oostr;
+
 	byte effSpeed_last=1; //for animate eff
-byte effLength=16;
 	byte effLength_last=16;
-byte effLength2=4;//!!
-byte effDisableChennel=0; //1 => disable R, 2 => disable G ,  7 => fast cycle diferent //!! tst
-#define effDisableChennel_M	17
-byte effSpeedH=1; //!!
-byte effLengthH=16;
-CRGB gColorBg=CRGB::Black; //! gHueBG == 0 ? White	== 255 ? black
+	byte effLength2=4;//!!
+
+//this because difficult to rename all to use struct
+#define effN oostr.effN
+#define effSpeed oostr.effSpeed
+#define effSpeedH oostr.effSpeedH
+#define effLength oostr.effLength
+#define effLengthH oostr.effLengthH
+#define effRGB oostr.effRGB
+#define effFade oostr.effFade
+#define gColor oostr.gColor
+#define gColorBg oostr.gColorBg
+#define gDelay oostr.gDelay
+#define gFade oostr.gFade
+
+
+
+
 
 //=========================================================================
 bool bCurrentEff_IsRandom_AndNotSlotN=false;
@@ -222,9 +271,9 @@ void display_upd()
 	lcd.setCursor(4,1); lcd.print("   ");
 	lcd.setCursor(4,1); lcd.print(effLength);
 	
-	lcd.setCursor(8,1); lcd.print("RGB");	lcd_print_selectedOption(effDisableChennel_OPTION);
+	lcd.setCursor(8,1); lcd.print("RGB");	lcd_print_selectedOption(effRGB_OPTION);
 	lcd.setCursor(12,1); lcd.print("   ");
-	lcd.setCursor(12,1); lcd.print(effDisableChennel);
+	lcd.setCursor(12,1); lcd.print(effRGB);
   }
 	#endif
 
@@ -240,7 +289,7 @@ void display_upd()
 	lcd.setCursor(0,2);
 	lcd.print(effLength); 		lcd.print("  ");	lcd.setCursor(6,2);lcd.print("length"); 
 	lcd.setCursor(0,3);
-	lcd.print(effDisableChennel); lcd.print("  ");	lcd.setCursor(6,3); lcd.print(" RGBs");
+	lcd.print(effRGB); lcd.print("  ");	lcd.setCursor(6,3); lcd.print(" RGBs");
 	//lcd.print(anim_d);lcd.print("  ");
   }
   #endif
@@ -257,7 +306,7 @@ void display_upd()
 	Serial.print(effN); Serial.print(" ");
 	Serial.print(effSpeed); Serial.print(" ");
 	Serial.print(effLength); Serial.print(" ");
-	Serial.print(effDisableChennel); Serial.print(" ");
+	Serial.print(effRGB); Serial.print(" ");
 	Serial.println();
   #endif
   
@@ -266,27 +315,29 @@ void display_upd()
   #endif
 }
 //=============================================================================================
-#include <EEPROMex.h>
-const int EEPROM_saved_flag_addr=0;
-const byte effN_addr = 4; 
-const byte effSpeed_addr = 5; 
-const byte effLength_addr = 6; 
-const byte effDisableChennel_addr = 7; 
-//const byte preset0_addr = 8; 
 
-// byte effN_toSave;
-// byte effSpeed_toSave;
-// byte effLength_toSave;
-// byte effDisableChennel_toSave;
-#ifdef save_load_enable
-void saveAfter2s();
-#endif
 void resetSetiings_and_change_slot() //! or changeEff(effN)
 {
-	effN=10;
-	effSpeed=1;
-	effLength=16;
-	effDisableChennel=0;
+								#ifdef tst
+								Serial.println("reset");
+								#endif
+	effN=effN_off; // = eff SLOT at start
+	effSpeed=4;
+	effSpeed_last=1; //for animate eff
+	effSpeedH=1; //! //EVERY_N_MILLISECONDS( 20 ) gHue+=effSpeed;
+	effLength=NUM_LEDS/4+1;
+	effLength_last=4;
+	effLength2=4;//!!
+	effLengthH=NUM_LEDS/4+1;
+	effRGB=0;
+	#define effRGB_M	17
+	effFade=1;
+	gColor=CRGB::White;
+	gColorBg=CRGB::Black;
+	gDelay=5;
+	gFade=0;
+
+
 	change_slot(effN);
 	SET_UPD_Display //saveAfter2s();
 
@@ -296,112 +347,11 @@ void resetSetiings_and_change_slot() //! or changeEff(effN)
 	// banimate=false;
 }
 
+
 bool bIRcommandRepeated=false;
+
 #ifdef save_load_enable
-void save(byte N)
-{
-	byte effNum=bCurrentEff_IsRandom_AndNotSlotN?realEffN:effN;
-
-	#ifdef tst
-	Serial.print("save slot: "); Serial.print(N); Serial.print(" effN: ");Serial.println(effNum);
-	if(effNum<11 || effNum==240 || N>9) 
-	{
-		Serial.println("no save");
-		return; //!opt del
-	}
-	#endif
-
-	//if(effN<10) return; //0-9 is slots, bot not effects //this for update old wrighten, normally it can't occur
-	if(EEPROM.readInt(EEPROM_saved_flag_addr)!=55)	EEPROM.updateInt(EEPROM_saved_flag_addr, 55);
-	
-	EEPROM.updateByte(effN_addr+N*5, effNum);
-	EEPROM.updateByte(effSpeed_addr+N*5, effSpeed);
-	EEPROM.updateByte(effLength_addr+N*5, effLength);
-	EEPROM.updateByte(effDisableChennel_addr+N*5, effDisableChennel);
-	
-		#ifdef tst
-		Serial.println(effSpeed);
-		Serial.println(effLength);
-		Serial.println(effDisableChennel);
-		#endif
-}
-void load(byte N)
-{
-		#ifdef tst
-											Serial.print("load slot:"); Serial.print(N);
-											if(N>9)  {Serial.println("!!!!! >9"); return; }
-		#endif
-	int saved=EEPROM.readInt(EEPROM_saved_flag_addr);
-	if(saved!=55) resetSetiings_and_change_slot();
-	else
-	{
-		effN = EEPROM.readByte(effN_addr+N*5); //!!  change_slot(effN);  before other opt apply, but SET_UPD_Display after all
-		if(effN<10) effN+=10; //return; //0-9 is slots, bot not effects //this for update old wrighten, normally it can't occur
-		change_slot(effN);
-		effSpeed=EEPROM.readByte(effSpeed_addr+N*5);
-		effLength=EEPROM.readByte(effLength_addr+N*5);
-		effDisableChennel=EEPROM.readByte(effDisableChennel_addr+N*5);
-	}
-	
-	#ifdef tst
-	Serial.print(" effN: ");Serial.println(effN);
-	Serial.println(effSpeed);
-	Serial.println(effLength);
-	Serial.println(effDisableChennel);
-	#endif
-
-	#ifdef demo_enable
-	brandom_demo=false;
-	#endif
-	banimate=false;
-	
-	//SET_UPD_Display
-}
-
-bool bNeedSave=false;
-unsigned long nextCanSave_t=0;
-unsigned long nextCanChangeByIr=0; //!opt combine with other
-
-void saveAfter2s() //for slot 0
-{
-	 // if(bNeedSave && SaveSlot!=N && SaveSlot>0) save(SaveSlot);
-	
-	 // effSpeed_toSave=effSpeed;
-	 // effLength_toSave=effLength;
-	 // effN_toSave=effN;
-	 // effDisableChennel_toSave=effDisableChennel;
-	
-	bNeedSave=true;
-	nextCanSave_t=millis()+4000;
-	#ifdef IRkeypad
-	nextCanChangeByIr=millis()+300;
-	#endif
-}
-
-void saveIfNeed()
-{
-	if(bNeedSave && millis()>nextCanSave_t)
-		{
-			save(0);
-			bNeedSave=false;
-		}
-}
-
-#ifdef IRkeypad
-void save_load_preset(byte N)
-{
-	if(bIRcommandRepeated) return; //!! load
-
-	if(!digitalRead(IR_mode_sw_p)) //##doc //mode switch at start toggle IRmode enable, after start switch  save\load mode
-	{
-		save(N);
-	}
-	else
-	{
-		load(N);
-	}
-}
-#endif
+	#include "save_load.h"
 #endif
 //=============================================================================================
 
@@ -416,7 +366,7 @@ void  effN_set(byte N)
 	#endif
 	banimate=false;
 
-	 if(N<=9)
+	 if(N<=9) //!
 	 {
 	 	#ifdef save_load_enable
 	 	load(N);
@@ -532,10 +482,10 @@ void  effLength_sub()
 	#endif
 }
 	  
-void  effDisableChennel_add()
+void  effRGB_add()
 {
-	effDisableChennel++;
-	if(effDisableChennel>effDisableChennel_M) effDisableChennel=0;
+	effRGB++;
+	if(effRGB>effRGB_M) effRGB=0;
 	SET_UPD_Display
 	#ifdef save_load_enable
 	 saveAfter2s();
@@ -567,8 +517,8 @@ void switch_LCDoption_selected_value_add()
 			 effLength_add();
 			break;	
 			
-			case effDisableChennel_OPTION:
-			 effDisableChennel_add();
+			case effRGB_OPTION:
+			 effRGB_add();
 			break;
 			
 			case brightness_OPTION: //!
@@ -597,9 +547,9 @@ void switch_LCDoption_selected_value_sub()
 			 effLength_sub();
 			break;	
 			
-			 case effDisableChennel_OPTION:
+			 case effRGB_OPTION:
 					//ambientLight_map(); FastLED.show(); //!
-			 // effDisableChennel_sub();
+			 // effRGB_sub();
 			 break;
 			 
 			case brightness_OPTION:
@@ -620,12 +570,16 @@ void setup()
 	#define LEDp	LEDpCustom
 #endif
 
-#ifdef ESP
-  FastLED.addLeds<WS2812B, 14>(leds, NUM_LEDS);//D5 6 7 8
-#else
+#ifdef use_ESP
+	WiFi.mode( WIFI_OFF );
+	WiFi.forceSleepBegin();
+#endif
+// #ifdef use_ESP
+//   ..FastLED.addLeds<WS2812B, 14>(leds, NUM_LEDS);//D5 6 7 8
+// #else
   //Nano	9 7 5 3 *2* 4 6 8 10
   FastLED.addLeds<WS2812B, LEDp, GRB>(leds, NUM_LEDS);
-#endif
+//#endif
 FastLED.clear();
 FastLED.show();
 
@@ -681,7 +635,7 @@ pinMode(IR_mode_sw_p, INPUT_PULLUP);
 	pinMode(btnSpeedSub, INPUT_PULLUP);
 	pinMode(btnEffNAdd, INPUT_PULLUP);
 	pinMode(btnEffLengthAdd, INPUT_PULLUP);
-	pinMode(btnEffDisableChennel, INPUT_PULLUP);
+	pinMode(btneffRGB, INPUT_PULLUP);
 	
 	//pinMode(btnReset_p, INPUT_PULLUP); //!
 #endif
@@ -702,6 +656,8 @@ delay(1);
 //if(!digitalRead(btnReset_p))	resetSetiings_and_change_slot(); else //!
 #ifdef save_load_enable
 load(effN);
+#else
+effN_set(11); //so anim_f != null
 #endif
 
 #ifdef IRkeypad
@@ -742,6 +698,9 @@ if(!digitalRead(IR_mode_sw_p))
 
 void loop()
 {
+#ifdef tst2
+	Serial.println(i_eff);
+#endif
 #if defined(SerialSelect) || defined(SerialControl)
 	checkSerial();
 #endif
@@ -824,7 +783,7 @@ Serial.print("IRcommand:"); Serial.println(IRcommand);
 	  break;
 
 	  case 0x46:		if(millis()<nextCanChangeByIr) break;
-	  effDisableChennel_add();
+	  effRGB_add();
 	  break;
 	  
 	  case 0x47:		if(millis()<nextCanChangeByIr) break;
@@ -968,9 +927,9 @@ EVERY_N_MILLISECONDS( 220 )
 		effLength_add();				
 	}
 	else
-	if(!digitalRead(btnEffDisableChennel))
+	if(!digitalRead(btneffRGB))
 	{
-		effDisableChennel_add();		
+		effRGB_add();		
 	}
 	#endif
   }

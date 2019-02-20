@@ -1,5 +1,5 @@
 bool bPause=false;
-byte gDelay=15;
+
 byte aDelay=0;
 byte gDelayH=20;
 
@@ -22,18 +22,17 @@ CRGB ledsX[NUM_LEDS];//!opt	 //-ARRAY FOR COPYING WHATS IN THE LED STRIP CURRENT
 //byte gDelay = 20;
 byte thisstep = 10;
 
-CRGB gColor;
-CRGB bgColor;
+
 
 unsigned long randomShow_next_effN_sw_t=0;
 
 // Define variables used by the sequences.
-uint8_t		twinkrate = 100; // The higher the value, the lower the number of twinkles.
-uint8_t		thisfade =	  8; // How quickly does it fade? Lower = slower fade rate.
+byte		twinkrate = 100; // The higher the value, the lower the number of twinkles.
+byte		thisfade =	  8; // How quickly does it fade? Lower = slower fade rate.
 //nscale 					 // Trail behind the LED's. Lower => faster fade.
-uint8_t		thishue =	 50; // Starting hue.
-uint8_t		thissat =	255; // The saturation, where 255 = brilliant colours.
-uint8_t		thisbri =	255; // Brightness of a sequence.
+byte		thishue =	 50; // Starting hue.
+byte		thissat =	255; // The saturation, where 255 = brilliant colours.
+byte		thisbri =	255; // Brightness of a sequence.
 bool		randhue =	  1; // Do we want random colours all the time? 1 = yes.
 uint8_t		thisinc =	  1; // Incremental value for rotating hues
 int			huediff =	256; // Range of random #'s to use for hue
@@ -178,7 +177,7 @@ Serial.println("randomSet");
 	effSpeed=random8(1,90); //40
 	effLength=random8(5,120); //60
 	effLength2=random8(5,120); //60
-	effDisableChennel=random8(0,effDisableChennel_M);
+	effRGB=random8(0,effRGB_M);
 	effSpeedH=random8(1,90);
 	effLengthH=random8(1,90);
 		thishue=random8();
@@ -191,7 +190,7 @@ byte effNt=0;
 void change_slot(byte effSlot)
 {
 gDelay = 20;
-effDisableChennel=0;
+effRGB=0;
 
 idex=0; idex16 = 0;
 thissat = 255;
@@ -332,9 +331,7 @@ long animHue_next_t=0;
 void LED_anim()
 {
 	if(bPause) return; //!! ifdef 
-	#ifdef tstFPS
-	Serial.println(LEDS.getFPS());
-	#endif
+
 
 //EVERY_N_MILLISECONDS(  )  //not working when argument changed
 //  EVERY_N_MILLIS_I(thistimer, gDelay) { //!test
@@ -343,6 +340,11 @@ void LED_anim()
 if(millis()>anim_next_t)
 {
 	anim_next_t=millis()+gDelay;
+
+	#ifdef tstFPS
+		if(i_eff%4==0) Serial.println(LEDS.getFPS());
+	#endif
+
 	if(banimate)
 	{
 		effSpeed=beatsin8(4, effSpeed_last/4, effSpeed_last>55?255:(15+effSpeed_last*4) ); //! speed
@@ -352,31 +354,33 @@ if(millis()>anim_next_t)
 		//effSpeed=beatsin8(3, 0, 150 );
   		//effLength=beatsin8(2, 2, 180 );
 
-		//! if(effDisableChennel>0 && effDisableChennel<7) nextSW_t=millis()+10;  else +30
+		//! if(effRGB>0 && effRGB<7) nextSW_t=millis()+10;  else +30
 		EVERY_N_MILLISECONDS( 20000 )
 		{
-			effDisableChennel=random8(0,effDisableChennel_M);
-			//effDisableChennel++;
-			//if(effDisableChennel>effDisableChennel_M) effDisableChennel=0;
+			effRGB=random8(0,effRGB_M);
+			//effRGB++;
+			//if(effRGB>effRGB_M) effRGB=0;
 		}
-		//effDisableChennel= beatsin8(1, 0, 16);
+		//effRGB= beatsin8(1, 0, 16);
 	}
-
+	// #ifdef tst2
+	// 	Serial.println(anim_f==NULL);
+	// #endif
 	anim_f();
 
-	if(effDisableChennel!=0)
+	if(effRGB!=0)
 	{
 		for(NUM_LEDS_type i = 0; i < NUM_LEDS; i++)
 		{
-			if(effDisableChennel==7) DisableChennel(i, 3+(i_eff/16)%3);
-			else if(effDisableChennel==8) DisableChennel(i, (i/4)%6);
-			else if(effDisableChennel==9) DisableChennel(i, ((i+millis()/(512-effSpeed))/4)%6);
-			//else if(effDisableChennel==10)  //! dis each 3rd
+			if(effRGB==7) DisableChennel(i, 3+(i_eff/16)%3);
+			else if(effRGB==8) DisableChennel(i, (i/4)%6);
+			else if(effRGB==9) DisableChennel(i, ((i+millis()/(512-effSpeed))/4)%6);
+			//else if(effRGB==10)  //! dis each 3rd
 			//
-			else if(effDisableChennel<=6) DisableChennel(i, effDisableChennel); //0..6  10..16
-			else if(effDisableChennel>=10 && effDisableChennel<=16)
+			else if(effRGB<=6) DisableChennel(i, effRGB); //0..6  10..16
+			else if(effRGB>=10 && effRGB<=16)
 			{
-			 	DisableChennel(i, effDisableChennel-10); //0..6  10..16
+			 	DisableChennel(i, effRGB-10); //0..6  10..16
 			 	i++;
 			}
 			else

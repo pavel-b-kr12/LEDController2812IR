@@ -41,7 +41,7 @@ void setValueFromMsg(byte msgType, byte value)
 		 effLength=value;
 		break;
 		case messageRGB:
-		 effDisableChennel=value;
+		 effRGB=value;
 		break;
 		case messageSpeedH:
 		 // =value;
