@@ -60,9 +60,9 @@ public void button_clear_click1(GButton source, GEvent event) { //_CODE_:button_
 
 public void slider_effN_change1(GSlider source, GEvent event) { //_CODE_:slider_effN:684540:
   if(bDebugPrint){
-																																				//println("slider event");
-																																				//println(event.getType());
-																																				//println(bSkipEvent);
+																																				println("slider event");
+																																				println(event.getType());
+																																				println(bSkipEvent);
   }
 	if(bSkipEvent) return;
 	settingsVals.get("effN").setValue(source.getValueI());
@@ -100,7 +100,7 @@ public void button_effNAdd_click1(GButton source, GEvent event) { //_CODE_:butto
 } //_CODE_:button_effNAdd:715775:
 
 public void slider_brightness_change1(GSlider source, GEvent event) { //_CODE_:slider_brightness:412375:
-	settingsVals.get("bright").setValue(source.getValueI());
+	settingsVals.get("gBrightness").setValue(source.getValueI());
 } //_CODE_:slider_brightness:412375:
 
 public void slider_speedH_change1(GSlider source, GEvent event) { //_CODE_:slider_speedH:696558:
@@ -123,19 +123,8 @@ public void slider_action_change(GSlider source, GEvent event) { //_CODE_:slider
 } //_CODE_:slider_action:268497:
 
 public void button_disconnect_click(GButton source, GEvent event) { //_CODE_:button_disconnect:619813:
-	if(bConnected==2)
-	{
-		myPort.clear();
-		myPort.stop();
-		myPort=null;
-		bConnected=0;
-		button_disconnect.setText("Connect");
-	}
-	else
-	{
-		bConnected=1;
-		button_disconnect.setText("Disonnect");
-	}
+	if(bConnected==2)  DisableSerial();
+	else EnableSerial();
 } //_CODE_:button_disconnect:619813:
 
 public void effN_random_click(GButton source, GEvent event) { //_CODE_:effN_random:685529:
@@ -168,18 +157,78 @@ public void button_animateRandom_click1(GButton source, GEvent event) { //_CODE_
 
 public void button_codeGen_click(GButton source, GEvent event) { //_CODE_:button_codeGen:274298:
 	int effN=settingsVals.get("effN").valueSlider.getValueI(); //!fix values has to be setted by Serial, not only slider pos. Bus seems it has not //settingsVals.get("effN").value
-	int effRGB=settingsVals.get("RGB").valueSlider.getValueI();
+	
 	String s="case "+
 	Integer.toString(effN)+ 
-	":anim_f="+EffNms[effN]+
-	";				effSpeed="+	Integer.toString(settingsVals.get("speed").valueSlider.getValueI())+
-	";		effLength="+		Integer.toString(settingsVals.get("length").valueSlider.getValueI());
+	":anim_f="+EffNms[effN]+";"+
+  printVal("effSpeed","speed",-1)+
+  printVal("effLength","length",-1)+
+  printVal("effSpeedH","speedH",-1)+
+  printVal("effLengthH","lengthH",-1)+
+  printVal("effFade","effFade",-1)+
+  "    gColor=CRGB("+
+     Integer.toString(settingsVals.get("gColorH").valueSlider.getValueI())+","+
+     Integer.toString(settingsVals.get("gColorS").valueSlider.getValueI())+","+
+     Integer.toString(settingsVals.get("gColorV").valueSlider.getValueI())+
+  ");"+
 
-	if(effRGB>0) s+=
-	";		effRGB="+ Integer.toString(effRGB);
-	s+="; break;";
+	// ";    gColorBg="+   Integer.toString(settingsVals.get("gColorH").valueSlider.getValueI())+
+	//printVal("gFade","gFade",-1)+
+	printVal("indexOrBits","indexOrBits",-1)+
+
+	printVal("gDelay","gDelay", 5);
+	//printVal("gBrightness","gBrightness")+
+	//printVal("NUM_LEDS","NUM_LEDS")+
+	printVal("effRGB","RGB", 0);
+	s+=" break;";
+
 	copyToClipboard(s);
 } //_CODE_:button_codeGen:274298:
+
+public void slider_gDelay_change1(GSlider source, GEvent event) { //_CODE_:slider_gDelay:330218:
+	if(bSkipEvent) return;
+	settingsVals.get("gDelay").setValue(source.getValueI());
+} //_CODE_:slider_gDelay:330218:
+
+public void slider_effFade_change(GSlider source, GEvent event) { //_CODE_:slider_effFade:371226:
+	if(bSkipEvent) return;
+	settingsVals.get("effFade").setValue(source.getValueI());
+} //_CODE_:slider_effFade:371226:
+
+public void slider_indexOrBits_change(GSlider source, GEvent event) { //_CODE_:slider_indexOrBits:366592:
+	if(bSkipEvent) return;
+	settingsVals.get("indexOrBits").setValue(source.getValueI());
+} //_CODE_:slider_indexOrBits:366592:
+
+public void slider_gColorH_change(GSlider source, GEvent event) { //_CODE_:slider_gColorH:600066:
+	if(bSkipEvent) return;
+	settingsVals.get("gColorH").setValue(source.getValueI());
+} //_CODE_:slider_gColorH:600066:
+
+public void slider_gColorS_change(GSlider source, GEvent event) { //_CODE_:slider_gColorS:910166:
+	if(bSkipEvent) return;
+	settingsVals.get("gColorS").setValue(source.getValueI());
+} //_CODE_:slider_gColorS:910166:
+
+public void slider_gColorV_change(GSlider source, GEvent event) { //_CODE_:slider_gColorV:320268:
+	if(bSkipEvent) return;
+	settingsVals.get("gColorV").setValue(source.getValueI());
+} //_CODE_:slider_gColorV:320268:
+
+public void NUM_LEDS_change(GSlider source, GEvent event) { //_CODE_:slider_NUM_LEDS:783871:
+	if(bSkipEvent) return;
+	settingsVals.get("NUM_LEDS").setValue(source.getValueI());
+} //_CODE_:slider_NUM_LEDS:783871:
+
+public void button_msgprint_click(GButton source, GEvent event) { //_CODE_:button_msgprint:899288:
+	SendMsg(settingsVals.get("msgprint").message_code, 0);
+	println("CRGBPalette16 currentPalette = CRGBPalette16(");
+
+} //_CODE_:button_msgprint:899288:
+
+public void button_sim_click(GButton source, GEvent event) { //_CODE_:button_sim:689176:
+  bSim_set(!bSim);
+} //_CODE_:button_sim:689176:
 
 
 
@@ -223,28 +272,25 @@ public void createGUI(){
   button_clear.setText("clear");
   button_clear.addEventHandler(this, "button_clear_click1");
   slider_effN = new GSlider(this, 20, 260, 560, 40, 10.0);
-  slider_effN.setShowValue(true);
   slider_effN.setLimits(1, 0, 255);
   slider_effN.setNbrTicks(26);
   slider_effN.setNumberFormat(G4P.INTEGER, 0);
   slider_effN.setOpaque(false);
   slider_effN.addEventHandler(this, "slider_effN_change1");
-  slider_speed = new GSlider(this, 20, 300, 560, 40, 10.0);
-  slider_speed.setShowValue(true);
+  slider_speed = new GSlider(this, 20, 290, 560, 40, 10.0);
   slider_speed.setLimits(1, 0, 180);
   slider_speed.setNbrTicks(18);
   slider_speed.setNumberFormat(G4P.INTEGER, 0);
   slider_speed.setOpaque(false);
   slider_speed.addEventHandler(this, "slider_speed_change1");
-  slider_length = new GSlider(this, 20, 340, 560, 40, 10.0);
+  slider_length = new GSlider(this, 20, 320, 560, 40, 10.0);
   slider_length.setShowValue(true);
   slider_length.setLimits(1, 1, 255);
   slider_length.setNbrTicks(26);
   slider_length.setNumberFormat(G4P.INTEGER, 0);
   slider_length.setOpaque(false);
   slider_length.addEventHandler(this, "slider_length_change1");
-  slider_RGB = new GSlider(this, 20, 380, 460, 50, 10.0);
-  slider_RGB.setShowValue(true);
+  slider_RGB = new GSlider(this, 20, 500, 460, 50, 10.0);
   slider_RGB.setLimits(0, 0, 8);
   slider_RGB.setNbrTicks(9);
   slider_RGB.setStickToTicks(true);
@@ -265,41 +311,38 @@ public void createGUI(){
   button_effNAdd.setText("+");
   button_effNAdd.addEventHandler(this, "button_effNAdd_click1");
   slider_brightness = new GSlider(this, 671, 10, 490, 41, 10.0);
-  slider_brightness.setShowValue(true);
   slider_brightness.setRotation(PI/2, GControlMode.CORNER);
   slider_brightness.setLimits(33, 255, 1);
   slider_brightness.setNumberFormat(G4P.INTEGER, 0);
   slider_brightness.setLocalColorScheme(GCScheme.GOLD_SCHEME);
   slider_brightness.setOpaque(true);
   slider_brightness.addEventHandler(this, "slider_brightness_change1");
-  slider_speedH = new GSlider(this, 20, 430, 560, 40, 10.0);
-  slider_speedH.setShowValue(true);
+  slider_speedH = new GSlider(this, 20, 350, 460, 40, 10.0);
   slider_speedH.setLimits(1, 0, 255);
   slider_speedH.setNumberFormat(G4P.INTEGER, 0);
   slider_speedH.setOpaque(false);
   slider_speedH.addEventHandler(this, "slider_speedH_change1");
-  slider_lengthH = new GSlider(this, 20, 470, 560, 40, 10.0);
-  slider_lengthH.setShowValue(true);
+  slider_lengthH = new GSlider(this, 20, 380, 460, 40, 10.0);
   slider_lengthH.setLimits(44, 1, 240);
   slider_lengthH.setNumberFormat(G4P.INTEGER, 0);
   slider_lengthH.setOpaque(false);
   slider_lengthH.addEventHandler(this, "slider_lengthH_change1");
-  label_effN = new GLabel(this, 580, 270, 50, 20);
+  label_effN = new GLabel(this, 540, 280, 50, 20);
   label_effN.setText("eff №");
   label_effN.setOpaque(false);
-  label_speed = new GLabel(this, 580, 310, 50, 20);
+  label_speed = new GLabel(this, 540, 310, 50, 20);
   label_speed.setText("speed");
   label_speed.setOpaque(false);
-  label_length = new GLabel(this, 580, 350, 50, 20);
+  label_length = new GLabel(this, 540, 340, 50, 20);
   label_length.setText("length");
   label_length.setOpaque(false);
-  label_RGB = new GLabel(this, 580, 396, 50, 20);
+  label_RGB = new GLabel(this, 480, 490, 50, 20);
   label_RGB.setText("RGB");
   label_RGB.setOpaque(false);
-  label_speedH = new GLabel(this, 580, 440, 60, 20);
+  label_speedH = new GLabel(this, 420, 370, 60, 20);
   label_speedH.setText("speed H");
   label_speedH.setOpaque(false);
-  label_lengthH = new GLabel(this, 580, 480, 60, 20);
+  label_lengthH = new GLabel(this, 420, 400, 60, 20);
   label_lengthH.setText("length H");
   label_lengthH.setOpaque(false);
   label_brightness = new GLabel(this, 620, 500, 60, 20);
@@ -311,11 +354,9 @@ public void createGUI(){
   label_effN_val.setText("1");
   label_effN_val.setOpaque(false);
   slider_action = new GSlider(this, 629, 10, 250, 40, 10.0);
-  slider_action.setShowValue(true);
   slider_action.setRotation(PI/2, GControlMode.CORNER);
   slider_action.setLimits(0, 0, 5);
   slider_action.setStickToTicks(true);
-  slider_action.setShowTicks(true);
   slider_action.setNumberFormat(G4P.INTEGER, 0);
   slider_action.setLocalColorScheme(GCScheme.ORANGE_SCHEME);
   slider_action.setOpaque(false);
@@ -353,7 +394,7 @@ public void createGUI(){
   button_animateRandom.setText("animate random");
   button_animateRandom.addEventHandler(this, "button_animateRandom_click1");
   button_codeGen = new GButton(this, 400, 70, 180, 20);
-  button_codeGen.setText("generate code for switch(mode)");
+  button_codeGen.setText("generate case for switch(mode)");
   button_codeGen.setLocalColorScheme(GCScheme.GOLD_SCHEME);
   button_codeGen.addEventHandler(this, "button_codeGen_click");
   label_instruction1 = new GLabel(this, 610, 544, 90, 10);
@@ -372,6 +413,58 @@ public void createGUI(){
   label_instruction3.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
   label_instruction3.setText("less interesting");
   label_instruction3.setOpaque(false);
+  slider_gDelay = new GSlider(this, 630, 260, 240, 40, 10.0);
+  slider_gDelay.setRotation(PI/2, GControlMode.CORNER);
+  slider_gDelay.setLimits(0.5, 0.0, 1.0);
+  slider_gDelay.setNumberFormat(G4P.DECIMAL, 2);
+  slider_gDelay.setOpaque(false);
+  slider_gDelay.addEventHandler(this, "slider_gDelay_change1");
+  slider_effFade = new GSlider(this, 20, 410, 390, 40, 10.0);
+  slider_effFade.setLimits(0.5, 0.0, 1.0);
+  slider_effFade.setNumberFormat(G4P.DECIMAL, 2);
+  slider_effFade.setOpaque(false);
+  slider_effFade.addEventHandler(this, "slider_effFade_change");
+  slider_indexOrBits = new GSlider(this, 20, 440, 390, 40, 10.0);
+  slider_indexOrBits.setLimits(0.5, 0.0, 1.0);
+  slider_indexOrBits.setNumberFormat(G4P.DECIMAL, 2);
+  slider_indexOrBits.setOpaque(false);
+  slider_indexOrBits.addEventHandler(this, "slider_indexOrBits_change");
+  slider_gColorH = new GSlider(this, 530, 390, 110, 30, 10.0);
+  slider_gColorH.setRotation(PI/2, GControlMode.CORNER);
+  slider_gColorH.setLimits(0.5, 0.0, 1.0);
+  slider_gColorH.setNumberFormat(G4P.DECIMAL, 2);
+  slider_gColorH.setOpaque(false);
+  slider_gColorH.addEventHandler(this, "slider_gColorH_change");
+  slider_gColorS = new GSlider(this, 560, 390, 110, 30, 10.0);
+  slider_gColorS.setRotation(PI/2, GControlMode.CORNER);
+  slider_gColorS.setLimits(0.5, 0.0, 1.0);
+  slider_gColorS.setNumberFormat(G4P.DECIMAL, 2);
+  slider_gColorS.setOpaque(false);
+  slider_gColorS.addEventHandler(this, "slider_gColorS_change");
+  slider_gColorV = new GSlider(this, 590, 390, 110, 30, 10.0);
+  slider_gColorV.setRotation(PI/2, GControlMode.CORNER);
+  slider_gColorV.setLimits(0.5, 0.0, 1.0);
+  slider_gColorV.setNumberFormat(G4P.DECIMAL, 2);
+  slider_gColorV.setOpaque(false);
+  slider_gColorV.addEventHandler(this, "slider_gColorV_change");
+  slider_NUM_LEDS = new GSlider(this, 20, 470, 390, 40, 10.0);
+  slider_NUM_LEDS.setLimits(0.5, 0.0, 1.0);
+  slider_NUM_LEDS.setNumberFormat(G4P.DECIMAL, 2);
+  slider_NUM_LEDS.setOpaque(false);
+  slider_NUM_LEDS.addEventHandler(this, "NUM_LEDS_change");
+  button_msgprint = new GButton(this, 380, 40, 80, 20);
+  button_msgprint.setText("print palette");
+  button_msgprint.setLocalColorScheme(GCScheme.GOLD_SCHEME);
+  button_msgprint.addEventHandler(this, "button_msgprint_click");
+  label_gDelay = new GLabel(this, 583, 500, 50, 20);
+  label_gDelay.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label_gDelay.setText("gD");
+  label_gDelay.setOpaque(false);
+  button_sim = new GButton(this, 380, 10, 40, 20);
+  button_sim.setText("sim");
+  button_sim.setTextItalic();
+  button_sim.setLocalColorScheme(GCScheme.GREEN_SCHEME);
+  button_sim.addEventHandler(this, "button_sim_click");
 }
 
 // Variable declarations 
@@ -419,3 +512,13 @@ GButton button_codeGen;
 GLabel label_instruction1; 
 GLabel label_instruction2; 
 GLabel label_instruction3; 
+GSlider slider_gDelay; 
+GSlider slider_effFade; 
+GSlider slider_indexOrBits; 
+GSlider slider_gColorH; 
+GSlider slider_gColorS; 
+GSlider slider_gColorV; 
+GSlider slider_NUM_LEDS; 
+GButton button_msgprint; 
+GLabel label_gDelay; 
+GButton button_sim; 

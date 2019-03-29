@@ -1,5 +1,3 @@
-bool bPause=false;
-
 byte aDelay=0;
 byte gDelayH=20;
 
@@ -11,15 +9,12 @@ byte ballColors[3][3] = {
 };
 #endif
 
-byte BOTTOM_INDEX = 0;
-NUM_LEDS_type CENTER_TOP_INDEX = byte(NUM_LEDS / 2);
-byte EVENODD = NUM_LEDS % 2;
 
 #ifndef saveMem
-CRGB ledsX[NUM_LEDS];//!opt	 //-ARRAY FOR COPYING WHATS IN THE LED STRIP CURRENTLY (FOR CELL-AUTOMATA, MARCH, ETC)
-//int ledsX[NUM_LEDS][3];
+CRGB ledsX_[gNUM_LEDS];//!opt	 //-ARRAY FOR COPYING WHATS IN THE LED STRIP CURRENTLY (FOR CELL-AUTOMATA, MARCH, ETC)
+//int ledsX_[NUM_LEDS][3];
 #endif
-//byte gDelay = 20;
+
 byte thisstep = 10;
 
 
@@ -43,9 +38,9 @@ uint8_t bgHinc = 0;
 uint8_t bgbri = 0;                                        // Brightness of background colour
 
 uint8_t deltahue = 15; // Hue change between pixels.
-uint16_t xscale = 30;                                         // Wouldn't recommend changing this on the fly, or the animation will be really blocky.
-uint16_t yscale = 30;                                         // Wouldn't recommend changing this on the fly, or the animation will be really blocky.
-uint8_t maxChanges = 24;                                      // Value for blending between palettes.
+uint8_t xscale = 30;                                         // Wouldn't recommend changing this on the fly, or the animation will be really blocky.
+uint8_t yscale = 30;                                         // Wouldn't recommend changing this on the fly, or the animation will be really blocky.
+uint8_t maxChanges = 24;            //! set every time or not chane                          // Value for blending between palettes.
 uint8_t thisbeat;
 uint8_t huerot;
 uint8_t palIndex;
@@ -61,10 +56,9 @@ uint8_t   thisdiff =  16;                                     // Incremental cha
 
 
 int8_t thisrot = 1;                                           // Hue rotation speed. Includes direction.
-bool thisdir = 0;  // I use a direction variable instead of signed math so I can use it in multiple routines.
+bool thisdir = 0;  // I use a direction variable instead of signed math so I can use it in multiple routines. //-SWITCH FOR COLOR BOUNCE (0-1)
 
 
-//! ifdef tri_sin
 int wave1=0;                                                  // Current phase is calculated.
 int wave2=0;
 int wave3=0;
@@ -91,7 +85,6 @@ NUM_LEDS_type idex_last = 0;
 byte ihue = 0;
 byte ibright = 0;
 byte isat = 0;
-bool bouncedirection = 0;	 //-SWITCH FOR COLOR BOUNCE (0-1)
 float tcount = 0.0;		  //-INC VAR FOR SIN LOOPS
 byte lcount = 0;			  //-ANOTHER COUNTING VAR
 
@@ -104,9 +97,49 @@ void (*anim_f)();
 void (*anim_f_last)();
 
 #include "UTILITY_FXNS.h"
+#ifdef eff_setX
+	#include "eff_setX.h"
+	#include "eff_set_Edges.h"
+#endif
+
 #include "LED_EFFECT_FUNCTIONS.h"
+#include "eff_setFastLED.h"
 #include "eff_setA.h"
 #include "eff_setB.h"
+#include "eff_set2.h"
+#include "eff_set_cel.h"
+#include "eff_set_interactive.h"
+
+
+ int step = -1;
+#ifdef sound_p
+#define MIC_PIN sound_p
+#define DC_OFFSET  0                                          // DC offset in mic signal - if unusure, leave 0
+unsigned int sample = 0;
+
+//uint16_t loops = 0;                                                             // Our loops per second counter.
+
+// Global sound variables used in other routines.
+uint16_t oldsample = 0;                                                         // Previous sample is used for peak detection and for 'on the fly' values.
+bool     samplepeak = 0;                                                        // The oldsample is well above the average, and is a 'peak'.
+uint16_t sampleavg = 0;                                                         // Average of the last 64 samples.
+
+
+
+#include "eff_set_Sound\mus_random_mov.h"
+
+#include "eff_set_Sound\soundmems_peak_ripple.h"
+#include "eff_set_Sound\soundmems_wave.h"
+ 
+#include "eff_set_Sound\mus_arduinoFFT.h"
+
+#include "eff_set_Sound\soundmems\_soundmems.h"
+#include "eff_set_Sound\soundmems\soundmems_fire.h"
+
+#include "eff_set_Sound\soundmems_noise.h"
+#include "eff_set_Sound\soundmems_pal.h"
+#endif
+
 #include "eff_setAT\aatemplate.h"
 #include "eff_setAT\beatwave.h"
 #include "eff_setAT\blend_test.h"
@@ -146,13 +179,12 @@ void (*anim_f_last)();
 #include "eff_setAT\three_sin_pal_demo.h"
 #include "eff_setAT\two_sin_pal_demo.h"
 
+
 //------------------------snd
 //#include "eff_setAT\fht_log.h"
 //#include "eff_setAT\fht_log_ripple.h"
 
-#ifdef eff_setX
-	#include "eff_setX.h"
-#endif
+
 
 #ifndef saveMem
 void nodo()
@@ -165,9 +197,9 @@ void change_slot(byte);
 
 void randomSet()
 {
-#ifdef tst2
-Serial.println("randomSet");
-#endif
+												#ifdef tst2
+												Serial.println("randomSet");
+												#endif
 	//anim_f=randomEff;
 	
 	//effN=random8(1,250);
@@ -184,17 +216,17 @@ Serial.println("randomSet");
 	gDelay=random8(2,30);
 
 	bCurrentEff_IsRandom_AndNotSlotN=true;
+
+	display_upd();
 }
 
 byte effNt=0;
 void change_slot(byte effSlot)
 {
-gDelay = 20;
 effRGB=0;
-
 idex=0; idex16 = 0;
 thissat = 255;
-bouncedirection = 0;
+thisdir = 0;
 			#ifdef tst2
 				Serial.print("slot:"); Serial.println(effSlot);
 			#endif
@@ -328,6 +360,7 @@ void DisableChennel(int i, byte chen)
 long anim_next_t=0;
 long animHue_next_t=0;
 
+
 void LED_anim()
 {
 	if(bPause) return; //!! ifdef 
@@ -342,7 +375,50 @@ if(millis()>anim_next_t)
 	anim_next_t=millis()+gDelay;
 
 	#ifdef tstFPS
-		if(i_eff%4==0) Serial.println(LEDS.getFPS());
+
+		uint8_t *p;
+
+		PRINT__
+
+		if(bPrintPixels)
+		{
+			PRINT_leds
+
+			int fps=LEDS.getFPS();
+			p = (uint8_t*) &fps;
+			Serial.write(p,2);
+
+			int size=NUM_LEDS*3; //! NUM_LEDS range
+			p = (uint8_t*) &size;
+			Serial.write(p,2);
+			Serial.write((uint8_t*)leds, size);
+		}
+		else //if(i_eff%4==0)  //print only FPS and totall power
+		{
+			PRINT_totall
+
+			int fps=LEDS.getFPS();
+			p = (uint8_t*) &fps;
+			Serial.write(p,2);
+
+			 {
+			  //#include "power_mgt.h" //? nw as FastLED.calculate_unscaled_power_mW		http://fastled.io/docs/3.1/power__mgt_8cpp_source.html
+			  //Serial.println(calculate_unscaled_power_mW (leds, NUM_LEDS)); //* FastLED.getBrightness()/256  this done in GUI
+				const CRGB* firstled = &(leds[0]);
+				uint8_t* p = (uint8_t*)(firstled);
+				uint16_t count = NUM_LEDS*3;
+				uint32_t totall=0;
+	 
+				while( count) { // This loop might benefit from an AVR assembly version -MEK
+					totall += *p++;
+					count--;
+				}
+												totall/=256; //!
+				p = (uint8_t*) &totall;
+				Serial.write(p,2);
+			}
+		}
+
 	#endif
 
 	if(banimate)
@@ -366,6 +442,7 @@ if(millis()>anim_next_t)
 	// #ifdef tst2
 	// 	Serial.println(anim_f==NULL);
 	// #endif
+	//Serial.print(anim_f==NULL);	Serial.print(" "); Serial.print(NUM_LEDS);	Serial.print(" ");Serial.println(gNUM_LEDS);
 	anim_f();
 
 	if(effRGB!=0)
@@ -384,24 +461,44 @@ if(millis()>anim_next_t)
 			 	i++;
 			}
 			else
+			if(effRGB==17)
 			{
 				//! fadeToBlackBy(leds, NUM_LEDS, 16);
 				addGlitter(20);
 			}
-
+			else
+			if(effRGB==18)
+			{
+				addGlitter(effLength/16);
+			}
+			else
+			if(effRGB==19)
+			{
+				fadeToBlackBy(leds, NUM_LEDS, effLength/32);
+				addGlitter(effLength/16);
+			}
+			else
+			if(effRGB==20)
+			{
+				addGlitterBlack(effLength/4);
+			}
 			//!confetti
 			//! black separators, 
 			//! black separators moving 
+			//! gFade
 		}
 	}
 	#ifdef BlueFilter
-		for(NUM_LEDS_type i = 0; i < NUM_LEDS; i++)
-			leds[i].b=leds[i].b/8;
+		for(NUM_LEDS_type i = 0; i < NUM_LEDS; i++)		leds[i].b=leds[i].b/8;
 	#endif
 
 	FastLED.show();
 	i_eff++;	//if(i_eff>effLength) i_eff=0; //!!!#  i_eff%effLength	i_eff_M_is_effLength
 } //anim_f(); EVERY_N_MILLISECONDS
+else
+{
+	//! https://github.com/FastLED/FastLED/wiki/FastLED-Temporal-Dithering
+}
 
 //EVERY_N_MILLISECONDS( 20 )
 //{
@@ -413,10 +510,9 @@ if(millis()>animHue_next_t)
 	#ifdef demo_enable //no show for this hardware
 	if(brandom_demo && millis()>randomShow_next_effN_sw_t)
 	{
-		#ifdef tst2
-		Serial.print("brandom_demo"); Serial.println();
-		#endif
-					
+						#ifdef tst2
+						Serial.println("brandom_demo");
+						#endif
 		randomShow_next_effN_sw_t=millis()+random8(random_demo_sw_speed_td_m, random_demo_sw_speed_td_M)*1000;
 		randomSet();
 	}

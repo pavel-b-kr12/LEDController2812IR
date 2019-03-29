@@ -11,29 +11,25 @@
  */
 
 //gColor                                              // Ripple colour is randomized.
-int center = 0;                                               // Center of the current ripple.
-int step = -1;                                                // -1 is the initializing step.
-uint8_t myfade = 255;                                         // Starting brightness.
+                                             
 #define maxsteps 16                                           // Case statement wouldn't allow a variable.
-
-uint8_t bgcol = 0;                                            // Background colour rotates.
 
 void ripple() {
 thisfade=effLength;
-myfade=255-effSpeed;
+byte myfade=255-effSpeed;
 
   fadeToBlackBy(leds, NUM_LEDS, thisfade);                             // 8 bit, 1 = slow, 255 = fast
   
   switch (step) {
 
     case -1:                                                          // Initialize ripple variables.
-      center = random(NUM_LEDS);
+      idex = random(NUM_LEDS); // Center of the current ripple.
       gColor = random8();
       step = 0;
       break;
 
     case 0:
-      leds[center] = ColorFromPalette(currentPalette, gColor, myfade, currentBlending);
+      leds[idex] = ColorFromPalette(currentPalette, gColor, myfade, currentBlending);
       
       step ++;
       break;
@@ -43,8 +39,8 @@ myfade=255-effSpeed;
       break;
 
     default:                                                          // Middle of the ripples.
-      leds[(center + step + NUM_LEDS) % NUM_LEDS] += ColorFromPalette(currentPalette, gColor, myfade/step*2, currentBlending);       // Simple wrap from Marc Miller
-      leds[(center - step + NUM_LEDS) % NUM_LEDS] += ColorFromPalette(currentPalette, gColor, myfade/step*2, currentBlending);
+      leds[(idex + step + NUM_LEDS) % NUM_LEDS] += ColorFromPalette(currentPalette, gColor, myfade/step*2, currentBlending);       // Simple wrap from Marc Miller
+      leds[(idex - step + NUM_LEDS) % NUM_LEDS] += ColorFromPalette(currentPalette, gColor, myfade/step*2, currentBlending);
       step ++;                                                         // Next step.
       break;  
   } // switch step

@@ -10,159 +10,25 @@ EVERY_N_MILLISECONDS( 40 )
 #endif
 */
 
-//effN, spd, , length, , RGB, , time to from start to end value
-// void animEff(byte N, byte spd0, byte spd9, byte length0,byte length9, byte chennels0,byte chennels9, byte time_d) //!!
-// {
-
-// }
-
-// spd, , length, , RGB, , time to from start to end value, time to do 
-// void animEffContinue(byte spd0, byte spd9, byte length0,byte length9, byte chennels0,byte chennels9, byte time1Cycle_d, byte time_d)
-// {
-
-	
-// }
-
-
-void fillStriped()
-{
-  for(NUM_LEDS_type i=0;i<NUM_LEDS;i++)
-  {
-    // leds[i] = (
-    //   ((byte)(i+i_eff/(effSpeed+1)))
-    //   %effLength<(1+effLength2)
-    //   )? gColor:gColorBg;
-
-    leds[i] = beat8 (effSpeed,i*effLength)<88 ? gColor:gColorBg;
-  }
-}
-
-void fillStripedFillRainbow()
-{
-  for(NUM_LEDS_type i=0;i<NUM_LEDS;i++)
-  {
-    // leds[i] = (
-    //   ((byte)(i+i_eff/(effSpeed+1)))
-    //   %effLength<(1+effLength2)
-    //   )? gColor:gColorBg;
-
-    leds[i] = beat8 (effSpeed,i*effLength)<127 ? gColor:CHSV(beat8 (effSpeed,i*effLength),255,255);
-  }
-}
-
-//------------------------------------------------------------------------------ fill fade
-void fillFadeChangeAll()
-{
-
-  fill_solid(leds, NUM_LEDS, CHSV(ihue,isat,i_eff%255));
-
-  if(i_eff%255 > effLength) //flash over effLength
-  {
-    ihue=random8();
-    isat=random8();
-  }
-}
-void fillFadeChangeAll_beat8()
-{
-  ibright=beat8(effSpeed);
-  fill_solid(leds, NUM_LEDS, CHSV(ihue,isat,ibright));
-
-  //if(i_eff%255 > effLength)  //other eff
-  if(ibright > effLength) //flash above effLength
-  {
-    ihue=gHue;
-    isat=random8();
-  }
-}
-
-void fillFadeChangeAll_beatsin8()
-{
-  ibright=beatsin8(effSpeed,0);
-  fill_solid(leds, NUM_LEDS, CHSV(ihue,isat,ibright));
-
-  if(ibright <effLength) //flash under effLength
-  {
-    ihue=random8();
-    isat=random8();
-  }
-}
-
-//! BrightWave on pre=generated
-
-//! Bright off from sides to central point 
-//------------------------------------------------------------------------------
-
-void fadeEvenUneven()
-{
-  ibright=beatsin8(effSpeed,0,255);
-  byte ibright2=beatsin8(effSpeed,0,255,0,effLength);
-
-  if(ibright<4)
-  {
-    if(random8()<32)  ihue= gHue;
-  }
-  else
-  if(ibright2<4)
-  {
-    if(random8()<32)  thishue= random8();
-  }
-
-  for(NUM_LEDS_type i=0;i<NUM_LEDS;i++)
-  {
-      leds[i] =i%2?
-      CHSV(ihue,255,ibright): 
-      CHSV(thishue,255,ibright2);
-  }
-}
-void fadeEvenUnevenDif()
-{
-  if(i_eff%500==0) ihue= gHue;
-
-  for(NUM_LEDS_type i=0;i<NUM_LEDS;i++)
-  {
-    if(i%2)
-    {
-      leds[i] = CHSV(ihue,255,beatsin8(effLength+effSpeed/4,0));
-    }
-    else
-      leds[i] = CHSV(ihue+gHue,255,beatsin8(effLength,127));
-  }
-}
-
-
-//! встречные столбы с разной частотой. Перекрытие цвета
 
 //------------------------LED EFFECT FUNCTIONS------------------------
-
-
-void random_burst() {                         //-m4-RANDOM INDEX/COLOR
-  for(NUM_LEDS_type i=0;i<effSpeed/4+1;i++)
-  {
-	  leds[random(0, NUM_LEDS)] = CHSV(random(0, 255), thissat, random8()<effLength?255:0);
-  }
-  
-  // for(NUM_LEDS_type i=0;i<effLength/10;i++)
-  // {
-	// leds[random(0, NUM_LEDS)] = CHSV(ihue, thissat, 0);
-  // }
-}
 
 #ifndef saveMem
 void bounce()
 {
-  if (bouncedirection == 0)
+  if (thisdir == 0)
   {
     idex ++;
     if (idex == NUM_LEDS) {
-      bouncedirection = 1;
+      thisdir = 1;
       idex --;
     }
   }
-  if (bouncedirection == 1) 
+  if (thisdir == 1) 
   {
     idex --;
     if (idex == 0) {
-      bouncedirection = 0;
+      thisdir = 0;
     }
   }
 }
@@ -302,7 +168,7 @@ void ems_lightsALL() {                  //-m8-EMERGENCY LIGHTS (TWO COLOR SOLID)
 }
 
 void flicker() {                          //-m9-FLICKER EFFECT
-  int random_bright = random(0, 255);
+  int random_bright = random8();
   int random_delay = random(10, 100);
   int random_bool = random(0, random_bright);
   if (random_bool < 10) {
@@ -316,20 +182,20 @@ void flicker() {                          //-m9-FLICKER EFFECT
 #endif
 
 void pulse_one_color_all() {              //-m10-PULSE BRIGHTNESS ON ALL LEDS TO ONE COLOR  //! speed up
-  if (bouncedirection == 0)
+  if (thisdir == 0)
   {
     ibright++;
     if (ibright >= 255)
     {
-      bouncedirection = 1;
+      thisdir = 1;
     }
   }
-  if (bouncedirection == 1)
+  if (thisdir == 1)
   {
     ibright --;
     if (ibright <= 1)
     {
-      bouncedirection = 0;
+      thisdir = 0;
     }
   }
   for(NUM_LEDS_type i = 0 ; i < NUM_LEDS; i++ ) {
@@ -338,20 +204,20 @@ void pulse_one_color_all() {              //-m10-PULSE BRIGHTNESS ON ALL LEDS TO
 }
 
 void pulse_one_color_all_rev() {           //-m11-PULSE SATURATION ON ALL LEDS TO ONE COLOR  //! speed up
-  if (bouncedirection == 0)
+  if (thisdir == 0)
   {
     isat++;
     if (isat >= 255)
     {
-      bouncedirection = 1;
+      thisdir = 1;
     }
   }
-  if (bouncedirection == 1)
+  if (thisdir == 1)
   {
     isat --;
     if (isat <= 1)
     {
-      bouncedirection = 0;
+      thisdir = 0;
     }
   }
   for(NUM_LEDS_type idex = 0 ; idex < NUM_LEDS; idex++ ) {
@@ -389,9 +255,9 @@ void random_red() {                       //QUICK 'N DIRTY RANDOMIZE TO GET CELL
 
 #ifndef saveMem
 void rule30() {                          //-m13-1D CELLULAR AUTOMATA - RULE 30 (RED FOR NOW)
-  if (bouncedirection == 0) {
+  if (thisdir == 0) {
     random_red();
-    bouncedirection = 1;
+    thisdir = 1;
   }
   copy_led_array();
   NUM_LEDS_type iCW;
@@ -400,28 +266,28 @@ void rule30() {                          //-m13-1D CELLULAR AUTOMATA - RULE 30 (
   for(NUM_LEDS_type i = 0; i < NUM_LEDS; i++ ) {
     iCW = adjacent_cw(i);
     iCCW = adjacent_ccw(i);
-    if (ledsX[iCCW][0] > y && ledsX[i][0] > y && ledsX[iCW][0] > y) {
+    if (ledsX_[iCCW][0] > y && ledsX_[i][0] > y && ledsX_[iCW][0] > y) {
       leds[i].r = 0;
     }
-    if (ledsX[iCCW][0] > y && ledsX[i][0] > y && ledsX[iCW][0] <= y) {
+    if (ledsX_[iCCW][0] > y && ledsX_[i][0] > y && ledsX_[iCW][0] <= y) {
       leds[i].r = 0;
     }
-    if (ledsX[iCCW][0] > y && ledsX[i][0] <= y && ledsX[iCW][0] > y) {
+    if (ledsX_[iCCW][0] > y && ledsX_[i][0] <= y && ledsX_[iCW][0] > y) {
       leds[i].r = 0;
     }
-    if (ledsX[iCCW][0] > y && ledsX[i][0] <= y && ledsX[iCW][0] <= y) {
+    if (ledsX_[iCCW][0] > y && ledsX_[i][0] <= y && ledsX_[iCW][0] <= y) {
       leds[i].r = 255;
     }
-    if (ledsX[iCCW][0] <= y && ledsX[i][0] > y && ledsX[iCW][0] > y) {
+    if (ledsX_[iCCW][0] <= y && ledsX_[i][0] > y && ledsX_[iCW][0] > y) {
       leds[i].r = 255;
     }
-    if (ledsX[iCCW][0] <= y && ledsX[i][0] > y && ledsX[iCW][0] <= y) {
+    if (ledsX_[iCCW][0] <= y && ledsX_[i][0] > y && ledsX_[iCW][0] <= y) {
       leds[i].r = 255;
     }
-    if (ledsX[iCCW][0] <= y && ledsX[i][0] <= y && ledsX[iCW][0] > y) {
+    if (ledsX_[iCCW][0] <= y && ledsX_[i][0] <= y && ledsX_[iCW][0] > y) {
       leds[i].r = 255;
     }
-    if (ledsX[iCCW][0] <= y && ledsX[i][0] <= y && ledsX[iCW][0] <= y) {
+    if (ledsX_[iCCW][0] <= y && ledsX_[i][0] <= y && ledsX_[iCW][0] <= y) {
       leds[i].r = 0;
     }
   }
@@ -437,9 +303,9 @@ void random_march() {                   //-m14-RANDOM MARCH CCW
 
   for(NUM_LEDS_type idex = 1; idex < NUM_LEDS ; idex++ ) {
     iCCW = adjacent_ccw(idex);
-    leds[idex].r = ledsX[iCCW][0];
-    leds[idex].g = ledsX[iCCW][1];
-    leds[idex].b = ledsX[iCCW][2];
+    leds[idex].r = ledsX_[iCCW][0];
+    leds[idex].g = ledsX_[iCCW][1];
+    leds[idex].b = ledsX_[iCCW][2];
   }
   delay(effSpeed/8);
 }
@@ -463,20 +329,14 @@ void rwb_march() {                    //-m15-R,W,B MARCH CCW
   }
   for(NUM_LEDS_type i = 1; i < NUM_LEDS; i++ ) {
     iCCW = adjacent_ccw(i);
-    leds[i].r = ledsX[iCCW][0];
-    leds[i].g = ledsX[iCCW][1];
-    leds[i].b = ledsX[iCCW][2];
+    leds[i].r = ledsX_[iCCW][0];
+    leds[i].g = ledsX_[iCCW][1];
+    leds[i].b = ledsX_[iCCW][2];
   }
   delay(effSpeed/8); //!!
 }
 
-byte colorize()
-{
-  if(effLength>250) return idex; //* //! lerp cColor gColorBg
-  else
-  if(effLength<5)   return gHue; //*
-  else              return effLength;
-}
+
 void rgb_propeller() {                           //-m27-RGB PROPELLER
   idex++;
   thishue=colorize();
@@ -494,7 +354,6 @@ void rgb_propeller() {                           //-m27-RGB PROPELLER
     leds[j1] = CHSV(ghue, 255, 255);
     leds[j2] = CHSV(bhue, 255, 255);
   }
-  delay(effSpeed/8);//!!
 }
 
 void radiation() {                   //-m16-SORT OF RADIATION SYMBOLISH- //!fix nwp  https://github.com/4tronix/SmartBadge/blob/master/Demo.ino
@@ -516,10 +375,14 @@ void radiation() {                   //-m16-SORT OF RADIATION SYMBOLISH- //!fix 
   }
 }
 
-void candycane() //!
+void candycane()
 {
-  idex++;
-  byte thisbri=255;
+	if(indexOrBits==0) idex=beat8(1+effSpeed/8, NUM_LEDS);
+	else
+	if(indexOrBits==1) idex+=(beat8(2+effSpeed/8)/64-effLength/64);
+	else
+	if(indexOrBits>1) idex=millis()/(1+effSpeed);
+
   //NUM_LEDS_type N3  = NUM_LEDS_type(NUM_LEDS/3);
   NUM_LEDS_type N6  = NUM_LEDS_type(NUM_LEDS/6);  
   NUM_LEDS_type N12 = NUM_LEDS_type(NUM_LEDS/12);  
@@ -530,12 +393,13 @@ void candycane() //!
     NUM_LEDS_type j3 = (j2+N6) % NUM_LEDS;
     NUM_LEDS_type j4 = (j3+N6) % NUM_LEDS;
     NUM_LEDS_type j5 = (j4+N6) % NUM_LEDS;
-    leds[j0] = CRGB(255, 255, 255).nscale8_video(thisbri*.75);
-    leds[j1] = CRGB(255, 0, 0).nscale8_video(thisbri);
-    leds[j2] = CRGB(255, 255, 255).nscale8_video(thisbri*.75);
-    leds[j3] = CRGB(255, 0, 0).nscale8_video(thisbri);
-    leds[j4] = CRGB(255, 255, 255).nscale8_video(thisbri*.75);
-    leds[j5] = CRGB(255, 0, 0).nscale8_video(thisbri);   
+    leds[j0] = gColor; //.nscale8_video(effFade)
+    leds[j1] = CHSV(effSpeedH, effLengthH, effFade);
+    leds[j2] = gColor;
+    leds[j3] = CHSV(effSpeedH/2, effLengthH, effFade);
+    leds[j4] = gColor;
+    leds[j5] = CHSV(effSpeedH/4, effLengthH, effFade);
+    //
   }
 }
 
@@ -623,12 +487,12 @@ void sin_bright_wave() {
 
 void pop_horizontal() {        //-m20-POP FROM LEFT TO RIGHT UP THE RING
   NUM_LEDS_type ix;
-  if (bouncedirection == 0) {
-    bouncedirection = 1;
+  if (thisdir == 0) {
+    thisdir = 1;
     ix = idex;
   }
-  else if (bouncedirection == 1) {
-    bouncedirection = 0;
+  else if (thisdir == 1) {
+    thisdir = 0;
     ix = horizontal_index(idex);
     idex++;
     if (idex > CENTER_TOP_INDEX) {
@@ -787,9 +651,9 @@ void matrix() {                                   //-m29-ONE LINE MATRIX
   }
   copy_led_array();
   for(NUM_LEDS_type i = 1; i < NUM_LEDS; i++ ) {
-    leds[i].r = ledsX[i - 1].r;
-    leds[i].g = ledsX[i - 1].g;
-    leds[i].b = ledsX[i - 1].b;
+    leds[i].r = ledsX_[i - 1].r;
+    leds[i].g = ledsX_[i - 1].g;
+    leds[i].b = ledsX_[i - 1].b;
   }
 }
 
@@ -798,9 +662,9 @@ void strip_march_cw() {                        //-m50-MARCH STRIP CW
   int iCW;
   for(NUM_LEDS_type i = 0; i < NUM_LEDS; i++ ) {
     iCW = adjacent_cw(i);
-    leds[i].r = ledsX[iCW][0];
-    leds[i].g = ledsX[iCW][1];
-    leds[i].b = ledsX[iCW][2];
+    leds[i].r = ledsX_[iCW][0];
+    leds[i].g = ledsX_[iCW][1];
+    leds[i].b = ledsX_[iCW][2];
   }
 }
 
@@ -809,9 +673,9 @@ void strip_march_ccw() {                        //-m51-MARCH STRIP CCW
   int iCCW;
   for(NUM_LEDS_type i = 0; i < NUM_LEDS; i++ ) {
     iCCW = adjacent_ccw(i);
-    leds[i].r = ledsX[iCCW][0];
-    leds[i].g = ledsX[iCCW][1];
-    leds[i].b = ledsX[iCCW][2];
+    leds[i].r = ledsX_[iCCW][0];
+    leds[i].g = ledsX_[iCCW][1];
+    leds[i].b = ledsX_[iCCW][2];
   }
 }
 #endif
@@ -910,7 +774,7 @@ void Fire() {
   byte Cooling=effSpeed;
   byte Sparking=effLength;
 
-  static byte heat[NUM_LEDS];
+  static byte heat[gNUM_LEDS];
   byte cooldown;
 
   // Step 1.  Cool down every cell a little
@@ -1042,10 +906,7 @@ void NewKITT()
    NewKITT(c.r, c.g, c.b, 8, 10+effSpeed/8, 10+effSpeed/8); //! crash at (serial) updates
 
   //NewKITT(255, 255, 188, 8, 10, 10);
-}
-
-
-//-------------------------------newKITT---------------------------------------
+} //-------------------------------newKITT---------------------------------------
 
 
 //-------------------------------TwinkleRandom---------------------------------------
@@ -1053,7 +914,7 @@ void NewKITT()
 //  // FastLED.clear();
 
 //  // for(NUM_LEDS_type i = 0; i < Count; i++) {
-//     leds[random(NUM_LEDS)]=CRGB( random(0, 255), random(0, 255), random(0, 255));
+//     leds[random(NUM_LEDS)]=CRGB( random8(), random8(), random8());
 //     // FastLED.show();
 //     // delay(SpeedDelay);
 //     // if (OnlyOne) {
@@ -1158,50 +1019,42 @@ void SnowSparkle() {
 }
 
 //-------------------------------theaterChase---------------------------------------
-void theaterChase(byte red, byte green, byte blue, int SpeedDelay) {
-  //for(byte j = 0; j < 10; j++) { //do 10 cycles of chasing
-    for(byte q = 0; q < 3; q++) {
-      for(NUM_LEDS_type i = 0; i < NUM_LEDS; i = i + 3) {
-        leds[i + q]=CRGB( red, green, blue);  //turn every third pixel on
+void theaterChase() {
+    for(byte q = 0; q < 3; q++)
+    {
+      for(NUM_LEDS_type i = 0; i < NUM_LEDS-q; i = i + 3) {
+        leds[i + q]= indexOrBits==0? gColor:CHSV(colorize(),255,255);  //turn every third pixel on
       }
       FastLED.show();
-      delay(SpeedDelay);
-      for(NUM_LEDS_type i = 0; i < NUM_LEDS; i = i + 3) {
+      delay(gDelay);
+      for(NUM_LEDS_type i = 0; i < NUM_LEDS-q; i = i + 3) {
         leds[i + q]=CRGB( 0, 0, 0);    //turn every third pixel off
       }
     }
-  //}
 }
 
 //-------------------------------theaterChaseRainbow---------------------------------------
-void theaterChaseRainbow(int SpeedDelay) {
+void theaterChaseRainbow() {
   byte *c;
 
-  for(NUM_LEDS_type j = 0; j < 256; j++) {   // cycle all 256 colors in the wheel
     for(byte q = 0; q < 3; q++) {
-      for(NUM_LEDS_type i = 0; i < NUM_LEDS; i = i + 3) {
-        c = Wheel( (i + j) % 255);
+      for(NUM_LEDS_type i = 0; i < NUM_LEDS-q; i = i + 3) {
+        c = Wheel( (i + i_eff%256) % 255);
         leds[i + q]=CRGB( *c, *(c + 1), *(c + 2)); //turn every third pixel on
       }
       FastLED.show();
-      delay(SpeedDelay);
-      for(NUM_LEDS_type i = 0; i < NUM_LEDS; i = i + 3) {
+      delay(gDelay);
+      for(NUM_LEDS_type i = 0; i < NUM_LEDS-q; i = i + 3) {
         leds[i + q]=CRGB( 0, 0, 0);    //turn every third pixel off
       }
     }
-	
-	#ifdef IRkeypad //!
-	EVERY_N_MILLISECONDS( 40 )
-	{
-	if (IRLremote.receiving()) return;
-	}
-	#endif
-  }
+
 }
 
 //-------------------------------Strobe---------------------------------------
 void Strobe(int StrobeCount, int FlashDelay, int endDelay) {
-  for(byte j = 0; j < StrobeCount; j++) {
+  for(byte j = 0; j < StrobeCount; j++)
+  {
     fillAll();
     FastLED.show();
     delay(FlashDelay);
@@ -1213,7 +1066,7 @@ void Strobe(int StrobeCount, int FlashDelay, int endDelay) {
 }
 void Strobe()
 {
-  Strobe(10, effSpeed/16, effSpeed/16);
+  Strobe(effLength/16, effSpeed/16, effSpeed/16);
 }
 //-------------------------------BouncingBalls---------------------------------------
 void BouncingBalls(byte red, byte green, byte blue, int BallCount) {

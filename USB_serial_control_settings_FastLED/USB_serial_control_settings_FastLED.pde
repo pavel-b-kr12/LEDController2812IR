@@ -4,23 +4,44 @@ fix load btn must not call effSet msg.   Avoid double event
 ask again for fix g4p event for press because bo fix absense  of dragg toleranse in Java-Swing (de-facto, he also confirm) and no other event available in current g4p version to workout this
 */
 
+int bSetBrightnessAtConnect=33; //-1 for not set
+boolean NUM_LEDS_x8=false;// true;
+boolean bDebugPrint=false;
+boolean bDebugXY=false; //ctrl - toggle
+
+static int serialSpeed=1000000;//500000 //115200; //57600
+
+//performance
+ boolean bRecieveLEDdata=true;
+
+ boolean bDrawLEDs_PXHistory_enabled=true;
+ boolean bDrawLEDs_enabled=true;
+
+ boolean bPlotPow_enabled=true;
+ boolean bDraw_plot_RGB_pow=true;
+
+ boolean bPlot_FPS_enabled=true; //# but show FPS num
 /*
-18 35 108 0
-33 8 12 3
-23 130 1 1
-19 13 229 10
-21 23 2 8
-22 11 209 9
-25 4 5 17
-31 10 28 13
-21 2 3 8
+boolean bRecieveLEDdata=true;
+
+boolean bDrawLEDs_PXHistory_enabled=false;
+boolean bDrawLEDs_enabled=true;
+
+boolean bPlotPow_enabled=false;
+boolean bDraw_plot_RGB_pow=false;
+
+boolean bPlot_FPS_enabled=false; //# but show FPS num
+
 */
 
-int bSetBrightnessAtConnect=55; //-1 for not set
-boolean bDebugPrint=true;
-static int serialSpeed=115200; //57600
 
 
+
+int NUM_LEDS_slider_M=300;//144;//1800;//300;
+
+int gColorBgB=200;//200;
+color gColorBg=color(gColorBgB);//200;
+color gColorTxt=color(0);//200;
 
 
 
@@ -54,6 +75,12 @@ void copyToClipboard(String selection) //https://forum.processing.org/one/topic/
 	Toolkit.getDefaultToolkit().getSystemClipboard();
 	clipboard.setContents(data, data);
 }
+String printVal(String str, String nm, int bSkipIfEqual)
+{
+	int value=settingsVals.get(nm).valueSlider.getValueI();
+	if( value==bSkipIfEqual) return "";
+	return "	"+str+"="+	Integer.toString(value)+";";
+}
 //====================================================
 
 
@@ -79,7 +106,8 @@ static int effN_PAUSE=0;
 
 private LinkedHashMap<String, settingsVal> settingsVals = new LinkedHashMap<String, settingsVal>();
 String actionNm[]={
-"flashLEDs","invertLEDs","addGlitter","flashAndBackLEDs","scroll1cycle_continued","scroll1cycle_continuedRev","fadeOut_continued","moveOut_continued","offPixel_continued","","","","","",""
+"flashLEDs","invertLEDs","addGlitter","flashAndBackLEDs","scroll1cycle_continued","scroll1cycle_continuedRev","fadeOut_continued","moveOut_continued","offPixel_continued",
+"","","","","",""
 }; //upd arr size at put("action",
 int actionsM=10;
 
@@ -104,9 +132,18 @@ class settingsVal
 		//if(value==v && value<239) return; // send again only № that toggle some settings at controller
 		value=v;
 
-		if(value>value_M) value=0;
-		else
-		if(value<value_m) value=value_M;
+		if(nm=="effN") //rollover
+		{
+			if(value>value_M) value=value_m;
+			else
+			if(value<value_m) value=value_M;
+		}
+		else //constrain
+		{
+			if(value>value_M) value=value_M;
+			else
+			if(value<value_m) value=value_m;
+		}
 //----------------------------------------------------------- upd GUI
 		if(valueSlider!=null)
 		{
@@ -129,7 +166,10 @@ class settingsVal
 		if(nm=="RGB") drawRGB(value);
 //-----------------------------------------------------------
 
-		SendMsg(message_code, value);
+		if(nm=="NUM_LEDS"&& NUM_LEDS_x8) 
+			SendMsg(message_code, value/8); // msg is 1 byte
+		else
+			SendMsg(message_code, value);
 	}
 
 	void add()
@@ -156,6 +196,44 @@ class settingsVal
 		message_code=code;
 		valueLabel=label;
 		valueSlider=slider;
+
+		if(valueSlider!=null)
+		{
+			valueSlider.setNumberFormat(G4P.INTEGER, 0);
+			valueSlider.setLimits(1, vm, vM);
+			valueSlider.setShowValue(true);
+
+			if(value_M<25)
+			{
+				valueSlider.setNbrTicks(value_M+1);
+				valueSlider.setStickToTicks(true);
+			}
+			else
+			if(value_M<50)
+			{
+				valueSlider.setNbrTicks(vM/5+1);
+			}
+			else
+			valueSlider.setNbrTicks(value_M/20+1);
+			if(labelColor>=0)
+			{
+				valueSlider.setLocalColor(2, color(labelColor));
+			}
+
+			//.addEventHandler(this, "slider_RGB_change1"); //!
+
+			if(label==null && !nm.equals("action") && !nm.equals("gDelay")&& !nm.contains("gColor"))
+			{
+				label = new GLabel(valueSlider.getPApplet(), valueSlider.getX()+325, valueSlider.getY()+22, 80, 20); //+125 -1
+				label.setText(n);
+  				label.setOpaque(false);
+  				if(labelColor>=0)
+  				{
+  					label.setLocalColor(2, color(labelColor));
+  				}
+			}
+		}
+
 	}
 }
 
@@ -250,19 +328,77 @@ void  put(String n, int v, int vm, int vM, int code, GLabel label, GSlider slide
 }
 
 
+Plot12 plotFPS;
+Plot12 plot_pow;
+
+Plot12 plotR; //from plotPX 
+Plot12 plotG;
+Plot12 plotB;
+PlotPX plotPX;
+boolean bplotPX=true;
+
+int labelColor=-1;
+
+int widthNormal=920;
 public void setup(){
-	size(920, 590);
+	size(920, 640); //, P3D); //widthNormal
+	frameRate(144);
+	surface.setResizable(true); 
+
+
+	//-------------------------------------------
+	float rnd=random(200);
+	if ( day()==1 && month()%5==0) {gColorBg= color(255,0,0); labelColor=0;} //changeSilerTextColor(color(0));
+	else 
+	if ( day()%4==0 && rnd<20) {gColorBg= color(0,0,0);labelColor=255;} //! also labels
+	else 
+	if ( day()%3==0 && rnd<20) {gColorBg= color(44);labelColor=255;}
+	else 
+	if ( rnd>50) gColorBg= color(200);
+	else 
+	if ( rnd>40) gColorBg= color(165.0, 173.0, 173.0);
+	else 
+	if ( rnd>30) gColorBg= color(164.0, 196.0, 196.0);
+	else 
+	if ( rnd>20) gColorBg= color(237.0, 255.0, 241.0);
+	else 
+	if ( rnd>10) gColorBg= color(226.0, 255.0, 161.0);
+	else 
+	if ( rnd>5) gColorBg= color(255.0, 216.0, 216.0);
+	else 
+	if ( rnd>3) gColorBg= color(255.0, 255.0, 168.0);
+	else 
+	if ( rnd>2) gColorBg= color(255.0, 255.0, 63.0);
+	else 
+	if ( rnd>1) gColorBg= color(4.0, 171.0, 171.0);
+	else 
+	 { gColorBg= color(0, 0, 255); labelColor=255;} 
+	//-------------------------------------------
 	createGUI();
 	customGUI();
 
+  //first 5, so mode_N is right
 	put("effN",		0,0,255,241,label_effN,slider_effN);
 	put("speed",	1,0,255,242,label_speed,slider_speed); //! uniform names
 	put("length",	9,1,255,243,label_length,slider_length);
-	put("RGB",		0,0, 18,244,label_RGB,slider_RGB);
+	put("RGB",		0,0, 21,244,label_RGB,slider_RGB);
+	put("gBrightness",	0,1,111,247,label_brightness,slider_brightness);
+
+
+	put("gDelay",	0,0,100,234,null,slider_gDelay);
+	put("effFade",	0,0,255,235,null,slider_effFade);
+	put("gColorH",	255,0,255,236,null,slider_gColorH);
+	put("gColorS",	127,0,255,237,null,slider_gColorS);
+	put("gColorV",	255,0,255,238,null,slider_gColorV);
+	put("indexOrBits",	0,0,255,239,null,slider_indexOrBits);
+	put("NUM_LEDS",	60,5,NUM_LEDS_slider_M,240,null,slider_NUM_LEDS);
+
+
 	put("speedH",	4,0,255,245,label_speedH,slider_speedH);
 	put("lengthH",	9,1,255,246,label_lengthH,slider_lengthH);
-	put("bright",	0,1,255,247,label_brightness,slider_brightness);
-	put("action",	0,0,  6,248,null,slider_action);
+
+
+	put("action",	0,0,  actionsM,248,null,slider_action);
 
 	put("save",		0,0,255,249,null,null);
 	put("load",		0,0,255,250,null,null);
@@ -270,14 +406,10 @@ public void setup(){
 	put("clear",	0,0,255,251,null,null);
 	put("pause",	0,0,255,252,null,null);
 	put("reset",	0,0,255,253,null,null);
+	put("msgprint",	0,0,255,254,null,null);
+	put("msgprintPX", 0,0,255,255,null,null);
 
-	int valM=	settingsVals.get("RGB").value_M;
-	slider_RGB.setNbrTicks(valM+1);
-	slider_RGB.setLimits(0, 0, valM);
 
-	valM=		settingsVals.get("action").value_M;
-	slider_action.setNbrTicks(actionsM+1);
-	slider_action.setLimits(0, 0, actionsM);
 
 	label_SerialSpeed.setText(Integer.toString(serialSpeed));
 
@@ -287,13 +419,13 @@ public void setup(){
 	setupValues();
 
 	for (int i=0; i<10; i++) {
-		slots_s[i]= new GButton(this, 20+45*i, 510, 30, 30);
+		slots_s[i]= new GButton(this, 20+45*i, 550, 30, 30);
 		slots_s[i].setLocalColorScheme(GCScheme.PURPLE_SCHEME);
 		slots_s[i].addEventHandler(this, "slots_click");
 		slots_s[i].tag="s";
 		slots_s[i].tagNo=i;
 
-		slots[i]= new GButton(this, 20+45*i, 550, 30, 30);
+		slots[i]= new GButton(this, 20+45*i, 590, 30, 30);
 		slots[i].setText(Integer.toString(i));
 		slots[i].setLocalColorScheme(GCScheme.GREEN_SCHEME);
 		slots[i].addEventHandler(this, "slots_click");
@@ -302,81 +434,486 @@ public void setup(){
 
 	search_animh();
 
-	fontFPS= createFont("Monospaced", 32);
+	fontFPS= createFont("Monospaced", 26);
 	//fontFPS= createFont("SourceCodePro-Regular.ttf", 26);
+	smooth(16); 
+	plotFPS= new Plot12(400,2,145, 320, 100); //new Plot12(400,2,290, 620, 210); //  //plot= new Plot12(100,250,300, 300, 200);
+	plotFPS.bDrawShiftLines=false;
+	plotFPS.colorConnections=color(0,255,255);
+	//plotFPS.bDrawBg=true;
 
+	if(bRecieveLEDdata)
+	{
+		plot_pow= new Plot12(200,2,145, 320, 145);
+		plot_pow.bDrawFromFarPoint=random(100)<20;
+		plot_pow.bDrawFromFarPoint_toEndPioint=random(100)<2;
+		plot_pow.colorFromFar_toEndPioint=color(gColorBgB,gColorBgB,255);
+		//plot_pow.posXt=plot_pow.posX;
+		//plot_pow.posYt=plot_pow.posY+32;
+
+		if(bDraw_plot_RGB_pow)
+		{
+			plotR= new Plot12(400,2,145, 320, 100);
+			plotR.bDrawShiftLines=false;
+			plotR.colorConnections=color(255,0,0);
+			plotR.set_value_mM_limits_byte();
+
+			plotG= new Plot12(400,2,145, 320, 100);
+			plotG.bDrawShiftLines=false;
+			plotG.colorConnections=color(0,255,0);
+			plotG.set_value_mM_limits_byte();
+
+			plotB= new Plot12(400,2,145, 320, 100);
+			plotB.bDrawShiftLines=false;
+			plotB.colorConnections=color(0,0,255);
+			plotB.set_value_mM_limits_byte();
+
+			if(random(100)<10)
+			{
+				plotR.bAdjLimitsStrange=true;
+				plotG.bAdjLimitsStrange=true;
+				plotB.bAdjLimitsStrange=true;
+			}
+		}
+	}
 
 
 //btn3_L.fireAllEvents(true); //not work in G4P bug //!@ttt
 }
+
+void changeSilerTextColor(int cc)
+{
+	for (Map.Entry<String, settingsVal> entry : settingsVals.entrySet()) {
+	    //String key = entry.getKey();
+	    settingsVal value = entry.getValue();
+	    if(value.valueSlider!=null)
+	    value.valueSlider.setLocalColor(2, color(cc)); //palette index 4=bg 2=text
+	}
+}
+//===========================================================================================================================
 // //fireAllEvents
 // public void handleButtonEvents(GButton button, GEvent event) {
 //   System.out.println("Recieved " + event + " event from " + button.getText());
 // }
 
-void serialEvent(Serial cPort){
-  String comPortString = cPort.readStringUntil('\n');
-  if(comPortString != null) {
-	comPortString=trim(comPortString);
-	
-
-	bDebugPrint_notSame_bRed(comPortString, true);
-	try{
-	 String[] parts = comPortString.split(" ");
-	
-		if(parts.length==4)
-		{
-			bSkipEvent=true;
-			settingsVals.get("effN").	valueSlider.setValue(Integer.parseInt(parts[0])); //! not upd if slider move over 0..9 slots or set some marker
-			settingsVals.get("speed").	valueSlider.setValue(Integer.parseInt(parts[1]));
-			settingsVals.get("length").	valueSlider.setValue(Integer.parseInt(parts[2]));
-			settingsVals.get("RGB").	valueSlider.setValue(Integer.parseInt(parts[3]));
-			bSkipEvent_off_t=millis()+120; //! test lower or different approach
-		}
-		else
-		if(parts.length==1) //FPS
-		{
-			bDrawFPSnow=Integer.parseInt(parts[0]);
-			bDrawFPS_until_t=millis()+1000;
-		}
-		else bDrawFPSnow=-1;
-	} catch(Exception e){ System.err.println(comPortString); }
-  }
+void updateSlider(String nm, int value)
+{
+	GSlider slider = settingsVals.get(nm).valueSlider;
+	if(slider.getValueI()!=value)
+	slider.setValue(value);
 }
 
 
-int gColorBg=200;
+int serState=0;
+int rec_header[]={111,166,77};
+
+int rec_fps;
+int rec_msg_size;
+int rec_msg_type;
+
+static final int PRINT_leds	=133;
+static final int PRINT_totall	=122;
+static final int PRINT_settings	=(99);
+
+int[] msg_buffer=new int[6000];
+
+
+
+boolean bSendSimDataToMCU=true;
+
+void DisableSerial()
+{
+	if(myPort!=null)
+	{
+		myPort.clear();
+		myPort.stop();
+		myPort=null;
+	}
+	bConnected=0;
+	button_disconnect.setText("Connect");
+}
+void EnableSerial()
+{
+	if(!bSendSimDataToMCU)
+    bSim_set(false);
+	bConnected=1;
+	button_disconnect.setText("Disonnect");
+}
+
+
+void serialEvent(Serial cPort){
+//# if(comPortString.contains(","))  {  print("CRGB( "); print(comPortString); println(" ),"); return;}
+
+while (myPort.available() > 0)
+{
+	int inByte = myPort.read();
+
+											//if(rec_msg_type!=PRINT_totall)	println("      " + inByte);
+
+	if(serState<3) //bWait_mgs_header
+	{
+		if(inByte!=rec_header[serState])
+		{
+			serState=0;
+			continue;
+		}
+	}
+	else
+	
+	if(serState==3)
+	{
+			rec_fps=0;
+			rec_msg_size=0;
+
+		rec_msg_type=inByte;						//println(rec_msg_type);
+		if(rec_msg_type==PRINT_settings)
+		{
+			serState+=2;
+		}
+		else
+		if(rec_msg_type!=PRINT_totall && rec_msg_type!=PRINT_leds)
+		{
+			serState=0;
+			continue;
+		}
+	}
+
+	else
+	if(serState==4)
+	{
+		rec_fps=inByte;
+	}
+	else
+	if(serState==5)
+	{
+		rec_fps+=inByte*256;				//if(rec_msg_type!=PRINT_totall) {print("fps: ");				println(rec_fps);	}	
+	}
+
+	else
+	if(serState==6)
+	{
+		rec_msg_size=inByte;
+		if(rec_msg_type==PRINT_settings) serState++;  //size of PRINT_settings is 1, so +1
+	}
+	else
+	if(serState==7)
+	{
+		rec_msg_size+=inByte*256;			//if(rec_msg_type!=PRINT_totall) println(rec_msg_size);
+
+		if(rec_msg_type==PRINT_totall)
+		{
+			processSerialData(); continue;
+		}
+	}
+
+	else
+	if(serState-8 < rec_msg_size)
+	{
+											//if(rec_msg_type!=PRINT_settings) println("   "+inByte);
+		msg_buffer[serState-8]=inByte;
+
+		if(serState-8 == rec_msg_size-1)
+		{
+			processSerialData(); continue;
+		}
+	}
+
+	serState++;
+}
+
+return;
+/*
+ 	if(comPortString.contains(","))  {  print("CRGB( "); print(comPortString); println(" ),"); return;}
+  */
+}
+
+
+void processSerialData()
+{
+	serState=0;
+	//rec_msg_type=0;
+	switch(rec_msg_type)
+	{
+		case PRINT_leds:
+
+			if(bRecieveLEDdata)
+			{	
+				if(plotPX==null)  plotPX=new PlotPX(60, height/2, width-widthNormal,height/2, widthNormal,height/2);
+				plotPX.push(msg_buffer, rec_msg_size);
+				bplotPX=true;
+				bDraw_plotPX_until_t=millis()+4000;
+			}
+			if(bDraw_plot_RGB_pow)
+			{	
+				plotR.push(plotPX.rE); plotR.tik();
+				plotG.push(plotPX.gE); plotG.tik();
+				plotB.push(plotPX.bE); plotB.tik();
+			}
+			if(bPlot_FPS_enabled)
+			{
+				bDrawFPSnow=rec_fps;
+				plotFPS.push(bDrawFPSnow); //plotFPS.push(((float)bDrawFPSnow)/10.);
+				bDrawFPS_until_t=millis()+1000;
+			}
+			if(bPlotPow_enabled)
+			{	
+				bDrawPownow=plotPX.rE+plotPX.gE+plotPX.bE;
+				plot_pow.push(bDrawPownow);
+				bDrawPow_until_t=millis()+1000;
+			}
+		break;
+
+		case PRINT_totall:
+			if(bPlot_FPS_enabled)
+			{	
+				bDrawFPSnow=rec_fps;
+				plotFPS.push(bDrawFPSnow); //plotFPS.push(((float)bDrawFPSnow)/10.);
+				bDrawFPS_until_t=millis()+1000;
+			}
+			if(bPlotPow_enabled)
+			{	
+				bDrawPownow=rec_msg_size;
+				plot_pow.push(bDrawPownow);
+				bDrawPow_until_t=millis()+1000;
+			}
+		break;
+
+		case PRINT_settings:
+			bSkipEvent=true;
+/*
+struct SaveObj //# sizeof
+{
+	byte effN; // = eff SLOT at start
+	byte effSpeed;
+	byte effSpeedH; //! //EVERY_N_MILLISECONDS( 20 ) gHue+=effSpeed;
+	byte effLength;
+	byte effLengthH;
+	byte effRGB;//1 => disable chennel R, 2 => disable G ,  7 => fast cycle diferent , //!comment other
+	byte effFade;
+	// byte gH;
+	// byte gS;
+	// byte gV;
+	CRGB gColor;
+	CRGB gColorBg;//! gHueBG == 0 ? White	== 255 ? black
+	byte gFade; //apply before eff
+	byte indexOrBits;
+	byte gDelay;
+	byte gBrightness; //#
+	byte NUM_LEDS; //work ifdef use_ESP to save progmem
+*/
+
+			updateSlider("effN",(msg_buffer[0])); //! not upd if slider move over 0..9 slots or set some marker
+			updateSlider("speed",(msg_buffer[1]));
+			updateSlider("speedH",(msg_buffer[2]));
+			updateSlider("length",(msg_buffer[3]));
+			updateSlider("lengthH",(msg_buffer[4]));
+			updateSlider("RGB",(msg_buffer[5]));
+			updateSlider("effFade",(msg_buffer[6]));
+
+			updateSlider("gColorH",(msg_buffer[7]));
+			updateSlider("gColorS",(msg_buffer[8]));
+			updateSlider("gColorV",(msg_buffer[9]));
+			//gColorBg
+			//
+			//
+			//gFade
+			updateSlider("indexOrBits",(msg_buffer[14]));
+			updateSlider("gDelay",(msg_buffer[15]));
+			//!! updateSlider("gBrightness",(msg_buffer[16]));
+																// for (int i=0; i<22; i++) {
+																// 	print(i+"= ");
+																// 	println(msg_buffer[i]+", ");
+																// }
+			
+			if(msg_buffer[17]!=0 && msg_buffer[18]<=0)
+				updateSlider("NUM_LEDS",(msg_buffer[17]));
+			else
+			if(msg_buffer[18]!=0)
+				updateSlider("NUM_LEDS",(msg_buffer[17]*256+msg_buffer[18]));
+			else
+				updateSlider("NUM_LEDS",  (msg_buffer[21]*256+msg_buffer[20])  ); //ESP8266 int32
+
+			bSkipEvent_off_t=millis()+120; //! test lower or different approach
+		break;
+
+	}
+
+	for (int i=0; i<100; i++) 	msg_buffer[i]=-1;
+}
+//=========================================================================================================================== sim
+boolean bSim=false;
+void bSim_set(boolean b)
+{
+	bSim=b;
+	if(bSim)
+	{
+		if(!bSendSimDataToMCU)
+		{
+			button_sim.setText("stop");
+			DisableSerial();
+		}
+	}
+	else 
+		button_sim.setText("sim");
+
+}
+//===========================================================================================================================
 int bDrawFPSnow=-1;
+int bDrawPownow=-1;
 PFont fontFPS;
 int bDrawFPS_until_t=0;
-public void draw(){
+int bDrawPow_until_t=0;
+int bDraw_plotPX_until_t=0;
+color cc;
+float mA_avg=-1;
+public void draw()
+{
 	if(bSkipEvent && millis()>bSkipEvent_off_t) bSkipEvent=false;
 
 	background(gColorBg);
-
 	//---------------------------------------- RGB option state
+	noStroke();
 	fill(rCh?255:0, gCh?255:0, bCh?255:0); 
-	if(rCh)	ellipse(496, 405, 8, 8);
-	if(gCh)	ellipse(526, 405, 8, 8);
-	if(bCh)	ellipse(556, 405, 8, 8);
+	if(rCh)	ellipse(496, 525, 8, 8);
+	if(gCh)	ellipse(526, 525, 8, 8);
+	if(bCh)	ellipse(556, 525, 8, 8);
 	//----------------------------------------
 	fill(255, 255, 88); stroke(128, 0, 128);
 	polygon(3,  effParsedList_btns_posX-12, 8+effParsedList_btn_h*2 +10, 11);  //mark on current eff N (scroll list to this pos)
 
-	stroke(255, gColorBg, 255); //stroke(0);//stroke(gColorBg-40);
+	stroke(255, gColorBgB, 255); //stroke(0);//stroke(gColorBgB-40);
 	line(effParsedList_btns_posX+40,0,effParsedList_btns_posX+40, height); //GUI scroll area markers
 	line(width-scroll_effParsedList_scrollWidth,0,width-scroll_effParsedList_scrollWidth, height);
 
 	textFont(fontFPS);
 
-	if(bDrawFPSnow>-1 && millis()<bDrawFPS_until_t)
+	if(bPlot_FPS_enabled && bDrawFPSnow>-1 && millis()<bDrawFPS_until_t)
 	{
-			//textSize(32); g.textSize
-			textFont(fontFPS);
-			text(bDrawFPSnow, 440, 155);
+		//textSize(32);
+		text(bDrawFPSnow, 440, 155);
+		if((millis()/50)%2==0)
+		plotFPS.tik(); //## tikIfNewData
+		plotFPS.draw();
 	}
 
-	if(mouseX>(width-scroll_effParsedList_scrollWidth-200) && (mouseY<20 || mouseY>height-20))
+	int sim_NUM_LEDS=settingsVals.get("NUM_LEDS").value;
+
+	if(width>1200 )
+	{
+		if(millis()<bDraw_plotPX_until_t)
+		{
+			if(plotPX!=null)
+			{
+				if(bDrawLEDs_PXHistory_enabled)
+				{	
+					plotPX.draww=width-widthNormal; //! on window resize
+					plotPX.drawh=height/2;
+					plotPX.posY=height/2;
+					plotPX.draw();
+				}
+				if(bDraw_plot_RGB_pow)
+				{
+					plotR.draw();
+					plotG.draw();
+					plotB.draw();
+				}
+
+				if(bDrawLEDs_enabled)
+				{
+					noStroke();
+					fill(0);
+					rect(0,640-18,680+220,height);
+					if(height>800)
+						plotPX.draw_LED_Line(sim_NUM_LEDS);
+				}
+			}
+		}
+		else
+		{
+			fill(0, 255, 0);
+			text(">start sending pixel data<",  width-widthNormal+50, height/2+100);
+		}
+	}
+
+	if(bRecieveLEDdata && bPlotPow_enabled && bDrawPownow>-1 && millis()<bDrawPow_until_t)
+	{
+		//textSize(32); g.textSize
+		textFont(fontFPS);
+		fill(255, 0, 0);
+		text("mA:", 320, 155); //! sw mW
+		fill(255, 88, 88);
+		//3...750
+		float mul=1.*256/255;// /255; //32. //MCU range divider
+		float LED_pow=20./255; //mA
+
+		//float NUM_LEDS_used=(60+30+144+50)/144.; //144 in arduino 
+		float NUM_LEDS_used=(60+30+144)/144.; //144 in arduino 
+
+		float NUM_LEDS_limit = (float) settingsVals.get("NUM_LEDS").value;
+
+		//---------- test set of 30+50+60+144 in parallel data pin
+		if(NUM_LEDS_limit<=30) NUM_LEDS_used=NUM_LEDS_limit*4;
+		else
+		if(NUM_LEDS_limit<=50) NUM_LEDS_used=30+NUM_LEDS_limit*3;
+		else
+		//if(NUM_LEDS_limit<=60) NUM_LEDS_used=30+50+NUM_LEDS_limit*2;
+		if(NUM_LEDS_limit<=60) NUM_LEDS_used=30+NUM_LEDS_limit*2;
+		else
+		//if(NUM_LEDS_limit>60) NUM_LEDS_used=30+50+60+NUM_LEDS_limit;
+		if(NUM_LEDS_limit>60) NUM_LEDS_used=30+60+NUM_LEDS_limit;
+		//----------
+
+		float mA=bDrawPownow*mul*LED_pow* (settingsVals.get("gBrightness").value/255.) *NUM_LEDS_used/NUM_LEDS_limit +1*NUM_LEDS_used; //this is in case there are no Unused but connected
+		
+		if(mA_avg<0 || abs(mA_avg-mA)/mA >0.2 )	mA_avg=mA;
+		else							mA_avg=mA_avg*0.9+mA*0.1;
+	
+		text((int)mA_avg, 365, 155); //! calibrate //!! set limist to average //!! gDark_mW   add after scale to current br
+		//if((millis()/50)%2==0)
+		plot_pow.tik(); //## tikIfNewData
+
+		if(width>1200)
+		{
+			plot_pow.w=width-widthNormal;
+			plot_pow.h=height/2;
+		}
+
+		if(width>1200 && !bWideSize)
+		{
+			bWideSize=true;
+			plot_pow.posX=widthNormal;
+			plot_pow.posY=0;
+			plot_pow.w=width-widthNormal;
+			plot_pow.h=height/2;
+			plot_pow.bDrawBg=true;
+			plot_pow.bDrawFromFarPoint=true;
+			plot_pow.bDrawFromFarPoint_toEndPioint=true;
+		}
+		else
+		if(width<1200 && bWideSize)
+		{
+			bWideSize=false;
+			plot_pow.posX=0;
+			plot_pow.posY=144;
+			plot_pow.w=320;
+			plot_pow.h=144;
+			plot_pow.bDrawBg=false;
+			plot_pow.colorRect=color(255);
+			plot_pow.bDrawFromFarPoint=false;
+			plot_pow.bDrawFromFarPoint_toEndPioint=false;
+			plot_pow.colorShiftLines=color(0);
+		}
+		if(bWideSize)
+		{
+			if(random(1000)<2) plot_pow.bDrawFromFarPoint=!plot_pow.bDrawFromFarPoint;
+			if(random(1000)<2) plot_pow.bDrawFromFarPoint_toEndPioint=!plot_pow.bDrawFromFarPoint_toEndPioint;
+		}
+		plot_pow.draw();
+	}
+
+
+
+	if(mouseX>(widthNormal-scroll_effParsedList_scrollWidth-200) && (mouseY<20 || mouseY>height-20))
 	{
 		 if(mouseY<20) 
 		 {
@@ -390,33 +927,95 @@ public void draw(){
 
 		scroll_effParsedList_btns( (int)yStart_last);
 	}
-	//---------------------------------------- serial
-	try
-	{
-		if(Serial.list().length<1)
-		{
-			text("plug USB or update driver",10,10);
-			myPort=null;
-			button_disconnect.setText("Connect");
-			delay(50); return; 
-		}
-	}catch(Exception e){ button_disconnect.setText("err"); }
 
-	if(myPort==null && bConnected==1)
+
+
+
+	if(bSim)
 	{
+		int sim_NUM_LEDS_arr_size=sim_NUM_LEDS*3;
+		if(plotPX==null)  plotPX=new PlotPX(60, height/2, width-widthNormal,height/2, widthNormal,height/2);
+
+//------------- effect  eff_set2.h eff_sin
+		for (int i=0; i<sim_NUM_LEDS; i++) //clear
+		{
+			msg_buffer[i*3]=0;
+			msg_buffer[i*3+1]=0;
+			msg_buffer[i*3+2]=0;
+		}
+																		if(myPort==null) bSendSimDataToMCU = false;
+																		if(bSendSimDataToMCU)
+																		{
+
+																			myPort.write(232);
+																			myPort.write(232);
+																		}
+		for (int i=0; i<sim_NUM_LEDS_arr_size; i++) 
+		{
+			msg_buffer[i]=(int) ( (sin(i/1.+millis()/1000.) +1) *255);
+
+																		if(bSendSimDataToMCU) myPort.write(((int)msg_buffer[i])%255);
+		}
+		
+//-------------
+		if(bDrawLEDs_PXHistory_enabled)
+		{	
+			plotPX.push(msg_buffer, sim_NUM_LEDS_arr_size);
+			bplotPX=true;
+			bDraw_plotPX_until_t=millis()+10000;
+		}
+		if(bDraw_plot_RGB_pow)
+		{
+			plotR.push(plotPX.rE); plotR.tik();
+			plotG.push(plotPX.gE); plotG.tik();
+			plotB.push(plotPX.bE); plotB.tik();
+		}
+		// bDrawFPSnow=rec_fps;//!!
+		// plotFPS.push(bDrawFPSnow); //plotFPS.push(((float)bDrawFPSnow)/10.);
+		// bDrawFPS_until_t=millis()+1000;
+
+
+		bDrawPownow=plotPX.rE+plotPX.gE+plotPX.bE;
+		plot_pow.push(bDrawPownow);
+		bDrawPow_until_t=millis()+1000;
+	}
+	else
+	{
+//---------------------------------------- serial
 		try
 		{
-			myPort = new Serial(this, Serial.list()[0], serialSpeed); 
+			if(Serial.list().length<1)
+			{
+				text("plug USB or update driver",10,10);
+				myPort=null;
+				button_disconnect.setText("Connect");
+				delay(50); return; 
+			}
 		}catch(Exception e){ button_disconnect.setText("err"); }
 
-		if(myPort!=null) 
+		if(myPort==null && bConnected==1)
 		{
-			if(bSetBrightnessAtConnect>-1)	settingsVals.get("bright").setValue(bSetBrightnessAtConnect);
-			bConnected=2;
-			button_disconnect.setText("Disonnect");
+			try
+			{
+				if(Serial.list()[0]!=null) //!! tst
+				myPort = new Serial(this, Serial.list()[0], serialSpeed); 
+			}catch(Exception e){ button_disconnect.setText("err"); }
+
+			if(myPort!=null) 
+			{
+				if(bSetBrightnessAtConnect>-1)	settingsVals.get("gBrightness").setValue(bSetBrightnessAtConnect);
+				bConnected=2;
+				button_disconnect.setText("Disonnect");
+			}
 		}
 	}
+
+
+			if(bDebugXY)		{	fill(255, 0, 0);	text(mouseX, mouseX, mouseY);		text(mouseY, mouseX, mouseY+30);		}
 }
+
+
+
 
 
 
@@ -480,3 +1079,63 @@ void mouseMoved() //! only if not big dY, if big - anim or nothing do
 // 		scroll_effParsedList_btns( height-mouseY);
 // 	}
 // }
+
+
+ boolean bWideSize=false;
+// int wtmp;
+ boolean bMadeScreenshot_thisTime=true;
+void mouseClicked() {
+	if(plotPX!=null) plotPX.bDrawLEDs_line=!plotPX.bDrawLEDs_line;
+
+	if(bWideSize && mouseX>width/2 && mouseY>height/2) 
+	{
+		//if(millis()<bDraw_plotPX_until_t) //too big delay, so if we click to made screenshot we got 2
+		if(millis()<bDraw_plotPX_until_t && bMadeScreenshot_thisTime)			//screen save,
+		{
+			plotPX.save(EffNms[settingsVals.get("effN").valueSlider.getValueI()]);
+			bMadeScreenshot_thisTime=!bMadeScreenshot_thisTime;
+		}
+
+		if(!bSim)  //!! toggle betwen pixel source or make 2 separate plots
+		SendMsg(settingsVals.get("msgprintPX").message_code, 0); 				// bPrintPixels=!bPrintPixels
+	}
+
+	if(mouseX>900 && mouseY<300)
+	{
+		if(bDrawLEDs_PXHistory_enabled)
+		{
+			bDrawLEDs_PXHistory_enabled=false;
+			bDrawLEDs_enabled=true;
+		}
+		else
+		{
+			bDrawLEDs_PXHistory_enabled=true;
+			bDrawLEDs_enabled=false;
+		}
+	}
+	// if(mouseX<10 &&  mouseY<300)
+	// {
+	// 	bWideSize=!bWideSize;
+
+	// 	if(bWideSize)
+	// 	{
+	// 		wtmp=width;
+	// 	surface.setSize(width*2, height);
+	// 	}
+	// 	else
+	// 		surface.setSize(wtmp, height);
+	// }
+
+	// print(red(cc));print(", ");
+	// print(green(cc));print(", ");
+	// println(blue(cc));
+}
+
+
+
+
+void keyPressed() {
+	if (key == CODED) {
+		if (keyCode == CONTROL)		bDebugXY = !bDebugXY;
+	}
+}

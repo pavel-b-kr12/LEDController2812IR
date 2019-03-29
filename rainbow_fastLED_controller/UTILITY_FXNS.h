@@ -21,6 +21,18 @@ void fadeall() //!
   }
 }
 
+byte colorize()
+{
+  if(indexOrBits>200) return idex; //* //! lerp cColor gColorBg
+  if(indexOrBits>150)   return sin8(idex*effLength); //*
+  if(indexOrBits>120)   return gHue; //*
+  if(indexOrBits>100)   return gColor.r; //*
+  if(indexOrBits>60)   return beatsin8(effSpeed); //*
+  if(indexOrBits>30)   return beatsin8(effLength); //*
+  if(indexOrBits>10)   return gColor.r+random8(effLength); //*
+  else              return random8();
+}
+
 byte * Wheel(byte WheelPos) {
   static byte c[3];
 
@@ -41,6 +53,11 @@ byte * Wheel(byte WheelPos) {
   }
 
   return c;
+}
+
+NUM_LEDS_type oppositeLEDinCircle(NUM_LEDS_type i)
+{
+  return (i<NUM_LEDS/2)? (i+NUM_LEDS/2) : (i-NUM_LEDS/2);
 }
 
 //------------------------------------- UTILITY FXNS --------------------------------------
@@ -103,11 +120,11 @@ int adjacent_ccw(int i) {
 
 #ifndef saveMem
 void copy_led_array() {
-	memmove( &ledsX[0], &leds[0], NUM_LEDS * sizeof( CRGB) ); // // Copy NUM_LEDS led colors from leds[src .. src+NUM_LEDS] to ledsX[dest .. dest+NUM_LEDS]
+	memmove( &ledsX_[0], &leds[0], NUM_LEDS * sizeof( CRGB) ); // // Copy NUM_LEDS led colors from leds[src .. src+NUM_LEDS] to ledsX_[dest .. dest+NUM_LEDS]
   // for(NUM_LEDS_type i = 0; i < NUM_LEDS; i++ ) {
-  //   ledsX[i][0] = leds[i].r;
-  //   ledsX[i][1] = leds[i].g;
-  //   ledsX[i][2] = leds[i].b;
+  //   ledsX_[i][0] = leds[i].r;
+  //   ledsX_[i][1] = leds[i].g;
+  //   ledsX_[i][2] = leds[i].b;
   // }
 }
 #endif

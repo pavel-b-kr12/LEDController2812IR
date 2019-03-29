@@ -1,8 +1,8 @@
-#define saveFormat_currentVersion	56 //invalidate old saves
+#define saveFormat_currentVersion	59 //invalidate old saves
 
 #ifndef use_EEPROMex
 	#include <EEPROM.h>
-#else
+#else //! this part is not updated to more settings
 	#include <EEPROMex.h>
 	// #ifdef tst
 	// 	setMaxAllowedWrites(40);
@@ -20,27 +20,26 @@ void save(byte N) //to slot N 0...9
 {
 	byte effNum=bCurrentEff_IsRandom_AndNotSlotN?realEffN:effN;
 
-			#ifdef tst
-				Serial.print("save slot: "); Serial.print(N); Serial.print(" effN: "); Serial.println(effNum);
-				if(effNum<11 || effNum==240 || N>9) 
-				{
-					Serial.println("no save ifdef tst");	return; //!opt del
-				}
-			#endif
+				#ifdef tst
+					Serial.print("save slot: "); Serial.print(N); Serial.print(" effN: "); Serial.println(effNum);
+					if(effNum<11 || effNum==240 || N>9) 
+					{
+						Serial.println("no save ifdef tst");	return; //!opt del
+					}
+				#endif
 
 	//if(effN<10) return; //0-9 is slots, bot not effects //this for update old written, normally it can't occur
 
-	#ifndef use_EEPROMex		//https://arduino.stackexchange.com/questions/25945/how-to-read-and-write-eeprom-in-esp8266
-				//!! if(EEPROM.readInt(EEPROM_saved_flag_addr)!=saveFormat_currentVersion)	EEPROM.updateInt(EEPROM_saved_flag_addr, saveFormat_currentVersion);
-		EEPROM.begin(512);
+	#ifndef use_EEPROMex		//https://arduino-esp8266.readthedocs.io/en/latest/libraries.html?highlight=eeprom%20
+		EEPROM.begin(512);  //https://arduino.stackexchange.com/questions/25945/how-to-read-and-write-eeprom-in-esp8266
 		EEPROM.put(EEPROM_saved_flag_addr,saveFormat_currentVersion); //this update if different
-		#ifdef tst2
-			EEPROM.commit();
-			Serial.print("save ver:");  Serial.print(saveFormat_currentVersion);
-			Serial.print(" size: ");  Serial.print(sizeof(oostr));
-			byte vers=0;	EEPROM.get(EEPROM_saved_flag_addr,vers);
-			Serial.print(" check ver: "); Serial.println(vers);
-		#endif
+				#ifdef tst2
+					EEPROM.commit();
+					Serial.print("save ver:");  Serial.print(saveFormat_currentVersion);
+					Serial.print(" size: ");  Serial.print(sizeof(oostr));
+					byte vers=0;	EEPROM.get(EEPROM_saved_flag_addr,vers);
+					Serial.print(" check ver: "); Serial.println(vers);
+				#endif
 		EEPROM.put(save_addr_start+N*sizeof(SaveObj),oostr);
 		EEPROM.commit();
 		EEPROM.end();
@@ -53,9 +52,6 @@ void save(byte N) //to slot N 0...9
 		EEPROM.updateByte(save_addr_start+N*5+3, effRGB);
 	#endif
 
-			#ifdef tst
-			Serial.println(effSpeed);		Serial.println(effLength);		Serial.println(effRGB);
-			#endif
 }
 
 void load(byte N)
@@ -69,14 +65,15 @@ void load(byte N)
 		byte vers=0;	EEPROM.get(EEPROM_saved_flag_addr,vers);
 											#ifdef tst
 												Serial.print(" ver:"); Serial.println(vers); //##
+												Serial.print(" NUM_LEDS:"); Serial.println(NUM_LEDS);Serial.println(gNUM_LEDS);
 											#endif
 		if(vers!=saveFormat_currentVersion) resetSetiings_and_change_slot();
 		else
 		{	
-				EEPROM.get(save_addr_start+N*sizeof(SaveObj),oostr);
-				
-				if(effN<10) effN+=10;
-				change_slot(effN);
+			EEPROM.get(save_addr_start+N*sizeof(SaveObj),oostr);
+
+			if(effN<10) effN+=10;
+			change_slot(effN);
 		}
 		EEPROM.end();
 	#else
@@ -91,15 +88,19 @@ void load(byte N)
 			effRGB=EEPROM.readByte(save_addr_start+N*5+3);
 		}
 	#endif
-		#ifdef tst
-		Serial.print(" effN: "); Serial.println(effN);	Serial.println(effSpeed);	Serial.println(effLength);	Serial.println(effRGB);
-		#endif
+
+	if(effLength==0) effLength=1;
+	if(effLengthH==0) effLengthH=1;
+	#if defined(SerialControl) && defined(NUM_LEDS_adjustable)
+		NUM_LEDS_set();
+	#endif
 
 	#ifdef demo_enable
 	brandom_demo=false;
 	#endif
 	banimate=false;
 	
+	FastLED.setBrightness( gBrightness );
 	//SET_UPD_Display
 }
 
@@ -109,15 +110,8 @@ unsigned long nextCanChangeByIr=0; //!opt combine with other
 
 void saveAfter2s() //for slot 0
 {
-	 // if(bNeedSave && SaveSlot!=N && SaveSlot>0) save(SaveSlot);
-	
-	 // effSpeed_toSave=effSpeed;
-	 // effLength_toSave=effLength;
-	 // effN_toSave=effN;
-	 // effRGB_toSave=effRGB;
-	
 	bNeedSave=true;
-	nextCanSave_t=millis()+4000;
+	nextCanSave_t=millis()+6000;
 	#ifdef IRkeypad
 	nextCanChangeByIr=millis()+300;
 	#endif

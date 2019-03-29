@@ -4,6 +4,8 @@
 ~~Simple~~ Flexible controller for ws2812b ws2811 stripes with support of IR control, keypad shield LCD, 3 or 5-buttons, settings over USB.
  Includes a lot of effects.
 
+### if you have interesting effects or need some new - tell me
+
 ### Сoncept
 There are save/load slots, many effects, each rich of settings.
 
@@ -29,7 +31,7 @@ It save/load presets by press numbers buttons in  "settings mode" / "working mod
 * With SerialControl (USB, bluetooth): create presets in PC software, fast load it with buttons. Easy to test new effects
 ![](USB_serial_control_settings.png)
 
-Presets are the first 10 effect slots:
+Saves are the first 10 effect slots (presets):
 * slot 0 - auto-saved last used effect and settings. excluding № 248..255
 * slots 1..9 you can manually save/load to EEPROM
 * slot 10 off
@@ -84,22 +86,35 @@ Some effects and test modes eat a lot of memory - disable it and use "#define sa
 ### Hints
 * to maintain max quality (bit depth) regulate brightness not by program but via DC-DC down modules like XL4005 (without current limit)
 
+### notable features
+* save/load, quick access slots
+* ESP8266 support
+* color by music or other input sensors
+* plot power, power by color chennels, leds
+
+* lightweight binary Serial protocol
+
 ### TODO
-* map action to btn
-* control , save  NUM_LEDS
-* control , save  BRIGHTNESS
+* fix  NUM_LEDS>255  rand8, itc
+* fix last uncommented case in GUI not appears
+* rewrite printPalette as usual PX
+
+* map action to btn, save selected
+* change effects to new settings available
 * SerialControl BlueFilter
 * animate demo - setings range related to eff
 * delay(){  input ,  FastLED.delay}
 * wemos-Xi
 * STM32
-* ESP8266
+* ESP32
 * wifi android
 * uniform speed of effects
 * implement colorize function, lengthH, speedH, set main gColor and BG colors. Rewrite effects that use existing settings for it.
 * save to file
+* reorder
 * group effect related to (circular) stripe ring
-* fix g4p clicks (with movement | drag)
+* fix g4p clicks (with movement | drag) if author would update it
+* not clear whole stripe with FastLED.clear() in effect that use it while NUM_LEDS adj mode
 "//!" - in code this mean need to write new, recheck of fix existing
 
 

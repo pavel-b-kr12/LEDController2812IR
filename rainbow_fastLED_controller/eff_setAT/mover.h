@@ -38,7 +38,6 @@ void animationA_() {                                             // running red 
 void animationA() {
 
   EVERY_N_MILLISECONDS(100) {
-    uint8_t maxChanges = 24; 
     nblendPaletteTowardPalette(currentPalette, targetPalette, maxChanges);   // AWESOME palette blending capability.
   }
 

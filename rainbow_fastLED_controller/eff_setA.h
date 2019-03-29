@@ -2,14 +2,14 @@
 
 void rainbow() 
 {
-    fill_rainbow( leds, NUM_LEDS, gHue, effLength); //255/NUM_LEDS/effLength  //!opt /2
+    fill_rainbow( leds, NUM_LEDS, gHue, effLengthH); //255/NUM_LEDS/effLength  //!opt /2
 }
 
 void rainbowConfetti() 
 {
     rainbow();
 	// Dim a color by ~6% (16/256ths), eventually fading to full black.
-	fadeToBlackBy(leds, NUM_LEDS, 16);
+	fadeToBlackBy(leds, NUM_LEDS, effFade);
 	int n = random16(NUM_LEDS);
 	leds[n]=CRGB(random8(),255,255);
 	//if (!leds[n]) { leds[n] += CHSV( random8(), 255, 255); }
@@ -55,7 +55,7 @@ void randomBlink()
   byte M=random8(0,effLength); //! sin/saw distribution
   for(NUM_LEDS_type i=0;i<M;i++)
   {
-    leds[random8(0,NUM_LEDS-1)] = CRGB::White;
+    leds[random8(0,NUM_LEDS-1)] = gColor;
   }
 }
 
@@ -218,7 +218,7 @@ void  rainbowSpawn_moveFromStartWithSeparators()
 	
 	leds[0] =CHSV(gHue,255,
 			//((i_eff+beatsin8(effLength, 0, effLength))%(effLength/2)>effLength/8)
-			((i_eff+beatsin8(effLength, 0, effLength))%effLength>effLength/4)
+			((i_eff+beatsin8(effSpeed/8, 0, effLength))%effLength>effLength/4)
 			?0   //black separators
 			:255
 			);
@@ -273,6 +273,18 @@ void spawnPixel_moveAll() //!
 }
 
 //----------------------------------------------------
+
+void random_burst() {                         //-m4-RANDOM INDEX/COLOR
+  for(NUM_LEDS_type i=0;i<effSpeed/4+1;i++)
+  {
+    leds[random(0, NUM_LEDS)] = CHSV(random8(), gColor.g, random8()<effLength?255:0);
+  }
+  
+  // for(NUM_LEDS_type i=0;i<effLength/10;i++)
+  // {
+  // leds[random(0, NUM_LEDS)] = CHSV(ihue, thissat, 0);
+  // }
+}
 
 void confetti() {                                             // Random colored speckles that blink in and fade smoothly.
   fadeToBlackBy(leds, NUM_LEDS, effSpeed);
@@ -356,6 +368,18 @@ void confetti_moveRemainFirstBlendByPos() {                                     
 	else
 		leds[pos]=blend(leds[pos], colNew, map(pos,0,NUM_LEDS,8,128));
   }
+}
+
+
+void confetti_density() {                                             // Random colored speckles that blink in and fade smoothly.
+	fadeToBlackBy(leds, NUM_LEDS, effFade);
+	for(byte i = 0; i < effSpeed; i++)
+	{
+		NUM_LEDS_type pos = random16(NUM_LEDS);
+		if(random8()>sin8(pos*effSpeedH/32+indexOrBits)*128/effLengthH)
+			leds[pos] += CHSV(gHue + random8(effLength), 200, 255);
+	}
+
 }
 
 void random_color_pop() {                         //-m25-RANDOM COLOR POP

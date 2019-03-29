@@ -1,5 +1,8 @@
+//#
+
 boolean bSkipCommentedCases= true;//false;
 int effParsedList_btns_posX=692;
+int btnShiftX_if_same_nm_w=12;
 int effParsedList_btns_i=0;
 int effParsedList_btn_h=21;
 int scroll_effParsedList_scrollWidth=50; //moving mouse righ pixels cause scroll
@@ -40,7 +43,11 @@ void search_animh()
 					int effN=Integer.parseInt(m[1]);
 					if(effN>250) continue;
 
-					GButton btn= new GButton(this, effParsedList_btns_posX, 10+effParsedList_btn_h*effParsedList_btns_i, width-effParsedList_btns_posX-2, 18);
+					int btnShiftX_if_same_nm=0;
+					if( m[2].equals(EffNms[effN-1]) ) btnShiftX_if_same_nm =btnShiftX_if_same_nm_w;
+					
+
+					GButton btn=new GButton(this, effParsedList_btns_posX +btnShiftX_if_same_nm, 10+effParsedList_btn_h*effParsedList_btns_i, width-effParsedList_btns_posX-2 -btnShiftX_if_same_nm, 18);
 					btn.setTextAlign(GAlign.LEFT, GAlign.MIDDLE);
 					
 					
@@ -122,7 +129,7 @@ void scroll_effParsedList_btns_toTopFor(int btnsE) //btnsE is  btn N in effParse
 public void effParsedList_btns_click(GButton source, GEvent event) {
 	//if ( event != GEvent.CLICKED) return;
 	int N=source.tagNo; //Integer.parseInt(source.getText().split(":")[0]);
-	println(N);
+					if(bDebugPrint)println(N);
 	settingsVals.get("effN").setValue(N);
 }
 

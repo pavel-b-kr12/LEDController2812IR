@@ -1,7 +1,19 @@
 
 #ifdef SerialControl
 //## SET_UPD_Display saveAfter2s();
-	#define msgN_m			241
+
+	#define msgN_m			232
+
+	#define msg_getLeds		232
+
+	#define msg_gDelay		234
+	#define msg_effFade		235
+	#define msg_gColorR		236
+	#define msg_gColorG		237
+	#define msg_gColorB		238
+	#define msg_indexOrBits	239
+	#define msg_NUM_LEDS	240
+
 	#define messageEffN		241
 	#define messageSpeed	242
 	#define messageLength	243
@@ -15,9 +27,13 @@
 	#define messageClear	251
 	#define messagePause	252
 	#define messageReset	253
-	#define msgN_M			253
-		
-	 	
+	#define msgprint		254
+ #ifdef tstFPS
+	#define msgprintPX		255
+#endif
+	#define msgN_M			255
+
+
 byte mesageRecState=0;
 byte msgLast=0;
 void setValueFromMsg(byte msgType, byte value)
@@ -44,15 +60,50 @@ void setValueFromMsg(byte msgType, byte value)
 		 effRGB=value;
 		break;
 		case messageSpeedH:
-		 // =value;
+		 effSpeedH =value;
 		break;
 		case messageLengthH:
-		  //=value;
+		  effLengthH=value;
 		break;
+
+		case msg_gDelay:
+		  gDelay=value;
+		break;
+		case msg_effFade:
+		  effFade=value;
+		break;
+		case msg_gColorR:
+		  gColor.r=value;
+		break;
+		case msg_gColorG:
+		  gColor.g=value;
+		break;
+		case msg_gColorB:
+		  gColor.b=value;
+		break;
+		case msg_indexOrBits:
+		  indexOrBits=value;
+		break;
+		case msg_NUM_LEDS:
+			#ifdef NUM_LEDS_adjustable
+			#if gNUM_LEDS>255
+		  		NUM_LEDS=value*8;
+		  	#else
+		  		NUM_LEDS=value;
+		  	#endif	
+		  		NUM_LEDS_set();
+		  	#endif
+		break;
+
 		case messageBright:
-		 FastLED.setBrightness( value ); FastLED.show();
-		 //!! save tst_BRIGHTNESS=value;
+		 FastLED.setBrightness( value ); 
+					 #if gNUM_LEDS<256 //!? otherwise crash when often change
+					 	FastLED.show();
+					 #endif
+		 gBrightness=value;
 		break;
+
+
 		case messageSave:
 		#ifdef save_load_enable
 		 save(value);
@@ -96,6 +147,41 @@ void setValueFromMsg(byte msgType, byte value)
 		 }
 		break;
 
+
+		case msgprint:
+			print_currentPalette();
+		break;
+
+		#ifdef tstFPS
+		case msgprintPX:
+			bPrintPixels=!bPrintPixels;
+		break;
+
+		case msg_getLeds:
+{
+		NUM_LEDS_type i=0;
+		while (Serial.available()) 
+	 	{ 
+	 		i++;
+	 		if(i<NUM_LEDS)
+	 		{
+		 	 leds[i].r = Serial.read();
+		 	 if(Serial.available())
+		 	 leds[i].g = Serial.read();
+		 	if(Serial.available())
+		 	 leds[i].b = Serial.read();
+		 	}
+		 	else			Serial.read();
+	 	}
+	 	FastLED.show();
+	 	bPause=true;
+}
+		break;
+
+		
+		#endif
+
+
 		default:
 		bNeedUpdDisplay=false;
 		break;
@@ -114,10 +200,10 @@ void checkSerial()
 	 while (Serial.available()) 
 	 { 
 
-	 	 byte msg = Serial.read();						//Serial.println(msg);
-			#ifdef tst2
-				Serial.println(msg);
-			#endif
+	 	 byte msg = Serial.read();
+						#ifdef tst2
+							Serial.println(msg);
+						#endif
 		if(millis()>SerialControlStateExpare_t)
 		{
 			mesageRecState=0;
@@ -163,7 +249,7 @@ void checkSerial()
 
 	#ifdef SerialSelect
 	  if (Serial.available() > 0) {
-			effN_set(Serial.parseInt()); //Serial.println(effN);
+			effN_set(Serial.parseInt()); 			//Serial.println(effN);
 			
 			#ifdef tst
 					Serial.println(effN);

@@ -11,22 +11,18 @@ void one_color_allHSV(int ahue) {    //-SET ALL LEDS TO ONE COLOR (HSV)
 	}
 }
 
-void moveAll() //cyclic
-{
-	CRGB t=leds[NUM_LEDS-1];
-	for(NUM_LEDS_type i = NUM_LEDS-1; i >0 ; i--) 
-	{
-		leds[i]=leds[i-1];
-	}
-	leds[0]=t;
-}
-
 void moveOutAllRemainFirst()
 {
 	for(NUM_LEDS_type i = NUM_LEDS-1; i >0 ; i--) 
 	{
 		leds[i]=leds[i-1];
 	}
+}
+void moveAll() //cyclic
+{
+	CRGB t=leds[NUM_LEDS-1];
+	moveOutAllRemainFirst();
+	leds[0]=t;
 }
 void moveOutAll()
 {
@@ -52,12 +48,55 @@ void moveOutAll_fadeN() //!tst
 }
 
 
+void move_toCenter_RemainFirst()
+{
+	for(NUM_LEDS_type i = NUM_LEDS/2-1; i >0 ; i--) 
+	{
+		leds[i]=leds[i-1];
+		leds[NUM_LEDS-i-1]=leds[NUM_LEDS-i];
+	}
+}
+void move_fromCenter_RemainFirst()
+{
+	for(NUM_LEDS_type i = 0; i < NUM_LEDS/2-2 ; i++) 
+	{
+		leds[i]=leds[i+1];
+		leds[NUM_LEDS-i-1]=leds[NUM_LEDS-i-2];
+	}
+}
+// void move_segments_RemainFirst() //!
+// {
+// 	byte segments=
+// 	for(NUM_LEDS_type i = NUM_LEDS/segments-1; i >0 ; i--) 
+// 	{
+// 		leds[i]=leds[i-1];
+// 		leds[i+NUM_LEDS/2]=leds[i-1+NUM_LEDS/2];
+// 	}
+// }
+
+
+
+
+
 void addGlitter(byte chanceOfGlitter)
 {
 	if(random8() < chanceOfGlitter) {
-		leds[ random16(NUM_LEDS) ] += CRGB::White;
+		leds[ random16(NUM_LEDS) ] += gColor;
 	}
 }
+void addGlitterBlack(byte chanceOfGlitter)
+{
+	if(random8() < chanceOfGlitter) {
+		leds[ random16(NUM_LEDS) ] = 0;
+	}
+}
+
+// void addGlitterByBG(byte chanceOfGlitter, byte V)
+// {
+// 	if(random8() < chanceOfGlitter) {
+// 		leds[ random16(NUM_LEDS) ] = gColorBg.nscale8(V);
+// 	}
+// }
 
 void invertLEDs()
 {
@@ -161,5 +200,17 @@ void moveOut_continued()
 			leds[i]=leds[i-1];
 		}
 		FastLED.show(); delay(map(effSpeed,0,255,25,1));
+	}
+}
+
+void print_currentPalette()
+{
+	for (int i = 0; i < 16; ++i)
+	{
+		Serial.print(currentPalette[i].r);
+		Serial.print(",");
+		Serial.print(currentPalette[i].g);
+		Serial.print(",");
+		Serial.println(currentPalette[i].b);
 	}
 }

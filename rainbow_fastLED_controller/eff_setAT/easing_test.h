@@ -23,18 +23,12 @@
  *
  */
 
-void easing_test() {
+void easing_test()
+{
+	uint8_t easeOutVal = ease8InOutQuad(i_eff);              // Start with easeInVal at 0 and then go to 255 for the full easing.
 
-  static uint8_t easeOutVal = 0;
-  static uint8_t easeInVal  = 0;
-  static uint8_t lerpVal    = 0;
+	idex = lerp8by8(0, NUM_LEDS, easeOutVal);                // Map it to the number of LED's you have.
 
-  easeOutVal = ease8InOutQuad(easeInVal);                     // Start with easeInVal at 0 and then go to 255 for the full easing.
-  easeInVal++;
-
-  lerpVal = lerp8by8(0, NUM_LEDS, easeOutVal);                // Map it to the number of LED's you have.
-
-  leds[lerpVal] = CHSV((easeInVal-easeOutVal)*2,255,255); //CRGB::Red;
-  fadeToBlackBy(leds, NUM_LEDS, effLength/2);                          // 8 bit, 1 = slow fade, 255 = fast fade
-  
+	leds[idex] = CHSV((i_eff-easeOutVal)*(1+effLength/4),255,255);
+	fadeToBlackBy(leds, NUM_LEDS, effFade);                  // 8 bit, 1 = slow fade, 255 = fast fade
 }
