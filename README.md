@@ -1,8 +1,9 @@
-# LEDController2812IR
+# Universal LEDController2812IR
 ![](0.jpg)
+New version will be available in a week.
 
-~~Simple~~ Flexible controller for ws2812b ws2811 stripes with support of IR control, keypad shield LCD, 3 or 5-buttons, settings over USB.
- Includes a lot of effects.
+~~Simple~~ The most universal and flexible controller for LED stripes with support of IR, WiFi, serial, keypad shield LCD, 3 or 5-buttons, USB control. Can use arduino on atmega, ESP8266, ESP32 with ws2812b ws2811 and other that is supported by FastLED library.
+ Includes a lot of effects, tools to create collection and visualize it.
 
 ### if you have interesting effects or need some new - tell me
 
