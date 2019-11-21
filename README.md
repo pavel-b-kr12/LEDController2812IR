@@ -1,5 +1,5 @@
 # Universal LEDController2812
-![](0.jpg)
+![]![](USB_serial_control_settings.jpg)
 
 ~~Simple~~ The most universal and flexible controller for LED stripes with support of IR, WiFi, serial, keypad shield LCD, 3 or 5-buttons, USB control. Can use arduino on atmega, ESP8266, ESP32 with ws2812b ws2811 and other that is supported by FastLED library.
  Includes a lot of effects, tools to create collection and visualize it.
@@ -24,12 +24,13 @@ You can build it with hardware options:
 At power up Switch between "settings"  (IR) and "working" (faster) modes.
 Choose effect, each has many settings to customize. It saves last.
 It save/load presets by press numbers buttons in  "settings mode" / "working mode".
+(0.jpg)
 
 * With keypad1602 or key3x: you have to press select button to select option (effect, speed, length, chennels), than change it with +- keys
 ![](keypad.jpg)
 
 * With SerialControl (USB, bluetooth): create presets in PC software, fast load it with buttons. Easy to test new effects
-![](USB_serial_control_settings.jpg)
+
 
 Saves are the first 10 effect slots (presets):
 * slot 0 - auto-saved last used effect and settings. excluding № 248..255
