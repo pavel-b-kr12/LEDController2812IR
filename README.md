@@ -1,12 +1,7 @@
 # Universal LEDController2812
 ![](0.jpg)
-New version will be available in a week.
 
-<<<<<<< .mine
 ~~Simple~~ The most universal and flexible controller for LED stripes with support of IR, WiFi, serial, keypad shield LCD, 3 or 5-buttons, USB control. Can use arduino on atmega, ESP8266, ESP32 with ws2812b ws2811 and other that is supported by FastLED library.
-=======
-~~Simple~~ The most universal and flexible controller for LED stripes with support of IR, WiFi, serial, keypad shield LCD, 3 or 5-buttons, USB control. Can use arduino on atmega, ESP8266, ESP32 with ws2812b ws2811 and other that is supported by FastLED library.
->>>>>>> .theirs
  Includes a lot of effects, tools to create collection and visualize it.
 
 ### if you have interesting effects or need some new - tell me
