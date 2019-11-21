@@ -1,8 +1,8 @@
-# LEDController2812IR
+# Universal LEDController2812
 ![](0.jpg)
 
-~~Simple~~ Flexible controller for ws2812b ws2811 stripes with support of IR control, keypad shield LCD, 3 or 5-buttons, settings over USB.
- Includes a lot of effects.
+~~Simple~~ The most universal and flexible controller for LED stripes with support of IR, WiFi, serial, keypad shield LCD, 3 or 5-buttons, USB control. Can use arduino on atmega, ESP8266, ESP32 with ws2812b ws2811 and other that is supported by FastLED library.
+ Includes a lot of effects, tools to visualize it, create collection itc.
 
 ### if you have interesting effects or need some new - tell me
 
@@ -29,7 +29,7 @@ It save/load presets by press numbers buttons in  "settings mode" / "working mod
 ![](keypad.jpg)
 
 * With SerialControl (USB, bluetooth): create presets in PC software, fast load it with buttons. Easy to test new effects
-![](USB_serial_control_settings.png)
+![](USB_serial_control_settings.jpg)
 
 Saves are the first 10 effect slots (presets):
 * slot 0 - auto-saved last used effect and settings. excluding № 248..255
@@ -85,18 +85,20 @@ Some effects and test modes eat a lot of memory - disable it and use "#define sa
 * Don't see on bright Blue LEDs (or white because it is from Blue) while testing if you need your eyes for a long life. Use diffuser, dim power, itc.
 ### Hints
 * to maintain max quality (bit depth) regulate brightness not by program but via DC-DC down modules like XL4005 (without current limit)
+* Brownout and other power problems add capacitor on power in and 3,3V output of LDO, change USB diode with low voltage drop diode https://github.com/nkolban/esp32-snippets/issues/168
 
 ### notable features
-* save/load, quick access slots
-* ESP8266 support
-* color by music or other input sensors
-* plot power, power by color chennels, leds
-
-* lightweight binary Serial protocol
+*💎 save/load, quick access slots
+*💎 ESP8266 support
+*💎 color by music or other input sensors
+*💎 plot power, power by color chennels, leds
+* lightweight binary Serial protocol and UDP WIFi
+*💎 send LEDs data or control over WiFi with external MCU's dedicated for rendering pixels
+*💎 test effects and LEDs constructions (how it looks like in circle or cube) without LED stripes or without MCU at all.
 
 ### TODO
-* fix  NUM_LEDS>255  rand8, itc
-* fix last uncommented case in GUI not appears
+*🐛 fix  NUM_LEDS>255  rand8, itc
+*🐛 fix last uncommented case in GUI not appears
 * rewrite printPalette as usual PX
 
 * map action to btn, save selected
@@ -113,8 +115,11 @@ Some effects and test modes eat a lot of memory - disable it and use "#define sa
 * save to file
 * reorder
 * group effect related to (circular) stripe ring
-* fix g4p clicks (with movement | drag) if author would update it
+*🐛 fix g4p clicks (with movement | drag) if author would update it
 * not clear whole stripe with FastLED.clear() in effect that use it while NUM_LEDS adj mode
 "//!" - in code this mean need to write new, recheck of fix existing
+* add support of multiple lists, not only switch_slot.h
+* fill switch_slot.h with newline to see free space
 
-
+* fix UI aligment
+*🐛 fix UI glitches

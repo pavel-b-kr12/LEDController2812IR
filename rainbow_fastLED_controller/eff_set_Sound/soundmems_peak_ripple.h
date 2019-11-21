@@ -52,7 +52,7 @@ void rippleSnd() {
   switch (step) {
 
     case -1:                                                  // Initialize ripple variables.
-      idex = random(NUM_LEDS); //center
+      idex = random8or16(NUM_LEDS-1); //center
       ihue = (peakspersec*10) % 255;                        // More peaks/s = higher the hue colour.
       step = 0;
       break;

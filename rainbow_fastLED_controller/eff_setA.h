@@ -1,8 +1,6 @@
-#include "eff_common.h"
-
 void rainbow() 
 {
-    fill_rainbow( leds, NUM_LEDS, gHue, effLengthH); //255/NUM_LEDS/effLength  //!opt /2
+    fill_rainbow( leds, NUM_LEDS, gHue, effLengthH); //255/NUM_LEDS/effLength  //!opt /2 //! use  effSpeedH
 }
 
 void rainbowConfetti() 
@@ -10,14 +8,13 @@ void rainbowConfetti()
     rainbow();
 	// Dim a color by ~6% (16/256ths), eventually fading to full black.
 	fadeToBlackBy(leds, NUM_LEDS, effFade);
-	int n = random16(NUM_LEDS);
-	leds[n]=CRGB(random8(),255,255);
+	leds[random8or16(NUM_LEDS)]=CRGB(random8(),255,255);
 	//if (!leds[n]) { leds[n] += CHSV( random8(), 255, 255); }
 }
 void rainbowWithGlitter() //!
 {
   rainbow();                                                  // Built-in FastLED rainbow, plus some random sparkly glitter.
-  addGlitter(effSpeed);
+  addGlitter(effFade);
 } 
 
 //-------------------------------------------------------
@@ -55,27 +52,30 @@ void randomBlink()
   byte M=random8(0,effLength); //! sin/saw distribution
   for(NUM_LEDS_type i=0;i<M;i++)
   {
-    leds[random8(0,NUM_LEDS-1)] = gColor;
+    leds[random8or16(NUM_LEDS)] = gColor;
   }
 }
 
 void Add_random_rainbow_pxel()
 {
-  byte N=random8(0,NUM_LEDS-1);
+  NUM_LEDS_type N=random8or16(NUM_LEDS);
   leds[N]=CHSV(N+i_eff*effLength,255,255); //! fix this not produce rainbow
 }
 void randomBlinkRainbow()
 {
   //! up brightness
-  for(byte i = 0; i < effSpeed; ++i)
+  for(byte i = 0; i < 1 || i <effSpeed/32; ++i)
   {
      Add_random_rainbow_pxel();
   }
+  
+  #ifdef LEDs_RENDER
   FastLED.show();
   delay(4);
   FastLED.clear();
   FastLED.show();
-  delay(6);
+  //delay(6);
+  #endif
 }
 void randomBlinkRainbowFade()
 {
@@ -98,11 +98,11 @@ void randomBlinkRainbow()
 {
   //! up brightness
   fill_rainbow( ledsTmp, NUM_LEDS, gHue, effLength);
-  byte N=random8(0,NUM_LEDS-1);
+  byte N=random8or16(0,NUM_LEDS-1);
   leds[N]=ledsTmp[N];
-  N=random8(0,NUM_LEDS-1);
+  N=random8or16(0,NUM_LEDS-1);
   leds[N]=ledsTmp[N];
-  N=random8(0,NUM_LEDS-1);
+  N=random8or16(0,NUM_LEDS-1);
   leds[N]=ledsTmp[N];
   FastLED.show();
   delay(4);
@@ -124,7 +124,7 @@ void randomBlinkRainbowFade()
   if(t<44)
   {
 	  fill_rainbow( ledsTmp, NUM_LEDS, gHue, effLength);
-	  byte N=random8(0,NUM_LEDS-1);
+	  byte N=random8or16(0,NUM_LEDS-1);
 	  leds[N]=ledsTmp[N];
   }
 }
@@ -385,7 +385,7 @@ void confetti_density() {                                             // Random 
 void random_color_pop() {                         //-m25-RANDOM COLOR POP
   //clear();
   leds[idex]=0;
-  idex =random8(NUM_LEDS);
+  idex =random8or16(NUM_LEDS);
   leds[idex] = CHSV(random8(), 255, 255);
 }
 

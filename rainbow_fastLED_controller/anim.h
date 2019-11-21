@@ -24,7 +24,7 @@ unsigned long randomShow_next_effN_sw_t=0;
 // Define variables used by the sequences.
 byte		twinkrate = 100; // The higher the value, the lower the number of twinkles.
 byte		thisfade =	  8; // How quickly does it fade? Lower = slower fade rate.
-//nscale 					 // Trail behind the LED's. Lower => faster fade.
+//nscale					 // Trail behind the LED's. Lower => faster fade.
 byte		thishue =	 50; // Starting hue.
 byte		thissat =	255; // The saturation, where 255 = brilliant colours.
 byte		thisbri =	255; // Brightness of a sequence.
@@ -74,14 +74,14 @@ uint8_t lvl3 = 80;
 uint8_t mul1 = 20;                                            // Frequency, thus the distance between waves
 uint8_t mul2 = 25;
 uint8_t mul3 = 22;
-//
 
 
 //static int16_t randStatic;
 
 NUM_LEDS_type idex = 0;		//-LED INDEX (0 to NUM_LEDS-1
-int idex16 = 0;
+uint16_t idex16 = 0;
 NUM_LEDS_type idex_last = 0;
+float idex_f = 0;
 byte ihue = 0;
 byte ibright = 0;
 byte isat = 0;
@@ -102,13 +102,25 @@ void (*anim_f_last)();
 	#include "eff_set_Edges.h"
 #endif
 
+#include "eff_common.h"
+#include "eff_set_sys.h"
+
 #include "LED_EFFECT_FUNCTIONS.h"
 #include "eff_setFastLED.h"
 #include "eff_setA.h"
 #include "eff_setB.h"
+#include "eff_set_Wave.h"
 #include "eff_set2.h"
 #include "eff_set_cel.h"
 #include "eff_set_interactive.h"
+
+#ifdef WiFi_SEND
+	void test_RF(){ fill_rainbow( leds, NUM_LEDS, i_eff, NUM_LEDS); } //# ifdef  wifi
+#endif
+
+#ifdef Cube4MCU
+	#include "eff_set_Cube.h"
+#endif
 
 
  int step = -1;
@@ -179,11 +191,30 @@ uint16_t sampleavg = 0;                                                         
 #include "eff_setAT\three_sin_pal_demo.h"
 #include "eff_setAT\two_sin_pal_demo.h"
 
+#ifdef MATRIX_ROWS
+ #include "eff_matrix.h"
+#endif
+
 
 //------------------------snd
-//#include "eff_setAT\fht_log.h"
+//#include "eff_setAT\fht_log.h" //for atm328
 //#include "eff_setAT\fht_log_ripple.h"
 
+
+#ifdef remap_LEDs
+	byte bMap_type=0;
+	#define bMap_type_matrix_			241 //! have to be in sync with gui.pde / btn_matrix_zigZag_h_click  and HTML_settings.htm
+	#define bMap_type_matrix_zigZag_h	242
+	#define bMap_type_matrix_spiral_cw	243
+	#define bMap_type_matrix_labyrinth_cw	244
+	#define bMap_type_mirror_half	245
+	#define bMap_type_history	246 // every n ms shift matrix rows and fill 1st with LEDs
+	#ifdef MATRIX_ROWS
+
+	#endif
+	bool bSwapLEDs=false;
+	CRGB leds_out[NUM_LEDS];
+#endif
 
 
 #ifndef saveMem
@@ -213,7 +244,11 @@ void randomSet()
 	effSpeedH=random8(1,90);
 	effLengthH=random8(1,90);
 		thishue=random8();
-	gDelay=random8(2,30);
+	#ifdef ESP32_HTML_NO_RENDER
+		gDelay=random8(5,20);
+	#else
+		gDelay=random8(0,30);
+	#endif
 
 	bCurrentEff_IsRandom_AndNotSlotN=true;
 
@@ -222,125 +257,154 @@ void randomSet()
 
 byte effNt=0;
 void change_slot(byte effSlot)
-{
-effRGB=0;
-idex=0; idex16 = 0;
-thissat = 255;
-thisdir = 0;
-			#ifdef tst2
-				Serial.print("slot:"); Serial.println(effSlot);
-			#endif
-bCurrentEff_IsRandom_AndNotSlotN=false;
- if(effSlot<=9)
- {
- 	//effNt=effN;
- 	#ifdef save_load_enable
- 	load(effSlot); 
- 	//effN=effNt;
- 	#endif
- }
- else
-  switch (effSlot) {
-	#include "switch_slot.h"
+	{
+	effRGB=0;
+	gDelay=5; //!tst //0 good always when #define gDelayMore to avoid serial bandwidth bug
+	idex=0; idex16 = 0;
+	thissat = 255;
+	thisdir = 0;
+				#ifdef tst2
+					Serial.print("slot:"); Serial.println(effSlot);
+				#endif
+	bCurrentEff_IsRandom_AndNotSlotN=false;
+	 if(effSlot<=9)
+	 {
+		//effNt=effN;
+		#ifdef save_load_enable
+		load(effSlot); 
+		//effN=effNt;
+		#endif
+	 }
+	 else
+	  switch (effSlot) {
+		#include "switch_slot.h"
 
-  case effN_random_endless: //randomEff endless when press btn left 
-	#ifdef demo_enable
-	brandom_demo=false;
-	#endif
-	banimate=false;
+//this N related to button in USB app
+#define effN_off 10 //clear, nodo()
+	
+#define effN_random_endless 248 //endless while press btn --
+#define effN_random 249 
+#define effN_animate_to_slot1 251
+#define effN_animate_SW 252 
 
-	randomSet();
-	effN++; //so we stay at same slot, when move left
-  break;  
+#ifdef demo_enable
+#define effN_random_demo_animated_SW 250  //effN_animate_SW & effN_random_demo_SW
+#define effN_predefined_show_seq 253
+#define effN_random_demo_fast_SW 254 
+#define effN_random_demo_SW 255 //del to disable
+#endif
 
-	case effN_animate_to_slot1: //animate settings from current to settings of slot 1
+
+
+	  case effN_random_endless: //randomEff endless when press btn left 
 		#ifdef demo_enable
 		brandom_demo=false;
 		#endif
 		banimate=false;
 
-		if(!anim_f) anim_f = rainbow_beat;
+		randomSet();
+		effN++; //so we stay at same slot, when move left
+	  break;  
 
-		effSpeed_last=effSpeed;
-  		effLength_last=effLength;
-	break;
+		case effN_animate_to_slot1: //animate settings from current to settings of slot 1
+			#ifdef demo_enable
+			brandom_demo=false;
+			#endif
+			banimate=false;
 
-  case effN_animate_SW: 
- 	banimate=true;
-	#ifdef demo_enable
-	brandom_demo=false;
-	#endif
+			if(!anim_f) anim_f = rainbow_beat;
 
-  	if(!anim_f) anim_f = fillStriped;
+			effSpeed_last=effSpeed;
+			effLength_last=effLength;
+		break;
 
-  	
-  break;
+	  case effN_animate_SW: 
+		banimate=true;
+		#ifdef demo_enable
+		brandom_demo=false;
+		#endif
 
-  #ifdef demo_enable
+		if(!anim_f) anim_f = fillStriped;
 
-  case effN_random_demo_animated_SW:
-	if(brandom_demo && banimate) //! del
-	{
+		
+	  break;
+
+	  #ifdef demo_enable
+
+	  case effN_random_demo_animated_SW:
+		if(brandom_demo && banimate) //! del
+		{
+			brandom_demo=false;
+			banimate=false;
+		}
+		else
+		{
+			brandom_demo=true;
+			banimate=true;
+
+			random_demo_sw_speed_td_m=30;
+			random_demo_sw_speed_td_M=120;
+			//! * effSpeed 
+			#ifdef tst
+			random_demo_sw_speed_td_m=10;
+			random_demo_sw_speed_td_M=20;
+			#endif
+		}
+	  break;
+
+	  case effN_predefined_show_seq:
 		brandom_demo=false;
 		banimate=false;
-	}
-	else
-	{
+	  break;
+
+	  case effN_random_demo_fast_SW:
+	  case effN_random_demo_SW: //! now not a SWich
 		brandom_demo=true;
-		banimate=true;
-
-		random_demo_sw_speed_td_m=30;
-		random_demo_sw_speed_td_M=120;
-		//! * effSpeed 
-		#ifdef tst
-		random_demo_sw_speed_td_m=10;
-		random_demo_sw_speed_td_M=20;
-		#endif
-	}
-  break;
-
-  case effN_predefined_show_seq:
-  	brandom_demo=false;
-  	banimate=false;
-  break;
-
-  case effN_random_demo_fast_SW:
-  case effN_random_demo_SW: //! now not a SWich
-	brandom_demo=true;
-	banimate=false;
-	//if( brandom_demo)
-	{
-		random_demo_sw_speed_td_m=(effSlot<effN_random_demo_SW)?1: ( 2+effLength/32 ); //*1000
-		random_demo_sw_speed_td_M=(effSlot<effN_random_demo_SW)?6: ( 8+effLength/4 ); 
-		// random_demo_sw_speed_td_m=8+effLength/32; //*1000
-		// random_demo_sw_speed_td_M=10+effLength/4; 
-		randomSet();
-	}
-  break;
-  #endif
-  
-	case effN_random:
-	default: //randomEff
-		#ifdef default_effN_Randon
-		randomSet();
-		#else
-  		FastLED.clear();
-  		#endif
-		//effN =0;
-	break;
-  
- //!	#ifndef saveMem
- //	case 111: one_color_all(255, 0, 0); LEDS.show(); break; //---ALL RED
- //	case 112: one_color_all(0, 255, 0); LEDS.show(); break; //---ALL GREEN
- //	case 113: one_color_all(0, 0, 255); LEDS.show(); break; //---ALL BLUE
- //	case 114: one_color_all(255, 255, 0); LEDS.show(); break; //---ALL COLOR X
- //	case 115: one_color_all(0, 255, 255); LEDS.show(); break; //---ALL COLOR Y
- //	case 116: one_color_all(255, 0, 255); LEDS.show(); break; //---ALL COLOR Z
-	// #endif
+		banimate=false;
+		//if( brandom_demo)
+		{
+			random_demo_sw_speed_td_m=(effSlot<effN_random_demo_SW)?1: ( 2+effLength/32 ); //*1000
+			random_demo_sw_speed_td_M=(effSlot<effN_random_demo_SW)?6: ( 8+effLength/4 ); 
+			// random_demo_sw_speed_td_m=8+effLength/32; //*1000
+			// random_demo_sw_speed_td_M=10+effLength/4; 
+			randomSet();
+		}
+	  break;
+	  #endif
+	  
+		case effN_random:
+		default: //randomEff
+			#ifdef default_effN_Random
+			randomSet();
+			#else
+			FastLED.clear();
+								anim_f=fillStriped; //## if not defined default_effN_Random  is NULL
+			#endif
+			//effN =0;
+		break;
+	  
+	 //!	#ifndef saveMem
+	 //	case 111: one_color_all(255, 0, 0); LEDS.show(); break; //---ALL RED
+	 //	case 112: one_color_all(0, 255, 0); LEDS.show(); break; //---ALL GREEN
+	 //	case 113: one_color_all(0, 0, 255); LEDS.show(); break; //---ALL BLUE
+	 //	case 114: one_color_all(255, 255, 0); LEDS.show(); break; //---ALL COLOR X
+	 //	case 115: one_color_all(0, 255, 255); LEDS.show(); break; //---ALL COLOR Y
+	 //	case 116: one_color_all(255, 0, 255); LEDS.show(); break; //---ALL COLOR Z
+		// #endif
   }
   
+											if(!anim_f) anim_f = fillStriped;
+
+
 	if(anim_f!=anim_f_last) //!
 	{
+		#ifndef saveMem
+		 if(effN>=240 &&effN<=245) //!!!upd  //this slots does not change eff, but have to be named for USB app, so temporary solution
+		 {
+		 	anim_f=anim_f_last;
+		 }
+		 else
+		#endif
 		anim_f_last=anim_f;
 		//if(anim_f!=animEffContinueRandomShow && anim_f!=animEffContinue)	anim_f_last=anim_f; //for animate settings
 
@@ -348,6 +412,14 @@ bCurrentEff_IsRandom_AndNotSlotN=false;
 		
 		//saveAfter2s(); // need after eff changed global options - so it will save in slot 0
 	}
+
+
+				// #ifdef tst2
+				//	Serial.print("slot changed"); 
+				//	Serial.print(anim_f==NULL); 
+
+				//	Serial.println(effSlot);
+				// #endif
 }
 
 void DisableChennel(int i, byte chen)
@@ -361,6 +433,7 @@ long anim_next_t=0;
 long animHue_next_t=0;
 
 
+
 void LED_anim()
 {
 	if(bPause) return; //!! ifdef 
@@ -372,23 +445,37 @@ void LED_anim()
 
 if(millis()>anim_next_t)
 {
+
 	anim_next_t=millis()+gDelay;
 
 	#ifdef tstFPS
 
 		uint8_t *p;
+						// PRINT__
+						// PRINT_tst
+						// Serial.write(sizeof("bPrintPixels: ")+3);
+						// Serial.print("bPrintPixels: ");			Serial.println(bPrintPixels);
 
-		PRINT__
+		PRINT__ //do not serial.print debug stuff inside
 
-		if(bPrintPixels)
+		if(bPrintPixels) //! move to  loop end, after anim and post proc
 		{
+			#ifdef gDelayMore
+				anim_next_t+=gDelayMore;
+			#endif
+												
 			PRINT_leds
 
-			int fps=LEDS.getFPS();
+			#if defined(LEDs_RENDER)
+				uint16_t fps=LEDS.getFPS();
+			#else
+				uint16_t fps=0; //!!//#
+			#endif
 			p = (uint8_t*) &fps;
 			Serial.write(p,2);
 
-			int size=NUM_LEDS*3; //! NUM_LEDS range
+
+			uint16_t size=NUM_LEDS*3; //! NUM_LEDS range
 			p = (uint8_t*) &size;
 			Serial.write(p,2);
 			Serial.write((uint8_t*)leds, size);
@@ -397,26 +484,30 @@ if(millis()>anim_next_t)
 		{
 			PRINT_totall
 
-			int fps=LEDS.getFPS();
+			#if defined(LEDs_RENDER)
+				uint16_t fps=LEDS.getFPS();
+			#else
+				uint16_t fps=0; //!!//#
+			#endif
 			p = (uint8_t*) &fps;
 			Serial.write(p,2);
 
-			 {
-			  //#include "power_mgt.h" //? nw as FastLED.calculate_unscaled_power_mW		http://fastled.io/docs/3.1/power__mgt_8cpp_source.html
-			  //Serial.println(calculate_unscaled_power_mW (leds, NUM_LEDS)); //* FastLED.getBrightness()/256  this done in GUI
-				const CRGB* firstled = &(leds[0]);
-				uint8_t* p = (uint8_t*)(firstled);
-				uint16_t count = NUM_LEDS*3;
-				uint32_t totall=0;
-	 
-				while( count) { // This loop might benefit from an AVR assembly version -MEK
-					totall += *p++;
-					count--;
-				}
-												totall/=256; //!
-				p = (uint8_t*) &totall;
-				Serial.write(p,2);
+
+			//#include "power_mgt.h" //? nw as FastLED.calculate_unscaled_power_mW		http://fastled.io/docs/3.1/power__mgt_8cpp_source.html
+			//Serial.println(calculate_unscaled_power_mW (leds, NUM_LEDS)); //* FastLED.getBrightness()/256  this done in GUI
+			const CRGB* firstled = &(leds[0]);
+			uint8_t* p = (uint8_t*)(firstled);
+			uint16_t count = NUM_LEDS*3;
+			uint32_t totall=0;
+
+			while(count)
+			{ // This loop might benefit from an AVR assembly version -MEK
+				totall += *p++;
+				count--;
 			}
+			totall/=256; //!
+			p = (uint8_t*) &totall;
+			Serial.write(p,2);
 		}
 
 	#endif
@@ -428,7 +519,7 @@ if(millis()>anim_next_t)
 		
 
 		//effSpeed=beatsin8(3, 0, 150 );
-  		//effLength=beatsin8(2, 2, 180 );
+		//effLength=beatsin8(2, 2, 180 );
 
 		//! if(effRGB>0 && effRGB<7) nextSW_t=millis()+10;  else +30
 		EVERY_N_MILLISECONDS( 20000 )
@@ -439,12 +530,19 @@ if(millis()>anim_next_t)
 		}
 		//effRGB= beatsin8(1, 0, 16);
 	}
-	// #ifdef tst2
-	// 	Serial.println(anim_f==NULL);
-	// #endif
-	//Serial.print(anim_f==NULL);	Serial.print(" "); Serial.print(NUM_LEDS);	Serial.print(" ");Serial.println(gNUM_LEDS);
+									 #ifdef tst2
+										Serial.print(anim_f==NULL);	Serial.print("NUM_LEDS: "); Serial.print(NUM_LEDS);	Serial.print(" gNUM_LEDS: ");Serial.println(gNUM_LEDS);
+									 #endif
+	#ifdef MATRIX_ROWS
+		if(bSwapLEDs)
+		{
+			bSwapLEDs=false;
+			memcpy8( &leds_out[0],	&leds[0], NUM_LEDS*3 ); //!!opt TODO avoid douple copy and copy at all
+		}
+	#endif
 	anim_f();
 
+//--------------------------------------------------------------- post processing
 	if(effRGB!=0)
 	{
 		for(NUM_LEDS_type i = 0; i < NUM_LEDS; i++)
@@ -457,8 +555,8 @@ if(millis()>anim_next_t)
 			else if(effRGB<=6) DisableChennel(i, effRGB); //0..6  10..16
 			else if(effRGB>=10 && effRGB<=16)
 			{
-			 	DisableChennel(i, effRGB-10); //0..6  10..16
-			 	i++;
+				DisableChennel(i, effRGB-10); //0..6  10..16
+				i++;
 			}
 			else
 			if(effRGB==17)
@@ -488,11 +586,218 @@ if(millis()>anim_next_t)
 			//! gFade
 		}
 	}
+
+
+
+
+#ifdef remap_LEDs
+#ifdef MATRIX_ROWS
+	#define LEDs_per_row NUM_LEDS/MATRIX_ROWS
+#endif
+
+ switch(bMap_type)
+ {
+ 	#ifdef MATRIX_ROWS
+	case bMap_type_matrix_zigZag_h: //@ https://github.com/FastLED/FastLED/blob/master/examples/XYMatrix/XYMatrix.ino
+		{
+			for(byte row=1;row<MATRIX_ROWS; row+=2) //reverse odd rows
+			{
+				NUM_LEDS_type len=LEDs_per_row/2;
+				NUM_LEDS_type x0=row*LEDs_per_row;
+				NUM_LEDS_type x9=(row+1)*LEDs_per_row-1;
+				
+				for(NUM_LEDS_type x=0; x<len; x++)
+				{
+					CRGB c=leds[x0+x];
+					leds[x0+x]=leds[x9-x];
+					leds[x9-x]=c;
+				}
+				//##TODO if !bMapInPlace memcpy8( &leds_out[0],	&leds[0], NUM_LEDS*3 );
+			}
+		}
+								// leds[0]=CRGB::Blue;
+								// leds[1]=CRGB::Blue;
+	break;
+	case bMap_type_matrix_spiral_cw:
+		{																	memset(leds_out, 0, NUM_LEDS * 3); //clear
+			NUM_LEDS_type matrix_px_per_row=NUM_LEDS/MATRIX_ROWS;
+			for(NUM_LEDS_type i=0, spiralCurrentSquareN=0, i_Square=0;i< NUM_LEDS; i++,i_Square++) //reverse odd rows
+			{
+				NUM_LEDS_type px_per_Square_side=matrix_px_per_row-1-spiralCurrentSquareN*2;
+				NUM_LEDS_type col_s=0, row_s=0;
+
+				if (i_Square<px_per_Square_side)
+				{
+					col_s=i_Square +spiralCurrentSquareN;
+			 		row_s=0+spiralCurrentSquareN;
+
+				}
+				else
+				if (i_Square<px_per_Square_side*2)
+				{
+					col_s=matrix_px_per_row-1 -spiralCurrentSquareN;
+			 		row_s=i_Square%px_per_Square_side +spiralCurrentSquareN;
+
+				}
+				else
+				if (i_Square<px_per_Square_side*3)
+				{
+					col_s=matrix_px_per_row-1-i_Square%px_per_Square_side -spiralCurrentSquareN;
+			 		row_s=matrix_px_per_row-1 -spiralCurrentSquareN;
+
+				}
+				else
+				if (i_Square<px_per_Square_side*4)
+				{
+					col_s=0 +spiralCurrentSquareN;
+			 		row_s=matrix_px_per_row-1-i_Square%px_per_Square_side -spiralCurrentSquareN;
+			 		if(i_Square==px_per_Square_side*4-1) 
+			 		{
+			 			spiralCurrentSquareN++;
+i_Square=-1;
+			 		}
+				}
+				else continue; //? why can't 'break' it stop on 4th size start
+
+				{
+					#ifndef bZigZag
+						leds_out[row_s*LEDs_per_row+col_s]=leds[i];
+					#else
+						NUM_LEDS_type ii;
+						if(row_s%2)
+						{
+							ii=LEDs_per_row-1-col_s;
+						}
+						else ii=col_s;
+
+						leds_out[row_s*LEDs_per_row+ii]=leds[i];
+					#endif
+				}
+
+			}
+			bSwapLEDs=true;
+			memcpy8( &leds[0],	&leds_out[0], NUM_LEDS*3 );
+		}
+								// leds[0]=CRGB::Red;
+								// leds[1]=CRGB::Red;
+	break;
+
+	case bMap_type_matrix_labyrinth_cw:
+		{
+			memset(leds_out, 0, NUM_LEDS * 3); //clear
+
+
+			NUM_LEDS_type matrix_px_per_row=NUM_LEDS/MATRIX_ROWS;
+			for(NUM_LEDS_type i=0, spiralCurrentSquareN=0, i_Square=0;i< NUM_LEDS; i++) //reverse odd rows
+			{
+				if(spiralCurrentSquareN*2 > matrix_px_per_row-1) break;
+				NUM_LEDS_type px_per_Square_side=matrix_px_per_row-1-spiralCurrentSquareN*2;
+
+				NUM_LEDS_type col_s=0, row_s=0;
+
+				if (i_Square<px_per_Square_side)
+				{
+					col_s=i_Square +spiralCurrentSquareN;
+			 		row_s=0+spiralCurrentSquareN;
+			 		i_Square++;
+				}
+				else
+				if (i_Square<px_per_Square_side*2)
+				{
+					col_s=matrix_px_per_row-1 -spiralCurrentSquareN;
+			 		row_s=i_Square%px_per_Square_side +spiralCurrentSquareN;
+			 		i_Square++;
+				}
+				else
+				if (i_Square<px_per_Square_side*3)
+				{
+					col_s=matrix_px_per_row-1-i_Square%px_per_Square_side -spiralCurrentSquareN;
+			 		row_s=matrix_px_per_row-1 -spiralCurrentSquareN;
+			 		i_Square++;
+				}
+				else
+				if (i_Square<px_per_Square_side*4-1)
+				{
+					col_s=0 +spiralCurrentSquareN;
+			 		row_s=matrix_px_per_row-1-i_Square%px_per_Square_side -spiralCurrentSquareN;
+			 		i_Square++;
+				}
+				else
+				if (i_Square==px_per_Square_side*4-1)
+				{
+					col_s=0 +spiralCurrentSquareN+1;
+					row_s=matrix_px_per_row-1-(i_Square-1)%px_per_Square_side -spiralCurrentSquareN;
+
+			 		{
+			 			spiralCurrentSquareN+=2;
+			 			i_Square=0;
+			 			//i_Square=-1; //-1 because it ++ in for and have to be 0 at start of next square //can't because unsigned
+			 		}
+
+				}
+				else break;
+
+				{
+					#ifndef bZigZag
+						leds_out[row_s*LEDs_per_row+col_s]=leds[i];
+					#else
+						NUM_LEDS_type ii;
+						if(row_s%2)
+						{
+							ii=LEDs_per_row-1-col_s;
+						}
+						else ii=col_s;
+
+						leds_out[row_s*LEDs_per_row+ii]=leds[i];
+
+					#endif
+				}
+
+
+			}
+			bSwapLEDs=true;
+			memcpy8( &leds[0],	&leds_out[0], NUM_LEDS*3 );
+		}
+								// leds[0]=CRGB::Red;
+								// leds[1]=CRGB::Red;
+	break;
+
+
+	#endif
+
+	case bMap_type_mirror_half:
+		{
+			NUM_LEDS_type E=NUM_LEDS/2;
+			NUM_LEDS_type x0=E;
+			NUM_LEDS_type x9=NUM_LEDS-1;
+
+			for(NUM_LEDS_type x=0; x<E/2; x++) //reverse last half
+			{
+				CRGB c=leds[x0+x];
+				leds[x0+x]=leds[x9-x];
+				leds[x9-x]=c;
+			}
+		}
+								// leds[0]=CRGB::Black;
+								// leds[1]=CRGB::Black;
+	break;
+
+ }
+#endif
+
 	#ifdef BlueFilter
 		for(NUM_LEDS_type i = 0; i < NUM_LEDS; i++)		leds[i].b=leds[i].b/8;
 	#endif
+	//--------------------------------------------------------------- 
 
-	FastLED.show();
+	#if defined(LEDs_RENDER)
+		FastLED.show();
+		//!! show_at_max_brightness_for_power();
+	#endif
+	#if defined(WiFi_SEND)
+		//######## send_LEDs_over_WiFi();
+	#endif
+
 	i_eff++;	//if(i_eff>effLength) i_eff=0; //!!!#  i_eff%effLength	i_eff_M_is_effLength
 } //anim_f(); EVERY_N_MILLISECONDS
 else
@@ -505,7 +810,7 @@ else
 if(millis()>animHue_next_t)
 {
 	animHue_next_t=millis()+gDelayH;
-	gHue+=effSpeed/2;
+	gHue+=effSpeed/2; //TODO move to each eff or iEff
 
 	#ifdef demo_enable //no show for this hardware
 	if(brandom_demo && millis()>randomShow_next_effN_sw_t)

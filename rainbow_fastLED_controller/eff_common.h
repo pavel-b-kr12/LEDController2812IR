@@ -1,8 +1,111 @@
+
+unsigned int crc32b(unsigned char *message) {
+   int i, j;
+   unsigned int byte, crc, mask;
+
+   i = 0;
+   crc = 0xFFFFFFFF;
+   while (message[i] != 0) {
+      byte = message[i];            // Get next byte.
+      crc = crc ^ byte;
+      for (j = 7; j >= 0; j--) {    // Do eight times.
+         mask = -(crc & 1);
+         crc = (crc >> 1) ^ (0xEDB88320 & mask);
+      }
+      i = i + 1;
+   }
+   return ~crc;
+}
+
+
+unsigned int crc2b(int message) {
+   int i, j;
+   unsigned int byte, crc, mask;
+
+   crc = 0xFFFFFFFF;
+
+      byte = message%256;            // Get next byte.
+      crc = crc ^ byte;
+      for (j = 7; j >= 0; j--) {    // Do eight times.
+         mask = -(crc & 1);
+         crc = (crc >> 1) ^ (0xEDB88320 & mask);
+      }
+
+
+
+      byte = message/256;            // Get next byte.
+      crc = crc ^ byte;
+      for (j = 7; j >= 0; j--) {    // Do eight times.
+         mask = -(crc & 1);
+         crc = (crc >> 1) ^ (0xEDB88320 & mask);
+      }
+
+
+   return ~crc;
+}
+
+
+
+
+void clear_leds()
+{
+	memset(leds, 0, NUM_LEDS * 3);
+	//FastLED.clear(true);
+
+	// for(NUM_LEDS_type i=0;i<NUM_LEDS;i++)
+	// {
+	// 	leds[i]=0;
+	// }
+}
+/*
+add new
+
+			leds[0]=moveOutAllRemainFirst_ret_last__all_bRight(true);
+			
+			for (int i = 0; i< NUM_LEDS; i++)
+			{
+				leds[i].nscale8(250);
+			}
+leds[0]+=CHSV(random8(33)+aVal*80,255,random8(4)*60);
+
+
+
+
+
+
+
+      if (strobe_bright > 0)
+        for (int i = 0; i < NUM_LEDS; i++) leds[i] = CHSV(STROBE_COLOR*aVal, STROBE_SAT+255*aVal, strobe_bright);
+      else
+        for (int i = 0; i < NUM_LEDS; i++) leds[i] = CHSV(EMPTY_COLOR*aVal, 255*aVal, EMPTY_BRIGHT);
+      break;
+
+
+*/
+
 /*
 randomBlink
 
 */
+
 //fill_solid( leds, NUM_LEDS, CRGB(50,0,200)); 
+
+/*
+// Dim a color by 25% (64/256ths)
+  // eventually fading to full black
+  leds[i].fadeToBlackBy( 64 );
+
+  // Reduce color to 75% (192/256ths) of its previous value
+  // eventually fading to full black
+  leds[i].nscale8( 192);
+  
+  
+  
+  leds[i].maximizeBrightness();  // Adjust brightness to maximum possible while keeping the same hue. //###
+  
+  ##обесцвечивающийся радужный mover
+  ## цветное движущиеся окно
+*/
 
 void one_color_allHSV(int ahue) {    //-SET ALL LEDS TO ONE COLOR (HSV)
 	for(NUM_LEDS_type i = 0 ; i < NUM_LEDS; i++ )
@@ -24,6 +127,108 @@ void moveAll() //cyclic
 	moveOutAllRemainFirst();
 	leds[0]=t;
 }
+// ==
+
+/*
+void moveRightMemset() {
+for (int i=0; i<NUM_LEDS; i++) {
+CRGB last_led = leds[NUM_LEDS-1];
+memmove( &leds[1], &leds[0], (NUM_LEDS-1)*sizeof(CRGB));
+leds[0] = last_led;
+FastLED.show();
+delay(300);
+}
+}
+*/
+/*
+int ar[]={1,2,3,4,5};
+   int n=sizeof(ar)/sizeof(ar[0]);
+   r_left(ar,n);
+
+void r_left(int *a,int n) 
+{ 
+  int tmp=a[0];
+  memmove(a,a+1,sizeof(int)*(n-1));
+  a[n-1]=tmp;
+} 
+//rotate right
+void r_right(int *a,int n) 
+{ 
+    int tmp=a[n-1];
+    memmove(a+1,a,sizeof(int)*(n-1));
+    a[0]=tmp;
+ } 
+*/
+
+// leds[0]=moveOutAllRemainFirst_ret_last__all_bRight(true);  //cyclic right
+CRGB moveOutAllRemainFirst_ret_last(NUM_LEDS_type x0, NUM_LEDS_type x9) //##use //move in forward dir
+{
+	//if x9 not [0..NUM_LEDS-1]
+	
+	CRGB t9=leds[x9];
+	CRGB t0=leds[x0];
+	int bs=sizeof(CRGB)*(abs(x9-x0));
+	if(x9>x0)
+	{
+		memmove(&leds[x0+1],&leds[x0],bs);
+		leds[x0]=t0;
+	}
+	else
+	{
+		memmove(&leds[x9],&leds[x9+1],bs);
+		leds[x0]=t0;
+	}
+	
+	/*
+	byte direction=x0<x9 ? 1 : -1;
+	for(NUM_LEDS_type i = x9; i != x0; i-=direction) 
+	{
+		if(i<0 || i> NUM_LEDS-1) break;
+		leds[i]=leds[i-direction];
+	}
+	*/
+	
+	/*
+ 
+	if(x0<x9)
+	{
+		for(NUM_LEDS_type i = x9; i != x0; i-=direction) 
+		{
+			if(i<0 || i> NUM_LEDS-1) break;
+			leds[i]=leds[i-direction];
+		}
+	}
+	*/
+	
+	return t9;
+}
+CRGB moveOutAllRemainFirst_ret_last__all_Right()
+{
+	return moveOutAllRemainFirst_ret_last(0, NUM_LEDS-1);
+}
+CRGB moveOutAllRemainFirst_ret_last__all_Left()
+{
+	return moveOutAllRemainFirst_ret_last(NUM_LEDS-1, 0);
+}
+
+CRGB moveOutAllRemainFirst_ret_lastRev(NUM_LEDS_type x0, NUM_LEDS_type x9) //##use //move in forward dir
+{
+	//if x9 not [0..NUM_LEDS-1]
+	
+	CRGB t=leds[x0];
+	
+	for(NUM_LEDS_type i = x0; i < x9; i++) 
+	{
+		if(i<0 || i> NUM_LEDS-1) break;
+		leds[i]=leds[i+1];
+	}
+
+	return t;
+
+}
+
+
+
 void moveOutAll()
 {
 	moveOutAllRemainFirst();
@@ -80,14 +285,17 @@ void move_fromCenter_RemainFirst()
 
 void addGlitter(byte chanceOfGlitter)
 {
+	#if NUM_LEDS > 400
+	for(byte i=0;i<10;i++)
+	#endif
 	if(random8() < chanceOfGlitter) {
-		leds[ random16(NUM_LEDS) ] += gColor;
+		leds[ random8or16(NUM_LEDS) ] += gColor;
 	}
 }
 void addGlitterBlack(byte chanceOfGlitter)
 {
 	if(random8() < chanceOfGlitter) {
-		leds[ random16(NUM_LEDS) ] = 0;
+		leds[ random8or16(NUM_LEDS) ] = 0;
 	}
 }
 
@@ -108,7 +316,7 @@ void invertLEDs()
 	}
 }
 
-void flashLEDs()
+void flashLEDs_d_effL()
 {
 	for(NUM_LEDS_type i = 0; i < NUM_LEDS; i++)
 	{
@@ -122,7 +330,7 @@ void flashLEDs()
 	FastLED.show();
 }
 
-void flashAndBackLEDs()
+void flashAndBackLEDs_d40()
 {
 	for(NUM_LEDS_type i = 0; i < NUM_LEDS; i++)
 	{
@@ -148,9 +356,9 @@ void offPixel_continued()
 {
 	for(unsigned long t = millis()+4500; millis() < t; )
 	{
-		//leds[random8(NUM_LEDS)]=CRGB::Black;
+		//leds[random8or16(NUM_LEDS)]=CRGB::Black;
 
-		NUM_LEDS_type N=random8(NUM_LEDS);
+		NUM_LEDS_type N=random8or16(NUM_LEDS);
 		if(leds[N]!=CRGB(0x000000)) //http://forum.arduino.cc/index.php?topic=385711.0
 		{
 			leds[N]=CRGB::Black;
@@ -200,17 +408,5 @@ void moveOut_continued()
 			leds[i]=leds[i-1];
 		}
 		FastLED.show(); delay(map(effSpeed,0,255,25,1));
-	}
-}
-
-void print_currentPalette()
-{
-	for (int i = 0; i < 16; ++i)
-	{
-		Serial.print(currentPalette[i].r);
-		Serial.print(",");
-		Serial.print(currentPalette[i].g);
-		Serial.print(",");
-		Serial.println(currentPalette[i].b);
 	}
 }

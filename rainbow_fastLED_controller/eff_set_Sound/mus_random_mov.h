@@ -1,6 +1,6 @@
 float a_avg;
 int accumulator=0;
-void mus_random_mov()
+void mus_random_mov() //@@
 {
 
 	byte a=qadd8( analogRead(sound_p), analogRead(sound_p) )-effLengthH; //! fix when level will be good (now I got <128)
@@ -12,11 +12,11 @@ void mus_random_mov()
 
 	}
 
-	leds[random8(NUM_LEDS)]=   ColorFromPalette(currentPalette, a, qadd8(50,abs(a_avg-a)*20), LINEARBLEND); 
+	leds[random8or16(NUM_LEDS)]=   ColorFromPalette(currentPalette, a, qadd8(50,abs(a_avg-a)*20), LINEARBLEND); 
 
 	if(abs(a_avg-a)>100) invertLEDs(); 
 	else
-	if(abs(a_avg-a)>50 &&random8()>220) flashLEDs();
+	if(abs(a_avg-a)>50 &&random8()>220) flashLEDs_d_effL();
 
 	accumulator+=a;
 	int accumulator_lim=effSpeed*8;

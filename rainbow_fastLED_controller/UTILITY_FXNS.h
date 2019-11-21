@@ -20,6 +20,7 @@ void fadeall() //!
       leds[i].nscale8(250); 
   }
 }
+//fadeToBlackBy(leds, NUM_LEDS, effFade);
 
 byte colorize()
 {

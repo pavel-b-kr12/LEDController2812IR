@@ -175,8 +175,10 @@ void flicker() {                          //-m9-FLICKER EFFECT
     for(NUM_LEDS_type i = 0 ; i < NUM_LEDS; i++ ) {
       leds[i] = CHSV(thishue, 255, random_bright);
     }
+	#ifdef LEDs_RENDER
     FastLED.show();
-    delay(random_delay); //!! if(random_delay>5) IR
+    delay(random_delay); //!! if(random_delay>5) IR 
+	#endif
   }
 }
 #endif
@@ -630,32 +632,6 @@ void kitt() {                                     //-m28-KNIGHT INDUSTIES 2000
   }
 }
 #ifndef saveMem
-void matrix() {                                   //-m29-ONE LINE MATRIX
-  byte rand = random8(0, 100);
-
-  if(effLength<125) thishue = effLength*2;
-  else 
-    if(effLength<200) thishue = gHue*effSpeed/16; //!tst //gHue*(effLength-124)/16;
-  else 
-  { //single color batch
-    if(rand<90)
-    thishue +=2*(1+effSpeed)/16;
-  }
-
-  
-  if (rand > 90) {
-    leds[0] = CHSV(thishue, 255, 255);
-  }
-  else {
-    leds[0] = CHSV(thishue, 255, 0);
-  }
-  copy_led_array();
-  for(NUM_LEDS_type i = 1; i < NUM_LEDS; i++ ) {
-    leds[i].r = ledsX_[i - 1].r;
-    leds[i].g = ledsX_[i - 1].g;
-    leds[i].b = ledsX_[i - 1].b;
-  }
-}
 
 void strip_march_cw() {                        //-m50-MARCH STRIP CW
   copy_led_array();
@@ -914,7 +890,7 @@ void NewKITT()
 //  // FastLED.clear();
 
 //  // for(NUM_LEDS_type i = 0; i < Count; i++) {
-//     leds[random(NUM_LEDS)]=CRGB( random8(), random8(), random8());
+//     leds[random8or16(NUM_LEDS-1)]=CRGB( random8(), random8(), random8());
 //     // FastLED.show();
 //     // delay(SpeedDelay);
 //     // if (OnlyOne) {
@@ -931,10 +907,10 @@ void RunningLights(byte red, byte green, byte blue) { //!
       //leds[i]=CRGB(level,0,0);
       //float level = sin(i+Position) * 127 + 128;
       leds[i]=CRGB(
-        sin8(i + i_eff*11/effSpeed)*red/255,
-        sin8(i + i_eff*14/effSpeed)*green/255,
-        sin8(i + i_eff*17/effSpeed)*blue/255
-        )  ;
+        sin8(i + i_eff*11/(1+effSpeed))*red/255,
+        sin8(i + i_eff*14/(1+effSpeed))*green/255,
+        sin8(i + i_eff*17/(1+effSpeed))*blue/255
+        );
 
                //  leds[i]=CRGB( ((sin8(i + i_eff*100/effSpeed) * 127 + 128) / 255)*red,
                // ((sin8(i + i_eff*113/effSpeed) * 127 + 128) / 255)*green,
@@ -994,28 +970,48 @@ void Sparkle()
 }
 
 //-------------------------------SnowSparkle---------------------------------------
+
 void SnowSparkle(int SparkleDelay, int SpeedDelay) {
   fillAll();
 
-  int Pixel = random(NUM_LEDS);
+  int Pixel = random8or16(NUM_LEDS);
   leds[Pixel]=CRGB::White;
   FastLED.show();
   delay(SparkleDelay);
   leds[Pixel]=gColor;
   FastLED.show();
-  delay(SpeedDelay);
+  delay(SpeedDelay); //TODO !!!## next, prevN random
 }
+
 void SnowSparkle() {
 	gDelay=effLength/8;
   fillAll();
 
-  int Pixel = random(NUM_LEDS);
+  int Pixel = random8or16(NUM_LEDS);
   leds[Pixel]=CRGB::White;
   FastLED.show();
-  delay(effSpeed/8);
+  delay(effSpeed/16);
   leds[Pixel]=gColor;
-  FastLED.show();
+  //FastLED.show();
   //delay(SpeedDelay);
+}
+
+void SnowSparkle_changeBG() {
+	//gDelay=effLength/8;
+  //fillAll();
+ if(random8()<10) gColor=CHSV(random8(),128+random8()/2,random8(4)*64);
+  int Pixel = crc2b(i_eff)%NUM_LEDS; //random8or16(NUM_LEDS);
+  leds[Pixel]=CRGB::White;
+  //FastLED.show();
+  //delay(effSpeed/8);
+  leds[crc2b(i_eff-10)%NUM_LEDS]=gColor;
+  
+  addGlitterBlack(effLengthH/4);
+  
+  if(effFade>10 && random8()<effFade/2 )
+  {
+	  fadeToBlackBy(leds, NUM_LEDS, 1+effFade/64);
+  }
 }
 
 //-------------------------------theaterChase---------------------------------------

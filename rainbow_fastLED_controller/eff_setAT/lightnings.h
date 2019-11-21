@@ -17,8 +17,8 @@ void lightnings() {
 	uint8_t flashes = 1+effLength/16;                                          //the upper limit of flashes per strike
 	unsigned int dimmer = 1;
 
-  uint8_t ledstart = random8(NUM_LEDS);                               //  starting location of flash
-  uint8_t ledlen = random8(NUM_LEDS-ledstart);                        //  length of flash (not to go beyond NUM_LEDS-1)
+  uint8_t ledstart = random8or16(NUM_LEDS);                               //  starting location of flash
+  uint8_t ledlen = random8or16(NUM_LEDS-ledstart);                        //  length of flash (not to go beyond NUM_LEDS-1)
   
   for (int flashCounter = 0; flashCounter < random8(3,flashes); flashCounter++) {
     if(flashCounter == 0) dimmer = 5;                         // the brightness of the leader is scaled down by a factor of 5

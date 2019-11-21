@@ -101,13 +101,11 @@ void cubic_test()
 
 
 
-//------------------------------------------------------------------------------------
-CRGBSet ledsRef(leds, NUM_LEDS);
+//------------------------------------------------------------------------------------ https://github.com/FastLED/FastLED/wiki/RGBSet-Reference
 
-CRGBSet ledsX(ledsRef(0,NUM_LEDS/3), NUM_LEDS/3);
-CRGBSet ledsY(ledsRef(NUM_LEDS/3,NUM_LEDS/3*2), NUM_LEDS/3);
-CRGBSet ledsZ(ledsRef(NUM_LEDS/3*2,NUM_LEDS/3*3), NUM_LEDS/3);
 
+
+/*
 
 CRGBSet ledsX00(ledsRef(0				,NUM_LEDS/12-1), NUM_LEDS/12);
 CRGBSet ledsX01(ledsRef(NUM_LEDS/12*1,NUM_LEDS/12*2-1), NUM_LEDS/12);
@@ -126,7 +124,7 @@ CRGBSet ledsZ11(ledsRef(NUM_LEDS/12*11,NUM_LEDS/12*12-1), NUM_LEDS/12);
 
 
 CRGBSet ledsXY0(ledsRef(0,NUM_LEDS/6), NUM_LEDS/6);
-
+*/
 
 
 /*

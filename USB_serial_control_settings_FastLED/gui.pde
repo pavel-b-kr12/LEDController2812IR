@@ -60,8 +60,8 @@ public void button_clear_click1(GButton source, GEvent event) { //_CODE_:button_
 
 public void slider_effN_change1(GSlider source, GEvent event) { //_CODE_:slider_effN:684540:
   if(bDebugPrint){
-																																				println("slider event");
-																																				println(event.getType());
+																																				print("slider event, skip: ");
+																																				//println(event.getType()); //alvays == VALUE_STEADY
 																																				println(bSkipEvent);
   }
 	if(bSkipEvent) return;
@@ -100,6 +100,7 @@ public void button_effNAdd_click1(GButton source, GEvent event) { //_CODE_:butto
 } //_CODE_:button_effNAdd:715775:
 
 public void slider_brightness_change1(GSlider source, GEvent event) { //_CODE_:slider_brightness:412375:
+  if(bSkipEvent) return;
 	settingsVals.get("gBrightness").setValue(source.getValueI());
 } //_CODE_:slider_brightness:412375:
 
@@ -230,6 +231,50 @@ public void button_sim_click(GButton source, GEvent event) { //_CODE_:button_sim
   bSim_set(!bSim);
 } //_CODE_:button_sim:689176:
 
+public void btn_copy_switch_nms_click(GButton source, GEvent event) { //_CODE_:btn_copy_switch_nms:419833:
+  
+String s="const linksNames =[";
+boolean bNotFirts=false;
+  for(int i=0;i<255;i++)
+  {
+    if(EffNmsQuality[i]==null || EffNmsQuality[i]>2) continue; //skip bugged and boring: 1 = all, all-1 = best, +1 - not interesting, +2 buggy //TODO GUI
+     String  nm= EffNms[i];
+
+     if(nm!=null)
+     {
+      if(bNotFirts) 
+      {
+        s+=",";
+      } else bNotFirts=true;
+      s+="['"+nm+"',"+Integer.toString(i)+"]";
+     }
+  }
+    s+="];";
+
+  copyToClipboard(s);
+} //_CODE_:btn_copy_switch_nms:419833:
+
+public void btn_matrix_zigZag_h_click(GButton source, GEvent event) { //_CODE_:btn_matrix_zigZag_h:353002:
+    set_bbtn_matrix_state(242);
+} //_CODE_:btn_matrix_zigZag_h:353002:
+
+public void btn_matrix_spiral_cw_click(GButton source, GEvent event) { //_CODE_:btn_matrix_spiral_cw:495934:
+  set_bbtn_matrix_state(243);
+  
+} //_CODE_:btn_matrix_spiral_cw:495934:
+
+public void btn_labyrinth_cw_click(GButton source, GEvent event) { //_CODE_:btn_labyrinth_cw:373886:
+  set_bbtn_matrix_state(244);
+} //_CODE_:btn_labyrinth_cw:373886:
+
+public void btn_mirror_half_click(GButton source, GEvent event) { //_CODE_:btn_mirror_half:261892:
+  set_bbtn_matrix_state(245);
+} //_CODE_:btn_mirror_half:261892:
+
+public void btn_history_click(GButton source, GEvent event) { //_CODE_:btn_history:509443:
+  set_bbtn_matrix_state(246);
+} //_CODE_:btn_history:509443:
+
 
 
 // Create all the GUI controls. 
@@ -271,10 +316,11 @@ public void createGUI(){
   button_clear = new GButton(this, 510, 100, 70, 20);
   button_clear.setText("clear");
   button_clear.addEventHandler(this, "button_clear_click1");
-  slider_effN = new GSlider(this, 20, 260, 560, 40, 10.0);
+  slider_effN = new GSlider(this, 150, 260, 430, 40, 10.0);
   slider_effN.setLimits(1, 0, 255);
   slider_effN.setNbrTicks(26);
   slider_effN.setNumberFormat(G4P.INTEGER, 0);
+  slider_effN.setLocalColorScheme(GCScheme.GREEN_SCHEME);
   slider_effN.setOpaque(false);
   slider_effN.addEventHandler(this, "slider_effN_change1");
   slider_speed = new GSlider(this, 20, 290, 560, 40, 10.0);
@@ -290,7 +336,7 @@ public void createGUI(){
   slider_length.setNumberFormat(G4P.INTEGER, 0);
   slider_length.setOpaque(false);
   slider_length.addEventHandler(this, "slider_length_change1");
-  slider_RGB = new GSlider(this, 20, 500, 460, 50, 10.0);
+  slider_RGB = new GSlider(this, 20, 500, 480, 50, 10.0);
   slider_RGB.setLimits(0, 0, 8);
   slider_RGB.setNbrTicks(9);
   slider_RGB.setStickToTicks(true);
@@ -304,11 +350,13 @@ public void createGUI(){
   button_reset = new GButton(this, 430, 100, 70, 20);
   button_reset.setText("Reset");
   button_reset.addEventHandler(this, "button_reset_click1");
-  button_effNsub = new GButton(this, 70, 240, 30, 20);
+  button_effNsub = new GButton(this, 70, 270, 30, 20);
   button_effNsub.setText("-");
+  button_effNsub.setLocalColorScheme(GCScheme.GREEN_SCHEME);
   button_effNsub.addEventHandler(this, "button_effNsub_click1");
-  button_effNAdd = new GButton(this, 110, 240, 30, 20);
+  button_effNAdd = new GButton(this, 110, 270, 30, 20);
   button_effNAdd.setText("+");
+  button_effNAdd.setLocalColorScheme(GCScheme.GREEN_SCHEME);
   button_effNAdd.addEventHandler(this, "button_effNAdd_click1");
   slider_brightness = new GSlider(this, 671, 10, 490, 41, 10.0);
   slider_brightness.setRotation(PI/2, GControlMode.CORNER);
@@ -317,17 +365,17 @@ public void createGUI(){
   slider_brightness.setLocalColorScheme(GCScheme.GOLD_SCHEME);
   slider_brightness.setOpaque(true);
   slider_brightness.addEventHandler(this, "slider_brightness_change1");
-  slider_speedH = new GSlider(this, 20, 350, 460, 40, 10.0);
+  slider_speedH = new GSlider(this, 20, 350, 480, 40, 10.0);
   slider_speedH.setLimits(1, 0, 255);
   slider_speedH.setNumberFormat(G4P.INTEGER, 0);
   slider_speedH.setOpaque(false);
   slider_speedH.addEventHandler(this, "slider_speedH_change1");
-  slider_lengthH = new GSlider(this, 20, 380, 460, 40, 10.0);
+  slider_lengthH = new GSlider(this, 20, 380, 480, 40, 10.0);
   slider_lengthH.setLimits(44, 1, 240);
   slider_lengthH.setNumberFormat(G4P.INTEGER, 0);
   slider_lengthH.setOpaque(false);
   slider_lengthH.addEventHandler(this, "slider_lengthH_change1");
-  label_effN = new GLabel(this, 540, 280, 50, 20);
+  label_effN = new GLabel(this, 530, 280, 50, 20);
   label_effN.setText("eff №");
   label_effN.setOpaque(false);
   label_speed = new GLabel(this, 540, 310, 50, 20);
@@ -336,8 +384,8 @@ public void createGUI(){
   label_length = new GLabel(this, 540, 340, 50, 20);
   label_length.setText("length");
   label_length.setOpaque(false);
-  label_RGB = new GLabel(this, 480, 490, 50, 20);
-  label_RGB.setText("RGB");
+  label_RGB = new GLabel(this, 510, 500, 80, 20);
+  label_RGB.setText("R       G       B");
   label_RGB.setOpaque(false);
   label_speedH = new GLabel(this, 420, 370, 60, 20);
   label_speedH.setText("speed H");
@@ -349,7 +397,7 @@ public void createGUI(){
   label_brightness.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
   label_brightness.setText("brightness");
   label_brightness.setOpaque(false);
-  label_effN_val = new GLabel(this, 20, 240, 40, 20);
+  label_effN_val = new GLabel(this, 20, 270, 40, 20);
   label_effN_val.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
   label_effN_val.setText("1");
   label_effN_val.setOpaque(false);
@@ -373,18 +421,23 @@ public void createGUI(){
   button_disconnect.addEventHandler(this, "button_disconnect_click");
   effN_random = new GButton(this, 320, 240, 60, 20);
   effN_random.setText("random");
+  effN_random.setLocalColorScheme(GCScheme.GREEN_SCHEME);
   effN_random.addEventHandler(this, "effN_random_click");
   effN_animate = new GButton(this, 390, 210, 80, 20);
   effN_animate.setText("animate to 1");
+  effN_animate.setLocalColorScheme(GCScheme.GREEN_SCHEME);
   effN_animate.addEventHandler(this, "effN_animate_click");
   effN_animate_continue = new GButton(this, 320, 210, 60, 20);
   effN_animate_continue.setText("animate");
+  effN_animate_continue.setLocalColorScheme(GCScheme.GREEN_SCHEME);
   effN_animate_continue.addEventHandler(this, "effN_animate_continue_click");
   effN_demoRandom = new GButton(this, 510, 240, 70, 20);
   effN_demoRandom.setText("demo rand");
+  effN_demoRandom.setLocalColorScheme(GCScheme.GREEN_SCHEME);
   effN_demoRandom.addEventHandler(this, "effN_demoRandom_click");
   effN_demoRandom_fast = new GButton(this, 390, 240, 110, 20);
   effN_demoRandom_fast.setText("demo random fast");
+  effN_demoRandom_fast.setLocalColorScheme(GCScheme.GREEN_SCHEME);
   effN_demoRandom_fast.addEventHandler(this, "effN_demoRandom_fast_click");
   button_effN_seq = new GButton(this, 270, 240, 40, 20);
   button_effN_seq.setText("seq");
@@ -392,6 +445,7 @@ public void createGUI(){
   button_effN_seq.addEventHandler(this, "button_effN_seq_click");
   button_animateRandom = new GButton(this, 480, 210, 100, 20);
   button_animateRandom.setText("animate random");
+  button_animateRandom.setLocalColorScheme(GCScheme.GREEN_SCHEME);
   button_animateRandom.addEventHandler(this, "button_animateRandom_click1");
   button_codeGen = new GButton(this, 400, 70, 180, 20);
   button_codeGen.setText("generate case for switch(mode)");
@@ -419,12 +473,12 @@ public void createGUI(){
   slider_gDelay.setNumberFormat(G4P.DECIMAL, 2);
   slider_gDelay.setOpaque(false);
   slider_gDelay.addEventHandler(this, "slider_gDelay_change1");
-  slider_effFade = new GSlider(this, 20, 410, 390, 40, 10.0);
+  slider_effFade = new GSlider(this, 20, 410, 480, 40, 10.0);
   slider_effFade.setLimits(0.5, 0.0, 1.0);
   slider_effFade.setNumberFormat(G4P.DECIMAL, 2);
   slider_effFade.setOpaque(false);
   slider_effFade.addEventHandler(this, "slider_effFade_change");
-  slider_indexOrBits = new GSlider(this, 20, 440, 390, 40, 10.0);
+  slider_indexOrBits = new GSlider(this, 20, 440, 480, 40, 10.0);
   slider_indexOrBits.setLimits(0.5, 0.0, 1.0);
   slider_indexOrBits.setNumberFormat(G4P.DECIMAL, 2);
   slider_indexOrBits.setOpaque(false);
@@ -447,7 +501,7 @@ public void createGUI(){
   slider_gColorV.setNumberFormat(G4P.DECIMAL, 2);
   slider_gColorV.setOpaque(false);
   slider_gColorV.addEventHandler(this, "slider_gColorV_change");
-  slider_NUM_LEDS = new GSlider(this, 20, 470, 390, 40, 10.0);
+  slider_NUM_LEDS = new GSlider(this, 20, 470, 480, 40, 10.0);
   slider_NUM_LEDS.setLimits(0.5, 0.0, 1.0);
   slider_NUM_LEDS.setNumberFormat(G4P.DECIMAL, 2);
   slider_NUM_LEDS.setOpaque(false);
@@ -456,15 +510,46 @@ public void createGUI(){
   button_msgprint.setText("print palette");
   button_msgprint.setLocalColorScheme(GCScheme.GOLD_SCHEME);
   button_msgprint.addEventHandler(this, "button_msgprint_click");
-  label_gDelay = new GLabel(this, 583, 500, 50, 20);
+  label_gDelay = new GLabel(this, 590, 500, 40, 20);
   label_gDelay.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
   label_gDelay.setText("gD");
   label_gDelay.setOpaque(false);
   button_sim = new GButton(this, 380, 10, 40, 20);
   button_sim.setText("sim");
   button_sim.setTextItalic();
-  button_sim.setLocalColorScheme(GCScheme.GREEN_SCHEME);
+  button_sim.setLocalColorScheme(GCScheme.PURPLE_SCHEME);
   button_sim.addEventHandler(this, "button_sim_click");
+  btn_copy_switch_nms = new GButton(this, 350, 70, 40, 20);
+  btn_copy_switch_nms.setText("list");
+  btn_copy_switch_nms.setLocalColorScheme(GCScheme.GOLD_SCHEME);
+  btn_copy_switch_nms.addEventHandler(this, "btn_copy_switch_nms_click");
+  btn_matrix_zigZag_h = new GButton(this, 20, 210, 50, 20);
+  btn_matrix_zigZag_h.setText("zig-zag");
+  btn_matrix_zigZag_h.setTextItalic();
+  btn_matrix_zigZag_h.setLocalColorScheme(GCScheme.CYAN_SCHEME);
+  btn_matrix_zigZag_h.addEventHandler(this, "btn_matrix_zigZag_h_click");
+  btn_matrix_spiral_cw = new GButton(this, 80, 210, 60, 20);
+  btn_matrix_spiral_cw.setText("spiral");
+  btn_matrix_spiral_cw.setLocalColorScheme(GCScheme.CYAN_SCHEME);
+  btn_matrix_spiral_cw.addEventHandler(this, "btn_matrix_spiral_cw_click");
+  btn_labyrinth_cw = new GButton(this, 150, 210, 60, 20);
+  btn_labyrinth_cw.setText("labyrinth");
+  btn_labyrinth_cw.setLocalColorScheme(GCScheme.CYAN_SCHEME);
+  btn_labyrinth_cw.addEventHandler(this, "btn_labyrinth_cw_click");
+  btn_mirror_half = new GButton(this, 220, 210, 50, 20);
+  btn_mirror_half.setText("mirror");
+  btn_mirror_half.setLocalColorScheme(GCScheme.CYAN_SCHEME);
+  btn_mirror_half.addEventHandler(this, "btn_mirror_half_click");
+  btn_history = new GButton(this, 280, 210, 30, 20);
+  btn_history.setText("hist");
+  btn_history.setLocalColorScheme(GCScheme.CYAN_SCHEME);
+  btn_history.addEventHandler(this, "btn_history_click");
+  label_matrix = new GLabel(this, 20, 190, 140, 20);
+  label_matrix.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label_matrix.setText("matrix map type toggle:");
+  label_matrix.setTextItalic();
+  label_matrix.setLocalColorScheme(GCScheme.CYAN_SCHEME);
+  label_matrix.setOpaque(false);
 }
 
 // Variable declarations 
@@ -522,3 +607,10 @@ GSlider slider_NUM_LEDS;
 GButton button_msgprint; 
 GLabel label_gDelay; 
 GButton button_sim; 
+GButton btn_copy_switch_nms; 
+GButton btn_matrix_zigZag_h; 
+GButton btn_matrix_spiral_cw; 
+GButton btn_labyrinth_cw; 
+GButton btn_mirror_half; 
+GButton btn_history; 
+GLabel label_matrix; 

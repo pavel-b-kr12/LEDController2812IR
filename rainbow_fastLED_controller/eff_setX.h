@@ -125,7 +125,7 @@ void SetupMySimilar4Palette() {                                                 
 
 
 byte currentPaletteN=255;
-void set_currentPalette(byte i)
+void set_currentPalette(byte i)  //0...15
 {
 	if(i==currentPaletteN) return;
 	currentPaletteN=i;
@@ -149,10 +149,10 @@ void set_currentPalette(byte i)
 		case 11: targetPalette_set_Striped_Random();  break;
 		case 12: targetPalette_set_PurpleAndGreen();  break;
 		
-		case 12: SetupRandom16Palette();  break;
-		case 12: SetupRandom4Palette();  break;
-		case 12: SetupSimilar4Palette();  break;
-		case 12: SetupMySimilar4Palette();  break;
+		//# case 12: SetupRandom16Palette();  break;
+		// case 12: SetupRandom4Palette();  break;
+		// case 12: SetupSimilar4Palette();  break;
+		// case 12: SetupMySimilar4Palette();  break;
 
 						  // currentPalette = CRGBPalette16(
   //                                  CRGB::Black, CRGB::Black, CRGB::Black, CHSV(effSpeed, 255,4),
@@ -167,11 +167,6 @@ void set_currentPalette(byte i)
 //else if effSpeed<50  scroll
 void palette_pipette() //## crash at indexOrBits>
 {
-  	for(NUM_LEDS_type i=0;i<NUM_LEDS;i++)
-	{
-		leds[i] =ColorFromPalette(currentPalette, map(i,0,NUM_LEDS,0,255), 255, (effLength>128)?LINEARBLEND:NOBLEND);
-	}
-
 	EVERY_N_MILLISECONDS(30)
 	{
 		byte i=indexOrBits/8;
@@ -184,7 +179,7 @@ void palette_pipette() //## crash at indexOrBits>
 			}
 			else
 			{
-				set_currentPalette(i-17);
+				set_currentPalette(i-17); //0...15
 			}
 		}
 		else
@@ -195,6 +190,11 @@ void palette_pipette() //## crash at indexOrBits>
 				if(effSpeed<50) currentPalette_scroll();
 			}
 		}
+	}
+	
+	for(NUM_LEDS_type i=0;i<NUM_LEDS;i++)
+	{
+		leds[i] =ColorFromPalette(currentPalette, map(i,0,NUM_LEDS,0,255), 255, (effLength>128)?LINEARBLEND:NOBLEND);
 	}
 }  // https://github.com/FastLED/FastLED/blob/master/examples/ColorPalette/ColorPalette.ino
 

@@ -3,7 +3,7 @@
 void confetti_pal_() {                                         // random colored speckles that blink in and fade smoothly
 
   fadeToBlackBy(leds, NUM_LEDS, effLength/16);                    // Low values = slower fade.
-  int pos = random8(NUM_LEDS);                               // Pick an LED at random.
+  int pos = random8or16(NUM_LEDS);                               // Pick an LED at random.
   leds[pos] = ColorFromPalette(currentPalette, thishue + random16(huediff)/4 , thisbri, LINEARBLEND);
   thishue = thishue + thisinc;                                // It increments here.
   

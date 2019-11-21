@@ -1,70 +1,476 @@
+		// 1500 LEDs ~ 20fps, 300 LEDs ~ 200fps , resticted by LEDs type per pin (only octo2812 support multi pin speedup)
 		//168: saveMem, NUM_LEDS 150
 		//328: saveMem, NUM_LEDS 330
+		//8266: 10000
+
+#define LEDchipType	WS2812B// WS2811 //
+
+//#define use_ESP_WiFioff
+//#define BlueFilter
 
 //#define saveMem
 //#define legacy_pinout
 
-#define LEDpCustom				2  //this redefine any. del to use reference hardware schematics  //2 == D4 on NODEMCU v3 when FASTLED_ESP8266_RAW_PIN_ORDER
-//#define MULTIPLE_PINS //4
-//#define sound_p					A0 // enebles sound effects  //!fix used by keypad
+// don't forget to change pins or disdable "#define LEDs_RENDER"  if not used, so it not affect serial or other stuff for different dev-boards
 
-#ifdef saveMem
-	#define gNUM_LEDS 			144 //60
-	#define NUM_LEDS_type byte
-#else
-	#define gNUM_LEDS 			300 //264//(1.67*2+1.05)*60 //300//1800//60 //300  //1024
-	 //!	if NUM_LEDS>255
-	#define NUM_LEDS_type 		uint16_t//byte //int //>255 NUM_LEDS  for(NUM_LEDS_type i=0; i<NUM_LEDS  //! fix random8(NUM_LEDS), effLength and other
 
+
+
+//@@ #define eff_setX
+
+//hardware sets, choose one:
+//#define ESP8266_SHOW
+//#define ESP8266_SHOW_60x20m
+//#define ESP8266_SHOW_MATRIX
+
+//-------------------- ESP32  in arduino IDE select DOIT ESP32 devkit
+//#define ESP32_SHOW_USBWiFi  
+#define ESP32_SHOW_USB
+//#define ESP32_SHOW_WiFi
+//#define ESP32_HTML_NO_RENDER //test on PC, control from USB app and WiFi HTML page
+
+//#define Cube4MCU // ESP32 server ( see code of render nodes in render_WiFi folder )
+//#define Cube3MCU_w_also_serverDraw //it also #define Cube4MCU  ,TODO probably have to split out. 
+//#define hadrware_3btn_ESP
+//#define hadrware_3btn_nano
+//#define hadrware_1btn_1pot_nano
+
+
+	#define effN_test_RF 244 //effect to show packet loss //also this number is in switch_slot.h
+	//#define startLoadEffN 18//220//11//71//152//71,72=CubeTest	35 218 //220=CubeCornersLight		209=mus_arduinoFFT //21//effN_test_RF //151=setColors_fill
+
+
+//#define LEDs_RENDER //show to connected LEDs stripe connected to this MCU 
+
+
+//#define WiFi_SEND //send leds array to connected WiFis, also enables #define use_ESP
+
+//#define WiFi_ControlHTMLpage
+//#define SerialControl
+//#define tstFPS //if defined, by  default: send only FPS, bPrintPixels=false; , You can enable Print in GUI
+
+//#define SerialSpeed		921600 //1000000 921600 // 921600 is max for esp32 cp2102 //1M=250FPS@60LED //115200 =25FPS@60LED //57600
+
+
+//#define sound_p					39//36 //A0 //esp32: 36==GPIO36=="VP"==14   39==GPIO39=="VN"
+//#define LEDpCustom				0
+#define FASTLED_ESP8266_RAW_PIN_ORDER
+
+	//#define tstFPS
+	//#define tst
+	//#define tst2  //detailed print of functions call
+
+
+#ifdef hadrware_3btn_nano
+	#define SerialControl //thease 3 option eat 7% of atm328 program storage space
+	#define SerialSpeed		1000000
+	#define tstFPS
+	
+	//#define sound_p					A2 //25% of program and 25% of mem of atm328
+	
+	#define LEDs_RENDER
+	#define gNUM_LEDS		256 //120
+	#define NUM_LEDS_type	byte
+	#define LEDp					4
+	
+	//#define key3x
+	
+			#define tst_BRIGHTNESS		66 
+	#define default_effN_Random //!! nwp start USB app without this
+	#define startLoadEffN 216
+	
+	//#define showSelectedOptionOnStipe //useful if no LCD to view what option is selected now
+	//#define save_load_enable
+#elif defined(hadrware_1btn_1pot_nano)
+	#define SerialControl //thease 3 option eat 7% of atm328 program storage space
+	#define SerialSpeed		1000000
+	//#define tstFPS
+	
+	//#define sound_p					A2 //25% of program and 25% of mem of atm328
+	
+	#define LEDs_RENDER
+	#define gNUM_LEDS		120
+	#define NUM_LEDS_type	byte
+	#define LEDp					2
+	
+	#define key1d1a
+	#ifdef  key1d1a
+		#define potAdd							A1
+		#define btnSelectMode_p					3
+		//#define btnSub							//# //12
+	#endif
+	
+			#define tst_BRIGHTNESS		22 
+	#define default_effN_Random
+#elif hadrware_3btn_ESP
+	#define use_ESP8266
+	
+	#define SerialControl //USB protocol for external GUI
+	#define SerialSpeed		1000000//500000 //1M=250FPS@60LED //115200 =25FPS@60LED //57600
+	#define tstFPS
+
+		
+	#define gNUM_LEDS 			300 //264
+	#define NUM_LEDS_type 		uint16_t
 	//#define eff_setX
 
 	//#define NUM_LEDS_adjustable //now only in SerialControl // 1.6kb prog mem
-	
+
 	#define showSelectedOptionOnStipe //useful if no LCD to view what option is selected now
-#endif
 
-#define save_load_enable //to EEPROM
+	#define save_load_enable //to EEPROM
 
+	#define demo_enable
+	#define default_effN_Random // switch default to randomSet() or FastLED.clear();
+
+	#define LEDpCustom				2
+
+	#define tst_BRIGHTNESS 		155 // to dimm AND see good colors use lower voltage but not software brightness
+		//#define tst_POW_LIM	1000
+
+	 byte random_demo_sw_speed_td_m=3; //s
+	 byte random_demo_sw_speed_td_M=15;
+
+	#define key3x		//central btn switch mode (settings). Side btns are +-, i.e. effN, speed, length, gamma
+	
+#elif defined(ESP32_HTML_NO_RENDER)
+	#define use_ESP32
+	//#define WiFi_ControlHTMLpage
+	#define SerialControl
+	#define SerialSpeed		921600
+	#define sound_p					39
+// ADC2 pins cannot be used when Wi-Fi is used. So, if you’re using Wi-Fi and you’re having trouble getting the value from an ADC2 GPIO, you may consider using an ADC1 GPIO
+
+	#define tstFPS
+	//#define LEDs_RENDER
+	#define gNUM_LEDS 			144// 30 60 120 144 150 180 240 300 145*12
+	#define NUM_LEDS_type 		uint16_t //byte uint16_t
+	//#define save_load_enable
+	//#define demo_enable
+	byte random_demo_sw_speed_td_m=2; //s  //!!
+	byte random_demo_sw_speed_td_M=15;
+	//#define LEDp							4
+	#define gDelayMore	12	//if(bPrintPixels) anim_next_t+=gDelayMore; //adds to delay to avoid Serial send pixel data bug
+							//otherwice it freeze on Serial overflow, I think. (start sending garbage after some time, then freeze)
+							// have to be ~8 or bigger if not LEDs_RENDER and many pixels
+#elif defined(ESP32_USBtest_NO_Render)
+	#define use_ESP32
+	//#define WiFi_ControlHTMLpage
+	#define SerialControl
+	#define SerialSpeed		921600
+	#define sound_p					39
+	#define tstFPS
+	//#define LEDs_RENDER
+	#define gNUM_LEDS 			16*16// 30 60 120 144 150 180 240 300 145*12
+	#define NUM_LEDS_type 		uint16_t //byte uint16_t
+	//#define save_load_enable
+	#define demo_enable
+	//#define LEDp					4 //36 nw
+	byte random_demo_sw_speed_td_m=2; //s  //!!
+	byte random_demo_sw_speed_td_M=15;
+						#define tst_BRIGHTNESS		25
+#elif defined(ESP32_SHOW_USBWiFi)
+	#define use_ESP32
+	#define WiFi_ControlHTMLpage
+	#define enableUDP
+
+	#define SerialControl
+	#define SerialSpeed		921600
+	#define sound_p					39
+	#define tstFPS
+	#define LEDs_RENDER
+	#define gNUM_LEDS 			16*16// 30 60 120 144 150 180 240 300 145*12
+	#define NUM_LEDS_type 		uint16_t //byte uint16_t
+	#define save_load_enable
+	#define demo_enable
+	#define LEDp					4 //36 nw  //12-19,0,2,3,4,5,21,22,23  https://github.com/hpwit/fastled-esp32-16PINS   @ avoids flickering
+	byte random_demo_sw_speed_td_m=2; //s  //!!
+	byte random_demo_sw_speed_td_M=15;
+						#define tst_BRIGHTNESS		26
+
+#elif defined(ESP32_SHOW_USB)
+	#define use_ESP32
+	//#define WiFi_ControlHTMLpage
+	#define use_ESP_WiFioff
+	#define SerialControl
+	#define SerialSpeed		921600
+	//#define sound_p					39
+	#define tstFPS
+	#define LEDs_RENDER
+	#define gNUM_LEDS 			800// 30 60 120 144 150 180 240 300 145*12
+	#define NUM_LEDS_type 		uint16_t //byte uint16_t
+	#define save_load_enable
+	#define demo_enable
+	//#define LEDp					6 //36 nw
+	#define MULTIPLE_PINS2 //4 5 13 14 (GPIO, marks on board)
+	byte random_demo_sw_speed_td_m=2; //s  //!!
+	byte random_demo_sw_speed_td_M=15;
+	#define default_effN_Random
+						#define tst_BRIGHTNESS		88
+	#define gDelayMore	25
+#elif defined(ESP32_SHOW_WiFi)
+	#define use_ESP32
+
+	#define WiFi_ControlHTMLpage
+	#define enableUDP //?????????? HTML nw without UPD
+
+	//#define sound_p					39
+	#define LEDs_RENDER
+	#define gNUM_LEDS 			800// 30 60 120 144 150 180 240 300 145*12
+	
+	#define NUM_LEDS_type 		uint16_t //byte uint16_t
+	#define save_load_enable
+	//#define demo_enable //?????????? HTML nw without
+	//#define LEDp					4 //36 nw
+	#define MULTIPLE_PINS4
+	byte random_demo_sw_speed_td_m=4; //s  //!!
+	byte random_demo_sw_speed_td_M=22;
+						#define tst_BRIGHTNESS		255
+	#define gDelayMore	10
+	
+#elif defined(ESP8266_SHOW)
+	#define use_ESP8266
+	#define WiFi_ControlHTMLpage
+	#define SerialControl
+	#define SerialSpeed		921600	//1000000 or 921600 for cp2102
+	//#define sound_p					39
+	#define tstFPS
+	#define LEDs_RENDER
+	#define gNUM_LEDS 			144// 30 60 120 144 150 180 240 300 145*12
+	#define NUM_LEDS_type 		uint16_t //byte uint16_t
+	//#define save_load_enable
+	//#define demo_enable
+	#define LEDp					4
+	//byte random_demo_sw_speed_td_m=2; //s  //!!
+	//byte random_demo_sw_speed_td_M=15;
+						#define tst_BRIGHTNESS		88
+#elif defined(ESP8266_SHOW_60x20m)
+	#define startLoadEffN 151 //setColors_fill
+	#define use_ESP8266
+	#define WiFi_ControlHTMLpage
+	//#define WiFi_ControlHTMLpage_switch_p	5 //5=D1
+	#define SerialControl
+	#define SerialSpeed		1000000	//or 921600 for cp2102
+	//#define sound_p					39
+	#define tstFPS
+	#define LEDs_RENDER
+	#define gNUM_LEDS 			60*20// 30 60 120 144 150 180 240 300 145*12
+	#define NUM_LEDS_type 		uint16_t //byte uint16_t
+	#define save_load_enable
+	//#define demo_enable
+	#define LEDp					4
+	//byte random_demo_sw_speed_td_m=2; //s  //!!
+	//byte random_demo_sw_speed_td_M=15;
+#elif defined(ESP8266_SHOW_60xBtn)
+	#define startLoadEffN 151 //setColors_fill
+	#define use_ESP8266
+	#define WiFi_ControlHTMLpage
+	#define WiFi_ControlHTMLpage_switch_p	5 //5=D1
+	#define SerialControl
+	#define SerialSpeed		1000000	//or 921600 for cp2102
+	//#define sound_p					39
+	#define tstFPS
+	#define LEDs_RENDER
+	#define gNUM_LEDS 			60// 30 60 120 144 150 180 240 300 145*12
+	#define NUM_LEDS_type 		uint16_t //byte uint16_t
+	#define save_load_enable
+	//#define demo_enable
+	#define LEDp					4
+	//byte random_demo_sw_speed_td_m=2; //s  //!!
+	//byte random_demo_sw_speed_td_M=15;
+	#define key3x
+	#ifdef  key3x
+		#define btnAdd						14 //14=D5 on NODEMCU and D1 mini
+		#define btnSelectMode_p				12 //12=D6
+		#define btnSub						13 //13=D7
+	#endif
+	#define btnAct							15 //15=D8
+						#define tst_BRIGHTNESS		88
+#elif defined(ESP8266_SHOW_MATRIX)
+	#define use_ESP8266
+	#define WiFi_ControlHTMLpage
+	#define SerialControl
+	#define SerialSpeed		921600	//1000000 or 921600 for cp2102
+	//#define sound_p					39
+	#define tstFPS
+		#define LEDs_RENDER
+		#define gDelayMore	12
+	#define gNUM_LEDS 			16*16// 30 60 120 144 150 180 240 300 145*12
+	#define MATRIX_ROWS			16
+	#define bZigZag //TODO
+
+	#define NUM_LEDS_type 		uint16_t //byte uint16_t
+		#define save_load_enable
+	#define demo_enable
+	#define LEDp					4
+	byte random_demo_sw_speed_td_m=2; //s  //!!
+	byte random_demo_sw_speed_td_M=15;
+						#define tst_BRIGHTNESS		28
+	#define remap_LEDs //allow toggle and use bMap_type to map line of pixels to zig-zag, spiral, topology
+#elif defined(Cube4MCU)
+	#define use_ESP32
+#define WiFi_SEND
+#define WiFi_ControlHTMLpage
+#define WiFi_ControlHTMLpage_switch_p	32	//GPIO32==IO32==Touch9			//touchRead(T9); th=~30
+
+	//#define key3x
+	#ifdef  key3x
+		#define btnAdd							25
+		#define btnSelectMode_p					27
+		#define btnSub							//# //12
+	#endif
+
+				//#define SerialControl
+				//#define tstFPS
+	#define SerialSpeed		921600
+
+	//#define sound_p					39
+
+				// #define CubeXp	2
+				// #define CubeYp	3
+				// #define CubeZp	4
+
+	#define NUM_LEDS_edge 		145//12//145//24//145
+	#define NUM_LEDS_mcu 		NUM_LEDS_edge*3
+	#define NUM_LEDSall 		NUM_LEDS_mcu*4
+	#define gNUM_LEDS			NUM_LEDSall
+
+	#define NUM_LEDS_type 		uint16_t
+//#define save_load_enable
 #define demo_enable
-//#define default_effN_Randon // switch default to randomSet() or FastLED.clear();
+				//#define BlueFilter
+				//#define tst_BRIGHTNESS 		33
+	byte random_demo_sw_speed_td_m=2; //s  //!!
+	byte random_demo_sw_speed_td_M=12;
 
-#define use_ESP
-#ifdef use_ESP
-	#include "ESP8266WiFi.h"
-	#define FASTLED_ESP8266_RAW_PIN_ORDER
+	//#define NUM_LEDS_adjustable //!del
+
+	//#define server_render
+	#ifdef server_render //server as 4th corner
+		#define CubeXp		13 //36 nw
+		#define CubeYp		12
+		#define CubeZp		14
+		#define LEDs_RENDER
+	#endif
+
+#elif defined(Cube3MCU_w_also_serverDraw)
+	#define Cube4MCU
+	#define use_ESP32
+#define WiFi_SEND
+#define WiFi_ControlHTMLpage
+#define WiFi_ControlHTMLpage_switch_p	32	//GPIO32==IO32==Touch9			//touchRead(T9); th=~30
+
+	//#define key3x
+	// #ifdef  key3x
+		// #define btnAdd							25
+		// #define btnSelectMode_p					27
+		// #define btnSub							//# //12
+	// #endif
+
+				//#define SerialControl
+				//#define tstFPS
+	#define SerialSpeed		921600
+
+	//#define sound_p					39
+
+				// #define CubeXp	2
+				// #define CubeYp	3
+				// #define CubeZp	4
+
+	#define NUM_LEDS_edge 		145//12//145//24//145
+	#define NUM_LEDS_mcu 		NUM_LEDS_edge*3
+	#define NUM_LEDSall 		NUM_LEDS_mcu*4
+	#define gNUM_LEDS			NUM_LEDSall
+
+	#define NUM_LEDS_type 		uint16_t
+#define save_load_enable
+#define demo_enable
+				//#define BlueFilter
+				//#define tst_BRIGHTNESS 		22
+	byte random_demo_sw_speed_td_m=2; //s  //!!
+	byte random_demo_sw_speed_td_M=12;
+
+	//#define NUM_LEDS_adjustable //!del
+
+	#define server_render
+	#ifdef server_render //server as 4th corner
+		#define CubeXp		13 //36 nw
+		#define CubeYp		12
+		#define CubeZp		14
+		#define LEDs_RENDER
+	#endif
+#else
+	/*
+	#define LEDpCustom				2//2  //this redefine any. del to use reference hardware schematics  //2 == D4 on NODEMCU v3 when FASTLED_ESP8266_RAW_PIN_ORDER
+
+	//#define MULTIPLE_PINS //4
+	//#define sound_p					A0 // enebles sound effects  //!fix used by keypad
+
+	#ifdef saveMem
+		#define gNUM_LEDS 			144 //60
+		#define NUM_LEDS_type byte
+	#else
+		#define gNUM_LEDS 			180//144 //264//(1.67*2+1.05)*60 //300//1800//60 //300  //1024    //is a limit when adjustable or NUM_LEDS if not adjustable
+		 //!	if NUM_LEDS>255
+		#define NUM_LEDS_type 		uint16_t //byte uint16_t  //>255 NUM_LEDS  for(NUM_LEDS_type i=0; i<NUM_LEDS  //! fix random8(NUM_LEDS), effLength and other
+
+		//#define eff_setX
+
+		//#define NUM_LEDS_adjustable //now only in SerialControl // 1.6kb prog mem
+		
+		#define showSelectedOptionOnStipe //useful if no LCD to view what option is selected now
+	#endif
+
+	#define save_load_enable //to EEPROM
+
+	#define demo_enable
+	#define default_effN_Random // switch default to randomSet() or FastLED.clear();
+
+	#define use_ESP8266
+
+	#define tstFPS
+
+	//#define tst
+	//#define tst2  //detailed print of functions call
+	//#define BlueFilter
+	#define tst_BRIGHTNESS 		33 // to dimm AND see good colors use lower voltage but not software brightness
+	#ifdef tst
+		#define tst_POW_LIM	1000 //!? nw
+	#endif
+
+	 byte random_demo_sw_speed_td_m=2; //s  //!!
+	 byte random_demo_sw_speed_td_M=12;
+
+
+	//#define keypad1602 //free D0..3, D11..13, A1..  http://wiki.keyestudio.com/Ks0256_keyestudio_LCD1602_Expansion_Shield
+												//https://www.dfrobot.com/wiki/index.php/Arduino_LCD_KeyPad_Shield_(SKU:_DFR0009)
+	//#define IRkeypad	//3*7, ask me about support other types
+	//#define key5x		//all main options has button //!! nw
+	//#define key3x		//central btn switch mode (settings). Side btns are +-, i.e. effN, speed, length, gamma
+	#define SerialControl //USB protocol for external GUI //! TODO software for android
+	//v0.7 define only one of Serial
+	//#define SerialSelect //enter effect № in terminal
+	//#define LCD2004_i2c						//A4 A5
+
+	//#define adj_pot								A0
+	#ifdef adj_pot
+	 #define adjType_LDR
+	#endif
+*/
 #endif
 
-#define tstFPS
-#ifdef tstFPS
-bool bPrintPixels=false;
-#endif
-//#define tst
-//#define tst2  //detailed print of functions call
-//#define BlueFilter
-#define tst_BRIGHTNESS 		88 // to dimm AND see good colors use lower voltage but not software brightness
-#ifdef tst
-	#define tst_POW_LIM	1000 //!? nw
+#if gNUM_LEDS<=255 // NUM_LEDS_type==byte  //not working this way 2F##
+	#define random8or16	random8
+	#define beat8or16	beat8
+#else
+	#define random8or16	random16 //!!## random16 seems not working on ESP32
+	#define beat8or16	beat16
 #endif
 
- byte random_demo_sw_speed_td_m=2; //s  //!!
- byte random_demo_sw_speed_td_M=12;
-
-
-//#define keypad1602 //free D0..3, D11..13, A1..  http://wiki.keyestudio.com/Ks0256_keyestudio_LCD1602_Expansion_Shield
-											//https://www.dfrobot.com/wiki/index.php/Arduino_LCD_KeyPad_Shield_(SKU:_DFR0009)
-//#define IRkeypad	//3*7, ask me about support other types
-//#define key5x		//all main options has button //!! nw
-#define key3x		//central btn switch mode (settings). Side btns are +-, i.e. effN, speed, length, gamma
-#define SerialControl //USB protocol for external GUI //! TODO software for android
-//v0.7 define only one of Serial
-//#define SerialSelect //enter effect № in terminal
-//#define LCD2004_i2c						//A4 A5
-
-#define SerialSpeed		1000000//500000 //1M=250FPS@60LED //115200 =25FPS@60LED //57600
-
-//#define adj_pot								A0
-#ifdef adj_pot
- #define adjType_LDR
+#if defined( WiFi_SEND) || defined(WiFi_ControlHTMLpage)
+ #ifndef use_ESP32
+	#define use_ESP8266
+ #endif
 #endif
 
 
@@ -88,17 +494,19 @@ bool bPrintPixels=false;
 #endif
 
 #ifdef key3x
+	/* //seted in each hardware option instead
 	#ifdef use_ESP
 		#define LEDp							D4
 		#define btnAdd							D1
-		#define btnSelectMode					D2
+		#define btnSelectMode_p					D2
 		#define btnSub							D3
-
 	#else
 		#define btnAdd							A1
-		#define btnSelectMode					A2
+		#define btnSelectMode_p					A2
 		#define btnSub							A3
 	#endif
+	*/
+	
 #endif
 
 #ifdef key5x
@@ -129,31 +537,61 @@ byte LCDoption_selected=effN_OPTION;
 #endif
 
 
-//this N related to button in USB app
-#define effN_off 10 //clear, nodo()
-#define effN_random_endless 248 //endless while press btn --
-#define effN_random 249 
-#define effN_animate_to_slot1 251
-#define effN_animate_SW 252 
-
 #ifdef demo_enable
-#define effN_random_demo_animated_SW 250  //effN_animate_SW & effN_random_demo_SW
-#define effN_predefined_show_seq 253
-#define effN_random_demo_fast_SW 254 
-#define effN_random_demo_SW 255 //del to disable
-
-bool brandom_demo=false;
+	bool brandom_demo=false;
 #endif
 bool banimate=false;
 
 //#define btnReset_p		A3 //resetSetiings_and_change_slot()
 
+//=========================================================================
+
 //#include "Arduino.h"										  // FastLED library.
 //#include "C:\Users\asd\Documents\Arduino\hardware\WAV\avr\cores\lgt8f\hooks.c"	  //! wemos-Xi FastLED library.
 #include "FastLED.h"
-CRGB leds[gNUM_LEDS]; //!! del +1
-//=========================================================================
 
+CRGB leds[gNUM_LEDS+4]; //!+4 del
+
+#ifdef Cube4MCU
+	//#define MCU_N	0
+
+	// CRGB ledsX[NUM_LEDS_edge];
+	// CRGB ledsY[NUM_LEDS_edge];
+	// CRGB ledsZ[NUM_LEDS_edge];
+
+	//	CRGBSet ledsRef(leds, gNUM_LEDS);
+
+	//	CRGB *ledsXptr[NUM_LEDS_mcu]; 
+	//	CRGB *ledsYptr[NUM_LEDS_mcu]; 
+	//	CRGB *ledsZptr[NUM_LEDS_mcu]; 
+	/*
+	CRGB ledsX[NUM_LEDS_mcu];
+	CRGB ledsY[NUM_LEDS_mcu];
+	CRGB ledsZ[NUM_LEDS_mcu];
+	*/
+	#ifdef server_render
+		//use server as 4th render node, same as in Cube_edges_arrays.h   MCU_N==3    shift by +NUM_LEDS_mcu*3
+//		CRGBSet ledsX(leds, 0  +NUM_LEDS_mcu*3, NUM_LEDS_edge  +NUM_LEDS_mcu*3);
+//		CRGBSet ledsY(leds, NUM_LEDS_edge*2  +NUM_LEDS_mcu*3,  NUM_LEDS_edge+1  +NUM_LEDS_mcu*3);
+//		CRGBSet ledsZ(leds, NUM_LEDS_edge*3  +NUM_LEDS_mcu*3,  NUM_LEDS_edge*2+1  +NUM_LEDS_mcu*3);
+	#endif
+
+	void CubeLEDsFill_setup();
+#endif
+
+
+//=============================================================================================
+#ifdef tstFPS
+	bool bPrintPixels=false;
+#endif
+
+#if defined(LEDs_RENDER)
+	#define setBrightness_gBrightness FastLED.setBrightness( gBrightness );
+#else
+	#define setBrightness_gBrightness // do nothing
+#endif
+
+//=========================================================================
 
 struct SaveObj //# sizeof
 {
@@ -162,12 +600,12 @@ struct SaveObj //# sizeof
 	byte effSpeedH; //! //EVERY_N_MILLISECONDS( 20 ) gHue+=effSpeed;
 	byte effLength;
 	byte effLengthH;
-	byte effRGB;//1 => disable chennel R, 2 => disable G ,  7 => fast cycle diferent , //!comment other
+	byte effRGB;//post processing //1 => disable chennel R, 2 => disable G ,  7 => fast cycle diferent , //!comment other
 	byte effFade;
 	// byte gH;
 	// byte gS;
 	// byte gV;
-	CRGB gColor;
+	CRGB gColor; //# save , set
 	CRGB gColorBg;//! gHueBG == 0 ? White	== 255 ? black
 	byte gFade; //apply before eff
 	byte indexOrBits;
@@ -203,26 +641,25 @@ byte EVENODD;
 #define indexOrBits oostr.indexOrBits
 #define gBrightness oostr.gBrightness
 #if defined(SerialControl) && defined(NUM_LEDS_adjustable)
-#define NUM_LEDS oostr.NUM_LEDS  //this eat 1.6kb of "program storage space" //? why 
+	#define NUM_LEDS oostr.NUM_LEDS  //this eat 1.6kb of "program storage space" //? why 
+#else
+	#define NUM_LEDS gNUM_LEDS //make it constant to use min mem
+#endif
 
-	void NUM_LEDS_set()
+	void NUM_LEDS_setup()
 	{
-
+		#if defined(SerialControl) && defined(NUM_LEDS_adjustable)
 		if(NUM_LEDS<5) NUM_LEDS=5;
 		else
 		if(NUM_LEDS>gNUM_LEDS) NUM_LEDS=gNUM_LEDS;
-
+		#endif
+		
 		CENTER_TOP_INDEX=NUM_LEDS / 2;
 		EVENODD = NUM_LEDS % 2;
 							#ifdef tst2
 												Serial.print(" NUM_LEDS:"); Serial.println(NUM_LEDS);Serial.println(gNUM_LEDS);
 							#endif					
 	}
-#else
-#define NUM_LEDS gNUM_LEDS //make it constant to use min mem
-#endif
-
-
 
 //=========================================================================
 bool bCurrentEff_IsRandom_AndNotSlotN=false;
@@ -257,6 +694,7 @@ bool bPause=false;
 #define PRINT__			Serial.write(111);Serial.write(166);Serial.write(77);//header
 #define PRINT_leds		Serial.write(133);
 #define PRINT_totall	Serial.write(122);
+#define PRINT_tst	Serial.write(199);
 #define PRINT_settings	Serial.write(99);
 //----------- 
 
@@ -332,12 +770,12 @@ void display_upd()
 		PRINT__
 		PRINT_leds
 
-		int fps=LEDS.getFPS();
+		uint16_t fps=LEDS.getFPS();
 		p = (uint8_t*) &fps;
 		Serial.write(p,2);
 
 
-		int size=gNUM_LEDS*3;
+		uint16_t size=gNUM_LEDS*3;
 		p = (uint8_t*) &size;
 		Serial.write(p,2);
 		Serial.write((const uint8_t*)leds, size);
@@ -347,7 +785,34 @@ void display_upd()
   #ifndef SET_UPD_Display
 	#define SET_UPD_Display
   #endif
+
+	//#ifdef tst2
+	// uint16_t size=gNUM_LEDS*3;
+	// uint16_t fps=LEDS.getFPS();
+	// Serial.println(size);Serial.println(size);
+	// Serial.println(gNUM_LEDS);Serial.println(gNUM_LEDS);
+	// Serial.println(fps);
+	//#endif
 }
+
+void save(byte);
+
+//=========================================================================
+#if defined(use_ESP8266) || defined(use_ESP32)  //! fix other #ifdef use_ESP
+	#ifdef use_ESP32
+	#else
+		#include "ESP8266WiFi.h"
+	#endif
+
+	#ifdef LEDs_RENDER
+	  //#define FASTLED_ESP8266_RAW_PIN_ORDER
+	#endif
+
+	#if defined(WiFi_SEND) || defined(WiFi_ControlHTMLpage)
+		#include "WiFi_server.h"
+	#endif
+
+#endif
 //=============================================================================================
 
 #include "anim.h"
@@ -361,7 +826,7 @@ void resetSetiings_and_change_slot() //! or changeEff(effN)
 	NUM_LEDS=gNUM_LEDS;
 	#endif
 	effN=effN_off; // = eff SLOT at start
-	effSpeed=4;
+	effSpeed=4; //also is incr for gHue in anim.h
 	effSpeed_last=1; //for animate eff
 	effSpeedH=1; //! //EVERY_N_MILLISECONDS( 20 ) gHue+=effSpeed;
 	effLength=NUM_LEDS/4+1;
@@ -373,7 +838,11 @@ void resetSetiings_and_change_slot() //! or changeEff(effN)
 	effFade=0;
 	gColor=CRGB::White;
 	gColorBg=CRGB::Black;
+	#ifdef ESP32_HTML_NO_RENDER
 	gDelay=5;
+	#else
+	gDelay=0;
+	#endif
 	gFade=0;
 
 
@@ -392,6 +861,8 @@ bool bIRcommandRepeated=false;
 #ifdef save_load_enable
 	#include "save_load.h"
 #endif
+
+
 //=============================================================================================
 
 void  effN_set(byte N)
@@ -535,7 +1006,7 @@ void  effRGB_add()
 void LCDoption_selected_add()
 {
 	LCDoption_selected++;
-	#ifdef showSelectedOptionOnStipe
+	#ifdef showSelectedOptionOnStipe //##
 		FastLED.clear();
 		switch(LCDoption_selected)
 		 {
@@ -618,13 +1089,14 @@ void switch_LCDoption_selected_value_add()
 			
 			case brightness_OPTION: //!
 				gBrightness+=5;
-				FastLED.setBrightness( gBrightness ); //!! save BRIGHTNESS
+				setBrightness_gBrightness  //!! save BRIGHTNESS
 			break;
 		 }
 	#ifdef tst2
 	Serial.print(":"); Serial.println(LCDoption_selected);
 	#endif
 }
+
 
 void switch_LCDoption_selected_value_sub()
 {
@@ -653,7 +1125,7 @@ void switch_LCDoption_selected_value_sub()
 			 
 			case brightness_OPTION:
 				gBrightness-=5;
-				FastLED.setBrightness( gBrightness ); //! save BRIGHTNESS
+				setBrightness_gBrightness
 			break;
 			default:
 			 LCDoption_selected=brightness_OPTION; //max
@@ -664,157 +1136,247 @@ void switch_LCDoption_selected_value_sub()
 	#endif
 }
 
+
+#ifdef key1d1a
+ int potAdd_a2x_avg;
+ int potAdd_a2x_avg_old;
+ const int rangeA_M_off=1500; // !!fix ESP   //  from 1024*2 because 2*analogRead
+ const int rangeA_m=rangeA_M_off*0.12, rangeA_M=rangeA_M_off*0.9;
+ int rangeOut_m=80, rangeOut_M=180; //current, changing while pot be moved out of rangeA
+
+#endif
+
 //=========================================================================
 void setup()
 {
-	
-#ifdef LEDpCustom
-	#define LEDp	LEDpCustom
-#endif
 
-#ifdef use_ESP
-	WiFi.mode( WIFI_OFF );
-	WiFi.forceSleepBegin();
-#endif
-
-#if defined(tst) || defined(SerialSelect) || defined(SerialControl)
-delay(800);
-#else
-delay(99);
-#endif
-
-#ifdef MULTIPLE_PINS
-	FastLED.addLeds<WS2812B, LEDp, GRB>(leds, 0, gNUM_LEDS/4);
-	FastLED.addLeds<WS2812B, 4, GRB>(leds, gNUM_LEDS/4,gNUM_LEDS/4);
-	FastLED.addLeds<WS2812B, 12, GRB>(leds, gNUM_LEDS/4*2,gNUM_LEDS/4);
-	FastLED.addLeds<WS2812B, 14, GRB>(leds, gNUM_LEDS/4*3,gNUM_LEDS/4);
-#else
-	FastLED.addLeds<WS2812B, LEDp, GRB>(leds, gNUM_LEDS);
-#endif
-
-#ifdef tstFPS
-	FastLED.countFPS(1); //nFrames = 25
-#endif
-FastLED.clear();
-FastLED.show();
-
-#ifdef keypad1602
- pinMode(A0, INPUT_PULLUP);	//for situation of shield not connected (if keypad1602 defined but not connected something run effSub)
- lcd.begin(16, 2);
-#endif
-
-//---------------------------------------------------------
-#ifdef adj_pot
- pinMode(adj_pot,INPUT_PULLUP); delay(2);
-#ifdef adjType_LDR
- FastLED.setBrightness(ambientLight_map()); FastLED.show();	//! every n ms
-#else
- if(analogRead(adj_pot)<900) FastLED.setBrightness( map(analogRead(adj_pot),0,1023, 22, 255) ); //! every n ms
-#endif
-#endif
-
-#ifdef tst_BRIGHTNESS
-	FastLED.setBrightness( tst_BRIGHTNESS );
-#endif
-//---------------------------------------------------------
-
-#if defined(tst) || defined(SerialSelect) || defined(SerialControl)
-Serial.begin(SerialSpeed);
-	#ifdef tst
-	#include "version.h"
-	#endif
-#endif
-
-  #ifdef tst_POW_LIM
-  	FastLED.setMaxPowerInVoltsAndMilliamps(5,tst_POW_LIM); //! tst
-  #endif
-  
-#ifdef tst
-	//Serial.println(F("test"));
-	#ifdef LDR
-	#endif
-#endif
-
-
-#ifdef key3x
- 	pinMode(btnAdd, INPUT_PULLUP);
-	pinMode(btnSub, INPUT_PULLUP);
-	pinMode(btnSelectMode, INPUT_PULLUP);
-#endif
-
-#ifdef key5x
-	pinMode(btnSpeedAdd, INPUT_PULLUP);
-	pinMode(btnSpeedSub, INPUT_PULLUP);
-	pinMode(btnEffNAdd, INPUT_PULLUP);
-	pinMode(btnEffLengthAdd, INPUT_PULLUP);
-	pinMode(btneffRGB, INPUT_PULLUP);
-	
-	//pinMode(btnReset_p, INPUT_PULLUP); //!
-#endif
-
-#ifdef LCD2004_i2c
-  lcd.init();	  lcd.init(); //!tst if only one init is enough
-  lcd.backlight();
-  // lcd.setCursor(3,0);
-  // lcd.setCursor(2,1);
-  // lcd.setCursor(0,2);
-  // lcd.print(""); 
-  // lcd.setCursor(2,3);
-#endif
-
-delay(1);
-
-
-//if(!digitalRead(btnReset_p))	resetSetiings_and_change_slot(); else //!
-#ifdef save_load_enable
-load(effN);
-#else
-effN_set(11); //so anim_f != null
-NUM_LEDS_set();
-#endif
-
-#ifdef IRkeypad
-pinMode(IR_mode_sw_p, INPUT_PULLUP);
-
-if(!digitalRead(IR_mode_sw_p))
-{
-	bIR_mode=true;
-  
-	#ifdef tst
-		Serial.println(F("IR save mode"));
-		//pinMode(LED_BUILTIN, OUTPUT);
+	#ifdef LEDpCustom
+		#define LEDp	LEDpCustom
 	#endif
 
-	if (!IRLremote.begin(IRp)) 
-	{
-		#ifdef tst
-		Serial.println(F("no IR pin"));
+	#if defined( WiFi_SEND) || defined(WiFi_ControlHTMLpage)
+		setup_wifi();
+	#elif  defined(use_ESP_WiFioff)
+		#ifdef use_ESP32 //@ https://github.com/espressif/arduino-esp32/issues/1306
+		  //Wifi is disabled by default //@@ https://lastminuteengineers.com/esp32-sleep-modes-power-consumption/
+			btStop();
+		#else
+			WiFi.mode( WIFI_OFF );
+			WiFi.forceSleepBegin();
 		#endif
-	}
-}
-#endif
 
-  #ifdef tst
-  leds[0] = CRGB::White;
-  leds[1] = CRGB::Red;
-  leds[2] = CRGB::Green;
-  leds[3] = CRGB::Blue;
-  FastLED.show();
-  delay(300);
-  FastLED.clear();
-  FastLED.show();
-  #endif
+	#endif
+
+	#if defined(tst) || defined(SerialSelect) || defined(SerialControl)
+	delay(800);
+	#else
+	delay(99);
+	#endif
+
+
+	#ifdef Cube4MCU
+	//TODO  CubeLEDsFill_setup(); //ptr arrs
+	#endif
+	#ifdef LEDs_RENDER
+		#if defined(MULTIPLE_PINS2)
+			FastLED.addLeds<LEDchipType, 4, GRB>(leds, 0, gNUM_LEDS/2);
+			FastLED.addLeds<LEDchipType, 5, GRB>(leds, gNUM_LEDS/2,gNUM_LEDS/2);
+		#elif defined(MULTIPLE_PINS4)
+			FastLED.addLeds<LEDchipType, 4, GRB>(leds, 0, gNUM_LEDS/4);
+			FastLED.addLeds<LEDchipType, 5, GRB>(leds, gNUM_LEDS/4,gNUM_LEDS/4);
+			FastLED.addLeds<LEDchipType, 13, GRB>(leds, gNUM_LEDS/4*2,gNUM_LEDS/4);
+			FastLED.addLeds<LEDchipType, 14, GRB>(leds, gNUM_LEDS/4*3,gNUM_LEDS/4);
+		#elif defined(MULTIPLE_PINS8)
+			FastLED.addLeds<LEDchipType, 2, GRB>(leds, 0, gNUM_LEDS/8);
+			FastLED.addLeds<LEDchipType, 3, GRB>(leds, gNUM_LEDS/8,gNUM_LEDS/8);
+			FastLED.addLeds<LEDchipType, 4, GRB>(leds, gNUM_LEDS/8*2,gNUM_LEDS/8);
+			FastLED.addLeds<LEDchipType, 5, GRB>(leds, gNUM_LEDS/8*3,gNUM_LEDS/8);
+			FastLED.addLeds<LEDchipType, 13, GRB>(leds, gNUM_LEDS/8*4,gNUM_LEDS/8);
+			FastLED.addLeds<LEDchipType, 14, GRB>(leds, gNUM_LEDS/8*5,gNUM_LEDS/8);
+			FastLED.addLeds<LEDchipType, 15, GRB>(leds, gNUM_LEDS/8*6,gNUM_LEDS/8);
+			FastLED.addLeds<LEDchipType, 16, GRB>(leds, gNUM_LEDS/8*7,gNUM_LEDS/8);
+
+		#elif defined(server_render) //use server as 4th render node Cube
+			FastLED.addLeds<LEDchipType, CubeXp, GRB>(leds,NUM_LEDS_mcu*3, NUM_LEDS_edge);
+			FastLED.addLeds<LEDchipType, CubeYp, GRB>(leds,NUM_LEDS_mcu*3+NUM_LEDS_edge,NUM_LEDS_edge); //w:4,5, 12 13 14 16 32 33  nw: 6, 11, 15,  31 34..37
+			FastLED.addLeds<LEDchipType, CubeZp, GRB>(leds,NUM_LEDS_mcu*3+NUM_LEDS_edge*2,NUM_LEDS_edge);
+			// FastLED.addLeds<LEDchipType, CubeXp, GRB>(ledsX,NUM_LEDS_edge);
+			// FastLED.addLeds<LEDchipType, CubeYp, GRB>(ledsY,NUM_LEDS_edge); //w:12 13 14 16 32 33  nw: 11, 15,  31 34..37
+			// FastLED.addLeds<LEDchipType, CubeZp, GRB>(ledsZ,NUM_LEDS_edge);
+		#else
+
+			FastLED.addLeds<LEDchipType, LEDp, GRB>(leds, gNUM_LEDS);
+
+		#endif
+		// #endif
+
+		#ifdef tstFPS
+			FastLED.countFPS(1); //nFrames = 25
+		#endif
+
+		FastLED.clear();
+		FastLED.show();
+	#endif
+
+
+
+	#ifdef keypad1602
+	 pinMode(A0, INPUT_PULLUP);	//for situation of shield not connected (if keypad1602 defined but not connected something run effSub)
+	 lcd.begin(16, 2);
+	#endif
+
+	//---------------------------------------------------------
+	#if defined(LEDs_RENDER)
+		#if defined(adj_pot) && defined(LEDs_RENDER)
+				 pinMode(adj_pot,INPUT_PULLUP); delay(2);
+				#if defined(adjType_LDR) 
+				 FastLED.setBrightness(ambientLight_map()); //! every n ms
+				#else
+				 if(analogRead(adj_pot)<900) FastLED.setBrightness( map(analogRead(adj_pot),0,1023, 22, 255) ); //! every n ms
+				#endif
+		#endif
+
+		#if defined(tst_BRIGHTNESS)
+			FastLED.setBrightness( tst_BRIGHTNESS );
+		#endif
+	#endif
+	//---------------------------------------------------------
+
+	#if defined(tst) || defined(SerialSelect) || defined(SerialControl)
+	Serial.begin(SerialSpeed);
+		#ifdef tst
+		#include "version.h"
+		#endif
+	#endif
+
+	  #ifdef tst_POW_LIM
+	  	FastLED.setMaxPowerInVoltsAndMilliamps(5,tst_POW_LIM); //! tst
+	  #endif
+	  
+	#ifdef tst
+		//Serial.println(F("test"));
+		#ifdef LDR
+		#endif
+	#endif
+
+
+	#ifdef key3x
+	 	pinMode(btnAdd, INPUT_PULLUP);
+		pinMode(btnSub, INPUT_PULLUP);
+		pinMode(btnSelectMode_p, INPUT_PULLUP);
+	#endif
+	#ifdef key1d1a
+		pinMode(potAdd, INPUT);
+		
+		pinMode(btnSelectMode_p, INPUT); //touch hi == not change jampers on module|IC
+		potAdd_a2x_avg=analogRead(potAdd)+analogRead(potAdd) -20;
+	#endif
+
+	#ifdef key5x
+		pinMode(btnSpeedAdd, INPUT_PULLUP);
+		pinMode(btnSpeedSub, INPUT_PULLUP);
+		pinMode(btnEffNAdd, INPUT_PULLUP);
+		pinMode(btnEffLengthAdd, INPUT_PULLUP);
+		pinMode(btneffRGB, INPUT_PULLUP);
+		
+		//pinMode(btnReset_p, INPUT_PULLUP); //!
+	#endif
+
+	#ifdef LCD2004_i2c
+	  lcd.init();	  lcd.init(); //!tst if only one init is enough
+	  lcd.backlight();
+	  // lcd.setCursor(3,0);
+	  // lcd.setCursor(2,1);
+	  // lcd.setCursor(0,2);
+	  // lcd.print(""); 
+	  // lcd.setCursor(2,3);
+	#endif
+
+	delay(1);
+
+
+	//if(!digitalRead(btnReset_p))	resetSetiings_and_change_slot(); else //!
+	#ifdef startLoadEffN
+		effN_set(startLoadEffN);
+		//change_slot(startLoadEffN); //not set effN, only set anim_f and settings, so not affect navigation next/prev
+		//SET_UPD_Display 
+	#else
+		#ifdef save_load_enable
+		load(effN);
+		#else
+		effN_set(11); //11 //so anim_f != null //# tst
+		NUM_LEDS_setup();
+		#endif
+	#endif
+
+
+	#ifdef IRkeypad
+	pinMode(IR_mode_sw_p, INPUT_PULLUP);
+
+	if(!digitalRead(IR_mode_sw_p))
+	{
+		bIR_mode=true;
+	  
+		#ifdef tst
+			Serial.println(F("IR save mode"));
+			//pinMode(LED_BUILTIN, OUTPUT);
+		#endif
+
+		if (!IRLremote.begin(IRp)) 
+		{
+			#ifdef tst
+			Serial.println(F("no IR pin"));
+			#endif
+		}
+	}
+	#endif
+
+	#if defined(tst) && defined(LEDs_RENDER)
+		leds[0] = CRGB::White;
+		leds[1] = CRGB::Red;
+		leds[2] = CRGB::Green;
+		leds[3] = CRGB::Blue;
+		FastLED.show();
+		delay(300);
+		FastLED.clear();
+		FastLED.show();
+	#endif
+
+	display_upd();
 }
  
 //=============================================================================================
 #include "SerialControl.h"
 
+#ifdef WiFi_ControlHTMLpage
+	long loopHTML_next_t=50; //d at startup
+	byte loopHTML_handleClient_d=5;//20;
+#endif
+
+
+long nextCanInputRead_t=0;
+#if defined (key1d1a)
+byte btnFlag=0; //
+byte aVal_old=0;
+
+long nextCan_effN_change_t=0;
+#endif
+
 void loop()
 {
-#if defined(SerialSelect) || defined(SerialControl)
-	checkSerial();
-#endif
+	#ifdef WiFi_ControlHTMLpage
+	if(millis()>loopHTML_next_t)
+	{
+		loopHTML_next_t=millis()+loopHTML_handleClient_d; //!tst
+		loopHTML(); //now it only call handleClient()
+	}
+	#endif
+
+	#if defined(SerialSelect) || defined(SerialControl)
+		checkSerial();
+	#endif
 	
+
 #ifdef IRkeypad
 if(bIR_mode)
 {
@@ -954,10 +1516,18 @@ else
 	 saveIfNeed(); //^
 	#endif
 #endif
-	
-#ifdef keypad1602
-EVERY_N_MILLISECONDS( 220 )
+
+//========================== btn on keypads
+#if defined(key3x) || defined(key5x)
+fill_solid( leds, NUM_LEDS/8, CRGB::Blue); FastLED.show(); delay(1000);
+#endif
+
+
+if(millis()>nextCanInputRead_t)
 {
+ 
+#ifdef keypad1602
+ nextCanInputRead_t=millis()+220;
  switch (read_LCD_buttons())
  {
 	case btnRIGHT:
@@ -991,12 +1561,11 @@ EVERY_N_MILLISECONDS( 220 )
 	 // break;
 	 // }
  }
-}
-#else
- 
-  EVERY_N_MILLISECONDS( 180 )
-  {
+#endif
+
+		//#if defined(key3x) || defined(key5x) || defined(key1d1a)
  #ifdef key3x
+	nextCanInputRead_t=millis()+180;
 	if(!digitalRead(btnAdd))
 	{
 		switch_LCDoption_selected_value_add();
@@ -1007,12 +1576,12 @@ EVERY_N_MILLISECONDS( 220 )
 		switch_LCDoption_selected_value_sub();
 	}
 	else
-	if(!digitalRead(btnSelectMode))
-	{ //!!! also flash
+	if(!digitalRead(btnSelectMode_p))
+	{ //##!!! also flash
 		LCDoption_selected_add();
 	}
-
  #elif defined (key5x)
+	nextCanInputRead_t=millis()+180;
 	if(!digitalRead(btnSpeedAdd))
 	{
 		//anim_d-=5;//nw
@@ -1039,12 +1608,267 @@ EVERY_N_MILLISECONDS( 220 )
 	{
 		effRGB_add();		
 	}
- #endif
-  }
- 
+ #elif defined (key1d1a)
+	
+nextCanInputRead_t=millis()+25;
+
+/*
+Serial.print(btnFlag); Serial.print(" ");
+Serial.print(LCDoption_selected); Serial.print(" ");
+Serial.print(effN); Serial.print(" ");
+Serial.println();
+*/
+//----------------------- btn single, double, long press with indication, and pos marks of selected value
+if(digitalRead(btnSelectMode_p)) // touch btn pressed
+{
+						if(btnFlag==0) //TODO every 8th px
+						{
+							fill_solid( leds, NUM_LEDS/8, CRGB::White); FastLED.show(); delay(10);
+						}else
+						if(btnFlag==1)
+						{
+							fill_solid( leds, NUM_LEDS/8, CRGB::Yellow); FastLED.show(); delay(10);
+						}else
+						if(btnFlag==6)
+						{
+							fill_solid( leds, NUM_LEDS/8, CRGB::Blue); FastLED.show(); delay(10);
+						}else
+						if(btnFlag==70)
+						{
+							fill_solid( leds, NUM_LEDS/8, CRGB::Green); FastLED.show(); delay(10);
+						}
+	if(btnFlag<99 )
+	{
+		btnFlag++;
+		if(btnFlag>70) //long pressing
+		{
+			btnFlag=20;
+			//if((millis()/16)%8==0 )	
+			{
+				effN_add();
+					leds[0]=CRGB::Green;
+					FastLED.show(); delay(10);
+					leds[0]=CRGB::Black;
+					FastLED.show();
+			}
+		}
+	}
+	else
+	if(btnFlag>=100 && btnFlag<=103) btnFlag=110;
+
+}
+else
+{
+	switch(btnFlag)
+	{
+		case 0: break; // no press before
+		case 1: //short click
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+		case 6:
+			btnFlag=100; //wait for next
+		break; 
+		
+		case 100:
+		case 101:
+		case 102:
+		case 103:
+		btnFlag++;
+		break;  //wait for next a tick more
+		
+		case 104: //very single click (end)
+			btnFlag=0;
+							LCDoption_selected_add();
+							
+							fill_solid( leds, NUM_LEDS, CRGB::Yellow);
+							leds[LCDoption_selected]=CRGB::Red;
+							FastLED.show(); delay(500);
+							// leds[0]=CRGB::Yellow;
+							// FastLED.show(); delay(5);
+							// leds[0]=CRGB::Black;
+							// FastLED.show();
+		break; 
+		
+		case 110: //double click
+		{
+			btnFlag=0;
+							fill_solid( leds, 8, CRGB::Black); FastLED.show(); 
+
+							// FastLED.show(); delay(5);
+							// leds[0]=CRGB::Black;
+							// leds[1]=CRGB::Black;
+							// FastLED.show();
+							byte rnd=5+random8(5);
+																	leds[rnd]=CRGB::Red;
+																	leds[rnd+1]=CRGB::Red;
+																	FastLED.show(); delay(50);
+							ActionRunWaitEnd(rnd);
+							//ActionRunWaitEnd(random8(9));
+		}
+		break;
+		
+		default: //7...99 //long click
+			btnFlag=0;
+			effN_add();
+							fill_solid( leds, NUM_LEDS, CRGB::Blue);
+							leds[effN/4]=CRGB::Red;
+							FastLED.show();  delay(50);
+							// leds[0]=CRGB::Blue;
+							// leds[1]=CRGB::Blue;
+							// FastLED.show(); delay(5);
+							// leds[0]=CRGB::Black;
+							// leds[1]=CRGB::Black;
+							// FastLED.show();
+
+		break;
+	}
+
+}
+
+#endif //key1d1a
+
+
+} //if(millis()>nextCanInputRead_t)
+
+#if defined (key1d1a) //this is better working when always read. But will try to fix and move it right after btn read in key1d1a
+//else //pot
+{
+
+int a =analogRead(potAdd)+analogRead(potAdd)	-60; if(a<0) a=0; 
+potAdd_a2x_avg_old=potAdd_a2x_avg;
+potAdd_a2x_avg = potAdd_a2x_avg*0.9+a*0.1;
+
+byte aVal;
+
+	if(a>rangeA_M_off) //out immidiately
+	{
+		goto potAdd_outOffRange_skipChanges;
+	}
+	else
+	{
+		aVal_old=aVal;
+		
+		
+		// -------------------- ranged
+		{
+		if(potAdd_a2x_avg>rangeA_m && potAdd_a2x_avg<rangeA_M) //senter region linear map to value
+		{
+			
+		}
+		else //border area act like joystick, moving range and value
+		{
+			if(potAdd_a2x_avg<rangeA_m)
+			{
+				byte change=(rangeA_m-potAdd_a2x_avg)/64;
+				if(change>3) change=3;
+				
+				if(rangeOut_m>change)
+				{
+					rangeOut_m-= change;
+					rangeOut_M-= change;
+				}
+				else
+				{
+					rangeOut_m=0;
+					rangeOut_M= 100; //rangeOut_M-= (change-rangeOut_m)
+				}
+			}
+			else
+			if(potAdd_a2x_avg>rangeA_M)
+			{
+				byte change=(potAdd_a2x_avg-rangeA_M)/64;
+				if(change>5) change=5;
+				if( rangeOut_M<(255-change))
+				{
+					rangeOut_m+= change;
+					rangeOut_M+= change;
+				}
+				else 
+				{
+					rangeOut_M=255; //!
+					rangeOut_m=155;//rangeOut_m+=(255-rangeOut_M);
+				}
+			}
+		}
+	
+	//float val= map(potAdd_a2x_avg, rangeA_m,rangeA_M, rangeOut_m, rangeOut_M);
+	aVal= map(potAdd_a2x_avg, 0,rangeA_M_off, rangeOut_m, rangeOut_M);	//if(val<0) val=0;
+	}
+	
+	// -------------------- simple, slow at start
+	//aVal=map(potAdd_a2x_avg,0,rangeA_M_off, 0, 253);
+	// -------------------- 
+	
+	if(aVal!=aVal_old)
+	{
+		leds[aVal/4]=CRGB::Red;			FastLED.show(); delay(10);
+		
+		switch(LCDoption_selected)
+		{
+			
+			case effN_OPTION:
+			{
+				//effN=map(potAdd_a2x_avg,40,rangeA_M_off, 10, 240);
+				
+				byte val=10+aVal/16;
+				if(effN!=val)
+				{
+					effN=val;
+														leds[aVal/4]=CRGB::Red;			FastLED.show(); delay(10);
+									
+					if(millis()>nextCan_effN_change_t)
+					//if(potAdd_a2x_avg_old==potAdd_a2x_avg)
+					{
+														leds[aVal/4+1]=CRGB::Red;			FastLED.show(); delay(10);
+					
+					#ifdef demo_enable
+					brandom_demo=false;
+					#endif
+					banimate=false;
+
+					change_slot(effN);
+					nextCan_effN_change_t=millis()+800;
+					//nextCanInputRead_t=millis()+200;//!! nextCanPotRead
+					}
+				}
+			}
+			break;
+			
+			case effSpeed_OPTION:
+			 effSpeed=aVal;
+			 //nextCanInputRead_t=millis()+10;
+			break;		
+			
+			case effLength_OPTION:
+			 effLength=aVal;
+			 //nextCanInputRead_t=millis()+10;
+			 
+							if( (millis()/5000)%2==0 ) effFade=aVal;
+			break;	
+			
+			case effRGB_OPTION:
+			 effRGB=aVal/16;
+			 //nextCanInputRead_t=millis()+50;
+			break;
+			
+			case brightness_OPTION:
+				gBrightness=aVal>10?aVal:2; //!!##
+				//nextCanInputRead_t=millis()+30;
+				setBrightness_gBrightness  //!!^ save BRIGHTNESS
+			break;
+			
+			default: LCDoption_selected=0; //min
+		}
+	}
+	//if(rangeNow<20) nextCanInputRead_t+=300; //! TODO slower upd when avg val slower changing, or increase avg_k
+	potAdd_outOffRange_skipChanges:
+	;
+	}
+} //pot
 #endif
 
-	
 //============================================= display LCD
   //#if defined (keypad1602) || defined (LCD2004_i2c) || defined (SerialControl)  || defined (tst) 
 //	if(bNeed_display_upd) display_upd();

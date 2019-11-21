@@ -1,15 +1,41 @@
 /* TODO
+drop image, create array
+test sending to MCU 
+set NUM_LEDS_slider setup
+
+fix app folder in root of disc, so find filed can't go in parent
+link switch_slot.h to relise 
+
+mode 168|328|full  to not show unavalable eff
+
 fix load btn must not call effSet msg.   Avoid double event
 
-ask again for fix g4p event for press because bo fix absense  of dragg toleranse in Java-Swing (de-facto, he also confirm) and no other event available in current g4p version to workout this
+ask again for fix g4p event for press because bo fix absense  of drag tolerance in Java-Swing (de-facto, he also confirm) and no other event available in current g4p version to workout this
 */
+int useSerialPortN=0;
+
+static int serialSpeed=921600; //! for ESP32 change to 921600 otherwise it buggy work and you spend many time to find why.  //1000000 921600 500000 115200 57600
+
+boolean b_Cube=true; //set NUM_LEDS_slider to Max; Use to calculate current.
+boolean b_NUM_LEDS_adj=false;//true false //! fix adj mode especially if no adjustable set in MCU
+
+//5 30 60 120 144 150 180 300 450
+int NUM_LEDS_slider_startup=800; //145*3*4 60*8 15*8 8*8 16*16
+int NUM_LEDS_slider_m=200;
+int NUM_LEDS_slider_M=1200;
+
+int matrix_rowsE=16; //for plotPX
+boolean NUM_LEDS_x8=false;// true false // have to be true if gNUM_LEDS>255 , so we can send it with 1 byte
+
+
+boolean bFlipArr_sim_to_zigZag_matrix=false; //for sim. If true - flips data before send to plot and MCU. MATRIX Plot also flip data by default plotPX.b_matrix_arr_is_zigZag
 
 int bSetBrightnessAtConnect=33; //-1 for not set
-boolean NUM_LEDS_x8=false;// true;
-boolean bDebugPrint=false;
+
+boolean bDebugPrint=true;//false true
 boolean bDebugXY=false; //ctrl - toggle
 
-static int serialSpeed=1000000;//500000 //115200; //57600
+boolean bSendSimDataToMCU=true;
 
 //performance
  boolean bRecieveLEDdata=true;
@@ -35,9 +61,21 @@ boolean bPlot_FPS_enabled=false; //# but show FPS num
 */
 
 
-
-
-int NUM_LEDS_slider_M=300;//144;//1800;//300;
+boolean bbtn_matrix_state=false;
+void set_bbtn_matrix_state(int value)
+{
+  settingsVals.get("effN").setValue(value); 
+  if(bbtn_matrix_state)
+  {
+   bbtn_matrix_state=false;
+   label_matrix.setTextPlain();
+  }
+  else
+  {
+   bbtn_matrix_state=true;
+   label_matrix.setTextBold();
+  }
+}
 
 int gColorBgB=200;//200;
 color gColorBg=color(gColorBgB);//200;
@@ -147,8 +185,8 @@ class settingsVal
 //----------------------------------------------------------- upd GUI
 		if(valueSlider!=null)
 		{
-			//bSkipEvent=true;
-			//bSkipEvent_off_t=millis()+10;
+			bSkipEvent=true;
+			bSkipEvent_off_t=millis()+10;
 			valueSlider.setValue(value);
 		}
 		if(nm=="effN") 
@@ -166,10 +204,19 @@ class settingsVal
 		if(nm=="RGB") drawRGB(value);
 //-----------------------------------------------------------
 
-		if(nm=="NUM_LEDS"&& NUM_LEDS_x8) 
-			SendMsg(message_code, value/8); // msg is 1 byte
+		if(nm=="NUM_LEDS")
+		{
+			if(b_NUM_LEDS_adj)
+			{
+				if(NUM_LEDS_x8) 
+					SendMsg(message_code, value/8); // msg is 1 byte
+				else
+					SendMsg(message_code, value);
+			}
+		}
 		else
-			SendMsg(message_code, value);
+					SendMsg(message_code, value);
+		
 	}
 
 	void add()
@@ -202,6 +249,8 @@ class settingsVal
 			valueSlider.setNumberFormat(G4P.INTEGER, 0);
 			valueSlider.setLimits(1, vm, vM);
 			valueSlider.setShowValue(true);
+			
+			if(nm=="NUM_LEDS") setValue(value);
 
 			if(value_M<25)
 			{
@@ -315,7 +364,7 @@ void SendMsg(int msgCode, int val)
 		button_disconnect.setText("not sent");
 		return;
 	}
-		if(bDebugPrint){ println(msgCode,": ",val, "--------------->>>");}
+		if(bDebugPrint){ println(msgCode,": ",val, "-sent---->>");}
 	myPort.write(msgCode);
 	myPort.write(msgCode);
 
@@ -391,7 +440,7 @@ public void setup(){
 	put("gColorS",	127,0,255,237,null,slider_gColorS);
 	put("gColorV",	255,0,255,238,null,slider_gColorV);
 	put("indexOrBits",	0,0,255,239,null,slider_indexOrBits);
-	put("NUM_LEDS",	60,5,NUM_LEDS_slider_M,240,null,slider_NUM_LEDS);
+	put("NUM_LEDS",	NUM_LEDS_slider_startup,NUM_LEDS_slider_m,NUM_LEDS_slider_M,240,null,slider_NUM_LEDS);
 
 
 	put("speedH",	4,0,255,245,label_speedH,slider_speedH);
@@ -504,30 +553,29 @@ void updateSlider(String nm, int value)
 }
 
 
+
 int serState=0;
 int rec_header[]={111,166,77};
+
+static final int PRINT_leds		=133;
+static final int PRINT_totall	=122;
+static final int PRINT_settings	=99;
+
+static final int msg_buffer_size=6000;
+
+int[] msg_buffer=new int[msg_buffer_size];
 
 int rec_fps;
 int rec_msg_size;
 int rec_msg_type;
 
-static final int PRINT_leds	=133;
-static final int PRINT_totall	=122;
-static final int PRINT_settings	=(99);
 
-int[] msg_buffer=new int[6000];
-
-
-
-boolean bSendSimDataToMCU=true;
 
 void DisableSerial()
 {
 	if(myPort!=null)
 	{
-		myPort.clear();
-		myPort.stop();
-		myPort=null;
+		myPort.clear();	myPort.stop(); myPort=null;
 	}
 	bConnected=0;
 	button_disconnect.setText("Connect");
@@ -540,91 +588,119 @@ void EnableSerial()
 	button_disconnect.setText("Disonnect");
 }
 
+boolean bErrStop=false;
+void serialEvent(Serial cPort)
+{
+	if(bErrStop) return;
+	try{
+	/*		//debug print serial
+	//String comPortString = cPort.readStringUntil('\n');
+	if(myPort.available() > 8)
+	{
+		String comPortString = cPort.readString();
+		if(comPortString != null)
+		{
+			comPortString=trim(comPortString);
 
-void serialEvent(Serial cPort){
+			if(bDebugPrint) 
+			{
+			if(comPortString.length()>1)
+			print(comPortString);
+			return;
+			}
+		}
+	}
+	return;
+	*/
+
 //# if(comPortString.contains(","))  {  print("CRGB( "); print(comPortString); println(" ),"); return;}
 
-while (myPort.available() > 0)
-{
-	int inByte = myPort.read();
-
-											//if(rec_msg_type!=PRINT_totall)	println("      " + inByte);
-
-	if(serState<3) //bWait_mgs_header
+	while (myPort.available() > 0)
 	{
-		if(inByte!=rec_header[serState])
-		{
-			serState=0;
-			continue;
-		}
-	}
-	else
-	
-	if(serState==3)
-	{
-			rec_fps=0;
-			rec_msg_size=0;
+		int inByte = myPort.read(); //byte in Java is signed. It will not work with byte without refactoring
 
-		rec_msg_type=inByte;						//println(rec_msg_type);
-		if(rec_msg_type==PRINT_settings)
+												//if(rec_msg_type!=PRINT_totall)	println("      " + inByte);
+
+		if(serState<3) //bWait_mgs_header
 		{
-			serState+=2;
+			if(inByte!=rec_header[serState])
+			{
+				serState=0;
+				continue;
+			}
 		}
 		else
-		if(rec_msg_type!=PRINT_totall && rec_msg_type!=PRINT_leds)
+		
+		if(serState==3)
 		{
-			serState=0;
-			continue;
+				rec_fps=0;
+				rec_msg_size=0;
+
+			rec_msg_type=inByte;						//if(rec_msg_type!=PRINT_totall) println(rec_msg_type);
+			if(rec_msg_type==PRINT_settings)
+			{
+				serState+=2;
+			}
+			else
+			if(rec_msg_type!=PRINT_totall && rec_msg_type!=PRINT_leds )
+			{
+				serState=0;
+				continue;
+			}
 		}
-	}
 
-	else
-	if(serState==4)
-	{
-		rec_fps=inByte;
-	}
-	else
-	if(serState==5)
-	{
-		rec_fps+=inByte*256;				//if(rec_msg_type!=PRINT_totall) {print("fps: ");				println(rec_fps);	}	
-	}
-
-	else
-	if(serState==6)
-	{
-		rec_msg_size=inByte;
-		if(rec_msg_type==PRINT_settings) serState++;  //size of PRINT_settings is 1, so +1
-	}
-	else
-	if(serState==7)
-	{
-		rec_msg_size+=inByte*256;			//if(rec_msg_type!=PRINT_totall) println(rec_msg_size);
-
-		if(rec_msg_type==PRINT_totall)
+		else
+		if(serState==4)
 		{
-			processSerialData(); continue;
+			rec_fps=inByte;
 		}
-	}
-
-	else
-	if(serState-8 < rec_msg_size)
-	{
-											//if(rec_msg_type!=PRINT_settings) println("   "+inByte);
-		msg_buffer[serState-8]=inByte;
-
-		if(serState-8 == rec_msg_size-1)
+		else
+		if(serState==5)
 		{
-			processSerialData(); continue;
+			rec_fps+=inByte*256;				//if(rec_msg_type!=PRINT_totall) {print("fps: ");				println(rec_fps);	}	
 		}
-	}
 
-	serState++;
-}
+		else
+		if(serState==6)
+		{
+			rec_msg_size=inByte;
+			if(rec_msg_type==PRINT_settings ) serState++;  //size of PRINT_settings is 1, so +1
+		}
+		else
+		if(serState==7)
+		{
+			rec_msg_size+=inByte*256;			
+			//if(rec_msg_type!=PRINT_totall ) 
+			if(rec_msg_size>=msg_buffer_size-8 ) 
+			 {print("rec_msg_size: ");				println(rec_msg_size); rec_msg_size=msg_buffer_size-8; processSerialData();	}	
+
+			if(rec_msg_type==PRINT_totall)
+			{
+				processSerialData(); continue;
+			}
+		}
+
+		else
+		if(serState-8 < rec_msg_size)
+		{
+												//if(rec_msg_type!=PRINT_settings) println("   "+inByte);
+			msg_buffer[serState-8]=inByte;
+
+			if(serState-8 == rec_msg_size-1)
+			{
+				processSerialData(); continue;
+			}
+		}
+
+		serState++;
+	}
 
 return;
+
 /*
  	if(comPortString.contains(","))  {  print("CRGB( "); print(comPortString); println(" ),"); return;}
   */
+ }catch(Exception e){ println(e); println(rec_msg_size);  println(serState); bErrStop=true;  }
 }
 
 
@@ -637,26 +713,26 @@ void processSerialData()
 		case PRINT_leds:
 
 			if(bRecieveLEDdata)
-			{	
+			{	 	//println("bRecieveLEDdata");
 				if(plotPX==null)  plotPX=new PlotPX(60, height/2, width-widthNormal,height/2, widthNormal,height/2);
 				plotPX.push(msg_buffer, rec_msg_size);
 				bplotPX=true;
 				bDraw_plotPX_until_t=millis()+4000;
 			}
 			if(bDraw_plot_RGB_pow)
-			{	
+			{	 	//println("bDraw_plot_RGB_pow");
 				plotR.push(plotPX.rE); plotR.tik();
 				plotG.push(plotPX.gE); plotG.tik();
 				plotB.push(plotPX.bE); plotB.tik();
 			}
 			if(bPlot_FPS_enabled)
-			{
+			{ 		//println("bPlot_FPS_enabled");
 				bDrawFPSnow=rec_fps;
 				plotFPS.push(bDrawFPSnow); //plotFPS.push(((float)bDrawFPSnow)/10.);
 				bDrawFPS_until_t=millis()+1000;
 			}
 			if(bPlotPow_enabled)
-			{	
+			{		//println("bPlotPow_enabled");
 				bDrawPownow=plotPX.rE+plotPX.gE+plotPX.bE;
 				plot_pow.push(bDrawPownow);
 				bDrawPow_until_t=millis()+1000;
@@ -677,6 +753,7 @@ void processSerialData()
 				bDrawPow_until_t=millis()+1000;
 			}
 		break;
+
 
 		case PRINT_settings:
 			bSkipEvent=true;
@@ -719,19 +796,22 @@ struct SaveObj //# sizeof
 			//gFade
 			updateSlider("indexOrBits",(msg_buffer[14]));
 			updateSlider("gDelay",(msg_buffer[15]));
-			//!! updateSlider("gBrightness",(msg_buffer[16]));
+			updateSlider("gBrightness",(msg_buffer[16]));
 																// for (int i=0; i<22; i++) {
 																// 	print(i+"= ");
 																// 	println(msg_buffer[i]+", ");
 																// }
-			
-			if(msg_buffer[17]!=0 && msg_buffer[18]<=0)
-				updateSlider("NUM_LEDS",(msg_buffer[17]));
-			else
-			if(msg_buffer[18]!=0)
-				updateSlider("NUM_LEDS",(msg_buffer[17]*256+msg_buffer[18]));
-			else
-				updateSlider("NUM_LEDS",  (msg_buffer[21]*256+msg_buffer[20])  ); //ESP8266 int32
+			if(b_NUM_LEDS_adj)
+			{	
+				int NUM_LEDS_arr_size;
+				if(msg_buffer[17]!=0 && msg_buffer[18]<=0) 
+					NUM_LEDS_arr_size=msg_buffer[17];
+				else
+					NUM_LEDS_arr_size=msg_buffer[17]*256+msg_buffer[18];
+	
+				if(NUM_LEDS_arr_size%3==0)	updateSlider("NUM_LEDS",NUM_LEDS_arr_size/3);
+																		//println(NUM_LEDS_arr_size/3);
+			}
 
 			bSkipEvent_off_t=millis()+120; //! test lower or different approach
 		break;
@@ -774,9 +854,10 @@ public void draw()
 	//---------------------------------------- RGB option state
 	noStroke();
 	fill(rCh?255:0, gCh?255:0, bCh?255:0); 
-	if(rCh)	ellipse(496, 525, 8, 8);
-	if(gCh)	ellipse(526, 525, 8, 8);
-	if(bCh)	ellipse(556, 525, 8, 8);
+  final int RGB_indicator_x0=515;
+	if(rCh)	ellipse(0+RGB_indicator_x0, 525, 8, 8);
+	if(gCh)	ellipse(30+RGB_indicator_x0, 525, 8, 8);
+	if(bCh)	ellipse(60+RGB_indicator_x0, 525, 8, 8);
 	//----------------------------------------
 	fill(255, 255, 88); stroke(128, 0, 128);
 	polygon(3,  effParsedList_btns_posX-12, 8+effParsedList_btn_h*2 +10, 11);  //mark on current eff N (scroll list to this pos)
@@ -796,14 +877,15 @@ public void draw()
 		plotFPS.draw();
 	}
 
-	int sim_NUM_LEDS=settingsVals.get("NUM_LEDS").value;
-
+	
 	if(width>1200 )
 	{
 		if(millis()<bDraw_plotPX_until_t)
 		{
 			if(plotPX!=null)
 			{
+				plotPX.matrix_rowsE=matrix_rowsE; //!!
+
 				if(bDrawLEDs_PXHistory_enabled)
 				{	
 					plotPX.draww=width-widthNormal; //! on window resize
@@ -824,7 +906,10 @@ public void draw()
 					fill(0);
 					rect(0,640-18,680+220,height);
 					if(height>800)
+					{
+						int sim_NUM_LEDS=settingsVals.get("NUM_LEDS").value;
 						plotPX.draw_LED_Line(sim_NUM_LEDS);
+					}
 				}
 			}
 		}
@@ -847,7 +932,7 @@ public void draw()
 		float LED_pow=20./255; //mA
 
 		//float NUM_LEDS_used=(60+30+144+50)/144.; //144 in arduino 
-		float NUM_LEDS_used=(60+30+144)/144.; //144 in arduino 
+		float NUM_LEDS_used=b_Cube?NUM_LEDS_slider_M: (60+30+144)/144.; //144 in arduino 
 
 		float NUM_LEDS_limit = (float) settingsVals.get("NUM_LEDS").value;
 
@@ -917,12 +1002,12 @@ public void draw()
 	{
 		 if(mouseY<20) 
 		 {
-		 	if(yStart_last>0) yStart_last--;
+		 	if(yStart_last>0) yStart_last-=4;
 		 }
 		 else
 		 if(mouseY>height-20) 
 		 {
-		 	if(yStart_last<height-50) yStart_last++;
+		 	if(yStart_last<height-50) yStart_last+=8;;
 		 }
 
 		scroll_effParsedList_btns( (int)yStart_last);
@@ -933,6 +1018,7 @@ public void draw()
 
 	if(bSim)
 	{
+		int sim_NUM_LEDS=settingsVals.get("NUM_LEDS").value;
 		int sim_NUM_LEDS_arr_size=sim_NUM_LEDS*3;
 		if(plotPX==null)  plotPX=new PlotPX(60, height/2, width-widthNormal,height/2, widthNormal,height/2);
 
@@ -950,12 +1036,101 @@ public void draw()
 																			myPort.write(232);
 																			myPort.write(232);
 																		}
-		for (int i=0; i<sim_NUM_LEDS_arr_size; i++) 
-		{
-			msg_buffer[i]=(int) ( (sin(i/1.+millis()/1000.) +1) *255);
 
-																		if(bSendSimDataToMCU) myPort.write(((int)msg_buffer[i])%255);
+
+
+		int matrixW=plotPX.matrix_px_per_row;
+		int rowE=plotPX.matrix_rowsE;	
+
+		int effN=settingsVals.get("effN").valueSlider.getValueI();
+
+		switch(effN)
+		{
+			case 0:
+			{
+				for (int i=0; i<sim_NUM_LEDS_arr_size; i++) 
+					msg_buffer[i]=i/3/matrixW%2 *255; //odd row
+			}
+			break;
+
+			case 1:
+			{
+				for (int r=0; r<rowE; r++) 
+				{
+					for (int c=0; c<matrixW; c++) 
+					{
+							//if(c==r) msg_buffer[(r*matrixW+c)*3]=255;
+						msg_buffer[(r*matrixW+c)*3 +1]=r*16;
+						msg_buffer[(r*matrixW+c)*3]=(int) (  (float)c/matrixW*255 );
+
+						// switch(r)
+						// {
+						// 	case 0:
+							 
+						// 	break;
+						// }
+						
+
+					}
+				}
+			}
+			break;
+
+			case 2:
+			{
+				for (int r=0; r<rowE; r++) 
+				{
+					for (int c=0; c<matrixW; c++) 
+					{
+						if(c==r) msg_buffer[(r*matrixW+c)*3]=255;
+
+						// switch(r)
+						// {
+						// 	case 0:
+							 
+						// 	break;
+						// }
+						
+
+					}
+				}
+			}
+			break;
+
+			default:
+				for (int i=0; i<sim_NUM_LEDS_arr_size; i++) 
+				{
+					msg_buffer[i]=(int) ( (sin(i/1.+millis()/1000.) +1) *255);
+				}
+			break;
 		}
+
+
+		if(bFlipArr_sim_to_zigZag_matrix)
+		{
+								// msg_buffer[0*3+1]=255;
+								// msg_buffer[8*3]=255;
+								// msg_buffer[16*3+1]=255;
+								// msg_buffer[24*3]=255;
+				//flip odd row due zig-zag connection //also plot b_matrix_arr_is_zigZag=true by default
+				for (int r=0; r<rowE; r++) 
+				{
+					for (int c=0; c<matrixW/2; c++) 
+					{
+						if(r%2==1)
+						{
+							 int t=msg_buffer[(r*matrixW+c)*3];
+							 msg_buffer[(r*matrixW+c)*3]=msg_buffer[((r+1)*matrixW-c-1)*3];
+							 msg_buffer[((r+1)*matrixW-c-1)*3]=t;
+						}
+					}
+				}
+		}
+		
+		if(bSendSimDataToMCU) 
+			for (int i=0; i<sim_NUM_LEDS_arr_size; i++)
+				myPort.write(((int)msg_buffer[i])%255);
+
 		
 //-------------
 		if(bDrawLEDs_PXHistory_enabled)
@@ -977,7 +1152,7 @@ public void draw()
 
 		bDrawPownow=plotPX.rE+plotPX.gE+plotPX.bE;
 		plot_pow.push(bDrawPownow);
-		bDrawPow_until_t=millis()+1000;
+		bDrawPow_until_t=millis()+1000; //!! move to push
 	}
 	else
 	{
@@ -997,9 +1172,11 @@ public void draw()
 		{
 			try
 			{
-				if(Serial.list()[0]!=null) //!! tst
-				myPort = new Serial(this, Serial.list()[0], serialSpeed); 
-			}catch(Exception e){ button_disconnect.setText("err"); }
+				if(Serial.list()[useSerialPortN]!=null) //!! tst
+					myPort = new Serial(this, Serial.list()[useSerialPortN], serialSpeed); //, 'S' ,7, 1.0);  if need. Now working by default
+				else if(Serial.list()[0]!=null) //!! tst
+					myPort = new Serial(this, Serial.list()[0], serialSpeed);//, 'S' ,7, 1.0);  
+			}catch(Exception e){ button_disconnect.setText("err"); text("USB Serial err",10,10); }
 
 			if(myPort!=null) 
 			{
@@ -1085,19 +1262,25 @@ void mouseMoved() //! only if not big dY, if big - anim or nothing do
 // int wtmp;
  boolean bMadeScreenshot_thisTime=true;
 void mouseClicked() {
-	if(plotPX!=null) plotPX.bDrawLEDs_line=!plotPX.bDrawLEDs_line;
+																							bErrStop=false;
+
+	if(plotPX!=null && (mouseY<200 ||  (mouseX<700&& mouseY>630))) plotPX.bDrawLEDs_line=!plotPX.bDrawLEDs_line;
+
+	bWideSize=width>1200;
 
 	if(bWideSize && mouseX>width/2 && mouseY>height/2) 
 	{
 		//if(millis()<bDraw_plotPX_until_t) //too big delay, so if we click to made screenshot we got 2
-		if(millis()<bDraw_plotPX_until_t && bMadeScreenshot_thisTime)			//screen save,
+		if(millis()<bDraw_plotPX_until_t && bMadeScreenshot_thisTime) //!! show save btn on mouse over			//screen save,
 		{
 			plotPX.save(EffNms[settingsVals.get("effN").valueSlider.getValueI()]);
 			bMadeScreenshot_thisTime=!bMadeScreenshot_thisTime;
 		}
 
 		if(!bSim)  //!! toggle betwen pixel source or make 2 separate plots
-		SendMsg(settingsVals.get("msgprintPX").message_code, 0); 				// bPrintPixels=!bPrintPixels
+		{
+			SendMsg(settingsVals.get("msgprintPX").message_code, 0); 				//in MCU: bPrintPixels=!bPrintPixels
+		}
 	}
 
 	if(mouseX>900 && mouseY<300)

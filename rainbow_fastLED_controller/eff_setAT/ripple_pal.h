@@ -23,7 +23,7 @@ byte myfade=255-effSpeed;
   switch (step) {
 
     case -1:                                                          // Initialize ripple variables.
-      idex = random(NUM_LEDS); // Center of the current ripple.
+      idex = random8or16(NUM_LEDS-1); // Center of the current ripple.
       gColor = random8();
       step = 0;
       break;

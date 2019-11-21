@@ -1,8 +1,8 @@
-#define saveFormat_currentVersion	59 //invalidate old saves
+#define saveFormat_currentVersion	62 //invalidate old version saves
 
 #ifndef use_EEPROMex
 	#include <EEPROM.h>
-#else //! this part is not updated to more settings
+#else //! this part is not updated to more settings, so need fix if need to use
 	#include <EEPROMex.h>
 	// #ifdef tst
 	// 	setMaxAllowedWrites(40);
@@ -31,7 +31,7 @@ void save(byte N) //to slot N 0...9
 	//if(effN<10) return; //0-9 is slots, bot not effects //this for update old written, normally it can't occur
 
 	#ifndef use_EEPROMex		//https://arduino-esp8266.readthedocs.io/en/latest/libraries.html?highlight=eeprom%20
-		EEPROM.begin(512);  //https://arduino.stackexchange.com/questions/25945/how-to-read-and-write-eeprom-in-esp8266
+		EEPROM.begin(512); 		//https://arduino.stackexchange.com/questions/25945/how-to-read-and-write-eeprom-in-esp8266
 		EEPROM.put(EEPROM_saved_flag_addr,saveFormat_currentVersion); //this update if different
 				#ifdef tst2
 					EEPROM.commit();
@@ -56,6 +56,7 @@ void save(byte N) //to slot N 0...9
 
 void load(byte N)
 {
+																																//Serial.println("l");
 		#ifdef tst
 											Serial.print("load slot:"); Serial.print(N);			if(N>9)  {Serial.println("!! >9"); return; }
 		#endif
@@ -77,9 +78,10 @@ void load(byte N)
 		}
 		EEPROM.end();
 	#else
+																									
 		if(EEPROM.readInt(EEPROM_saved_flag_addr)!=saveFormat_currentVersion) resetSetiings_and_change_slot(); //check compatible saved before
 		else
-		{
+		{																							//Serial.println("read");
 			effN = EEPROM.readByte(save_addr_start+N*5); //!!  change_slot(effN);  before other opt apply, but SET_UPD_Display after all
 			if(effN<10) effN+=10; //return; //0-9 is slots, bot not effects //this for update old wrighten, normally it can't occur
 			change_slot(effN);
@@ -92,7 +94,7 @@ void load(byte N)
 	if(effLength==0) effLength=1;
 	if(effLengthH==0) effLengthH=1;
 	#if defined(SerialControl) && defined(NUM_LEDS_adjustable)
-		NUM_LEDS_set();
+		NUM_LEDS_setup();
 	#endif
 
 	#ifdef demo_enable
@@ -100,7 +102,9 @@ void load(byte N)
 	#endif
 	banimate=false;
 	
-	FastLED.setBrightness( gBrightness );
+	if(gBrightness>1) FastLED.setBrightness( gBrightness );  delay(20);//## fix why is it == 1
+
+	//setBrightness_gBrightness //## fix is 1 or 0
 	//SET_UPD_Display
 }
 

@@ -18,7 +18,7 @@ void ripple() {                                                                 
   switch (step) {
 
     case -1:                                                                    // Initialize ripple variables. By Andrew Tuline.
-      center = random(NUM_LEDS);
+      center = random8or16(NUM_LEDS-1);
       colour = (oldsample) % 255;                                               // More peaks/s = higher the hue colour.
       step = 0;
       break;

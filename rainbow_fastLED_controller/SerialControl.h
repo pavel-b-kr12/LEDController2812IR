@@ -1,4 +1,29 @@
+//TODO !!## save mem define
+void ActionRunWaitEnd(byte N)
+{
+ switch(N) //! btn
+ {
+	default:
+	case 0: flashLEDs_d_effL(); break;
+	case 1: invertLEDs(); FastLED.show(); delay(10); break;
 
+	case 2: 
+	for(byte i = 0; i < 10; ++i)
+	{
+		addGlitter(255);
+	}
+	FastLED.show();
+	break;
+	
+	case 3: flashAndBackLEDs_d40(); break;
+	case 4: scroll1cycle_continued(); break;
+	case 5: scroll1cycle_continuedRev(); break;
+	case 6: fadeOut_continued(); break;
+	case 7: moveOut_continued(); break;
+	case 8: offPixel_continued(); break;
+ }
+}
+		
 #ifdef SerialControl
 //## SET_UPD_Display saveAfter2s();
 
@@ -39,7 +64,7 @@ byte msgLast=0;
 void setValueFromMsg(byte msgType, byte value)
 {
 	#ifdef tst2
-	Serial.print(msgType);Serial.print(" msg ");Serial.println(value);
+		Serial.print(msgType);Serial.print(" msg ");Serial.println(value);
 	#endif
 								
 	bool bNeedUpdDisplay=true;
@@ -84,23 +109,24 @@ void setValueFromMsg(byte msgType, byte value)
 		case msg_indexOrBits:
 		  indexOrBits=value;
 		break;
+		
+		#ifdef NUM_LEDS_adjustable
 		case msg_NUM_LEDS:
-			#ifdef NUM_LEDS_adjustable
-			#if gNUM_LEDS>255
-		  		NUM_LEDS=value*8;
-		  	#else
-		  		NUM_LEDS=value;
-		  	#endif	
-		  		NUM_LEDS_set();
-		  	#endif
+				#if gNUM_LEDS>255
+			  		NUM_LEDS=value*8;
+			  	#else
+			  		NUM_LEDS=value;
+			  	#endif	
+		  		NUM_LEDS_setup();
 		break;
+		#endif
 
 		case messageBright:
-		 FastLED.setBrightness( value ); 
-					 #if gNUM_LEDS<256 //!? otherwise crash when often change
-					 	FastLED.show();
-					 #endif
-		 gBrightness=value;
+					 // #if gNUM_LEDS<256 //!? otherwise crash when often change
+					 	// FastLED.show();
+					 // #endif
+			gBrightness=value;
+			setBrightness_gBrightness
 		break;
 
 
@@ -113,8 +139,10 @@ void setValueFromMsg(byte msgType, byte value)
 		//  load(value);
 		// break;
 		case messageClear:
-		 FastLED.clear();
-		 FastLED.show();
+		  FastLED.clear();
+		#ifdef LEDs_RENDER
+		  FastLED.show();
+		#endif
 		break;
 		case messagePause:
 		 bPause=!bPause; //return from LED_anim() //!! nw
@@ -125,26 +153,7 @@ void setValueFromMsg(byte msgType, byte value)
 		 else change_slot(effN);
 		break;
 		case messageAction:
-		 switch(value) //! btn
-		 {
-		 	case 0: flashLEDs(); FastLED.show(); break;
-		 	case 1: invertLEDs(); FastLED.show(); delay(10); break;
-
-		 	case 2: 
-		 	for(byte i = 0; i < 10; ++i)
-		 	{
-		 		addGlitter(255);
-		 	}
-		 	FastLED.show();
-		 	break;
-		 	
-		 	case 3: flashAndBackLEDs(); break;
-		 	case 4: scroll1cycle_continued(); break;
-		 	case 5: scroll1cycle_continuedRev(); break;
-		 	case 6: fadeOut_continued(); break;
-		 	case 7: moveOut_continued(); break;
-		 	case 8: offPixel_continued(); break;
-		 }
+			ActionRunWaitEnd(value);
 		break;
 
 
@@ -155,6 +164,9 @@ void setValueFromMsg(byte msgType, byte value)
 		#ifdef tstFPS
 		case msgprintPX:
 			bPrintPixels=!bPrintPixels;
+									#ifdef tst2
+										Serial.print("bPrintPixels: "); Serial.println(bPrintPixels);
+									#endif
 		break;
 
 		case msg_getLeds:
@@ -196,7 +208,18 @@ unsigned long SerialControlStateExpare_t=0;
 
 void checkSerial()
 {
+//if serial not working - psible pin conflict
+//  while(Serial.available())
+//   {
+//     byte b=Serial.read();
+//     Serial.write(b);
+// }
+
 	#ifdef SerialControl
+	// EVERY_N_MILLISECONDS( 1000 ) Serial.print(".");
+	// #ifdef use_ESP32
+	// 	yield();
+	// #endif
 	 while (Serial.available()) 
 	 { 
 
