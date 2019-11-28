@@ -134,26 +134,48 @@ Integer[] EffNmsQuality = new Integer[255];
 
 GButton[] effParsedList_btns = new GButton[255];
 float yStart_last=10;
-float smothScroll=0.15;//0.03
-void scroll_effParsedList_btns(int yStart)
+float smothScroll=0.07;//0.15 0.03
+
+void setBtnPosY_and_visibility(GButton btn, float posY)
 {
-	if(abs(yStart-yStart_last)>20)
+  if(posY<600)
+    {
+     btn.moveTo(btn.getX(), posY );
+     btn.setVisible(true);
+    }
+    else
+    {
+      btn.setVisible(false);
+    }
+}
+void scroll_effParsedList_btns(int yStart) //yStart=mouseY
+{
+	float y_diff_abs=abs(yStart-yStart_last);
+	if(y_diff_abs>20) //smooth
 	{
-	 yStart_last= yStart_last*(1-smothScroll)+yStart*smothScroll;
+		yStart_last= yStart_last*(1-smothScroll)+yStart*smothScroll;
+	}
+	else if(y_diff_abs<4)
+	{
+		return;
 	}
 	else
-	yStart_last=yStart;
+	{
+		yStart_last=yStart;
+	}
+	
 
 	for (int i=0; i<effParsedList_btns_i-1; i++) {
 		GButton btn=effParsedList_btns[i];
-		btn.moveTo(btn.getX(),  map((int)yStart_last,0,height,0,-effParsedList_btns_i*effParsedList_btn_h) +10+effParsedList_btn_h*i);
+    float posY=map((int)yStart_last,0,height,0,-effParsedList_btns_i*effParsedList_btn_h) +10+effParsedList_btn_h*i;
+    setBtnPosY_and_visibility(btn, posY);
 	}
 }
 void scroll_effParsedList_btns_toTopFor(int btnsE) //btnsE is  btn N in effParsedList_btns array
 {
 	for (int i=0; i<effParsedList_btns_i-1; i++) {
 		GButton btn=effParsedList_btns[i];
-		btn.moveTo(btn.getX(),  8+effParsedList_btn_h*(i-btnsE+2));
+    setBtnPosY_and_visibility(btn, 8+effParsedList_btn_h*(i-btnsE+2));
 	}
 }
 

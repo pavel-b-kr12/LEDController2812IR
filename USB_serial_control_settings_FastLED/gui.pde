@@ -275,6 +275,19 @@ public void btn_history_click(GButton source, GEvent event) { //_CODE_:btn_histo
   set_bbtn_matrix_state(246);
 } //_CODE_:btn_history:509443:
 
+public void checkbox_LEDs_customGeom_cl(GCheckbox source, GEvent event) { //_CODE_:checkbox_LEDs_customGeom:713840:
+  if(plotPX!=null)
+  {
+    plotPX.bDrawLEDs_customGeometry_paint=source.isSelected(); //!bDrawLEDs_customGeometry_paint;
+    if(plotPX.bDrawLEDs_customGeometry_paint)  plotPX.DrawLEDs_currentPoint=0;
+    else
+    {
+      plotPX.DrawLEDs_save(plotPX.DrawLEDs_currentPoint);
+    }
+  }
+  //!!TODO gen btns as files, change text draw / save
+} //_CODE_:checkbox_LEDs_customGeom:713840:
+
 
 
 // Create all the GUI controls. 
@@ -550,6 +563,11 @@ public void createGUI(){
   label_matrix.setTextItalic();
   label_matrix.setLocalColorScheme(GCScheme.CYAN_SCHEME);
   label_matrix.setOpaque(false);
+  checkbox_LEDs_customGeom = new GCheckbox(this, 490, 590, 210, 20);
+  checkbox_LEDs_customGeom.setIconAlign(GAlign.LEFT, GAlign.MIDDLE);
+  checkbox_LEDs_customGeom.setText("F3 = draw LEDs (mouse, ctrl, shift)");
+  checkbox_LEDs_customGeom.setOpaque(false);
+  checkbox_LEDs_customGeom.addEventHandler(this, "checkbox_LEDs_customGeom_cl");
 }
 
 // Variable declarations 
@@ -614,3 +632,4 @@ GButton btn_labyrinth_cw;
 GButton btn_mirror_half; 
 GButton btn_history; 
 GLabel label_matrix; 
+GCheckbox checkbox_LEDs_customGeom; 

@@ -1,4 +1,5 @@
 /* TODO
+gen HTML link
 drop image, create array
 test sending to MCU 
 set NUM_LEDS_slider setup
@@ -20,9 +21,9 @@ boolean b_Cube=true; //set NUM_LEDS_slider to Max; Use to calculate current.
 boolean b_NUM_LEDS_adj=false;//true false //! fix adj mode especially if no adjustable set in MCU
 
 //5 30 60 120 144 150 180 300 450
-int NUM_LEDS_slider_startup=800; //145*3*4 60*8 15*8 8*8 16*16
-int NUM_LEDS_slider_m=200;
-int NUM_LEDS_slider_M=1200;
+int NUM_LEDS_slider_startup=105;//60*3;//105; //145*3*4 60*8 15*8 8*8 16*16  //this is also max for draw gemetry arr DrawLEDs_pointsX 
+int NUM_LEDS_slider_m=105;
+int NUM_LEDS_slider_M=32*32;
 
 int matrix_rowsE=16; //for plotPX
 boolean NUM_LEDS_x8=false;// true false // have to be true if gNUM_LEDS>255 , so we can send it with 1 byte
@@ -42,11 +43,26 @@ boolean bSendSimDataToMCU=true;
 
  boolean bDrawLEDs_PXHistory_enabled=true;
  boolean bDrawLEDs_enabled=true;
+ boolean bDrawLEDs_customGeometry=true; //F3 toggle draw
+
+ boolean bPlotPow_enabled=false; //! opt>400 LEDs
+ boolean bPlotPowBig_enabled=false; //!!!TODO
+ boolean bDraw_plot_RGB_pow=false;
+
+ boolean bPlot_FPS_enabled=true; //# but show FPS num
+ 
+ 
+/*
+ boolean bRecieveLEDdata=true;
+
+ boolean bDrawLEDs_PXHistory_enabled=true;
+ boolean bDrawLEDs_enabled=true;
 
  boolean bPlotPow_enabled=true;
  boolean bDraw_plot_RGB_pow=true;
 
  boolean bPlot_FPS_enabled=true; //# but show FPS num
+ */
 /*
 boolean bRecieveLEDdata=true;
 
@@ -57,7 +73,6 @@ boolean bPlotPow_enabled=false;
 boolean bDraw_plot_RGB_pow=false;
 
 boolean bPlot_FPS_enabled=false; //# but show FPS num
-
 */
 
 
@@ -271,10 +286,20 @@ class settingsVal
 
 			//.addEventHandler(this, "slider_RGB_change1"); //!
 
-			if(label==null && !nm.equals("action") && !nm.equals("gDelay")&& !nm.contains("gColor"))
+			if(label==null && !nm.equals("action") && !nm.equals("gDelay") && !nm.contains("gColor"))
 			{
-				label = new GLabel(valueSlider.getPApplet(), valueSlider.getX()+325, valueSlider.getY()+22, 80, 20); //+125 -1
-				label.setText(n);
+
+        if(nm=="NUM_LEDS")
+        {
+          label = new GLabel(valueSlider.getPApplet(), valueSlider.getX()+220, valueSlider.getY()+22, 280, 20); //+125 -1
+          label.setText(nm+" must be enabled in app and MCU");
+        }
+        else
+        {
+           label = new GLabel(valueSlider.getPApplet(), valueSlider.getX()+420, valueSlider.getY()+22, 80, 20); //+125 -1
+           label.setText(nm);   
+        }
+        //label.resizeToFit(true, false);
   				label.setOpaque(false);
   				if(labelColor>=0)
   				{
@@ -475,7 +500,7 @@ public void setup(){
 		slots_s[i].tagNo=i;
 
 		slots[i]= new GButton(this, 20+45*i, 590, 30, 30);
-		slots[i].setText(Integer.toString(i));
+		slots[i].setText(Integer.toString(i)); //TODO2 get from EEPROM
 		slots[i].setLocalColorScheme(GCScheme.GREEN_SCHEME);
 		slots[i].addEventHandler(this, "slots_click");
 		slots[i].tagNo=i;
@@ -525,9 +550,13 @@ public void setup(){
 			}
 		}
 	}
-
-
 //btn3_L.fireAllEvents(true); //not work in G4P bug //!@ttt
+}
+
+void plotPX_create()
+{
+	plotPX=new PlotPX(60, height/2, width-widthNormal,height/2, widthNormal,height/2);
+	plotPX.DrawLEDs_load();
 }
 
 void changeSilerTextColor(int cc)
@@ -714,7 +743,7 @@ void processSerialData()
 
 			if(bRecieveLEDdata)
 			{	 	//println("bRecieveLEDdata");
-				if(plotPX==null)  plotPX=new PlotPX(60, height/2, width-widthNormal,height/2, widthNormal,height/2);
+				if(plotPX==null)  plotPX_create();
 				plotPX.push(msg_buffer, rec_msg_size);
 				bplotPX=true;
 				bDraw_plotPX_until_t=millis()+4000;
@@ -837,6 +866,9 @@ void bSim_set(boolean b)
 		button_sim.setText("sim");
 
 }
+
+
+
 //===========================================================================================================================
 int bDrawFPSnow=-1;
 int bDrawPownow=-1;
@@ -846,15 +878,18 @@ int bDrawPow_until_t=0;
 int bDraw_plotPX_until_t=0;
 color cc;
 float mA_avg=-1;
+
+
 public void draw()
 {
 	if(bSkipEvent && millis()>bSkipEvent_off_t) bSkipEvent=false;
 
 	background(gColorBg);
+
 	//---------------------------------------- RGB option state
 	noStroke();
 	fill(rCh?255:0, gCh?255:0, bCh?255:0); 
-  final int RGB_indicator_x0=515;
+	final int RGB_indicator_x0=515;
 	if(rCh)	ellipse(0+RGB_indicator_x0, 525, 8, 8);
 	if(gCh)	ellipse(30+RGB_indicator_x0, 525, 8, 8);
 	if(bCh)	ellipse(60+RGB_indicator_x0, 525, 8, 8);
@@ -1020,7 +1055,7 @@ public void draw()
 	{
 		int sim_NUM_LEDS=settingsVals.get("NUM_LEDS").value;
 		int sim_NUM_LEDS_arr_size=sim_NUM_LEDS*3;
-		if(plotPX==null)  plotPX=new PlotPX(60, height/2, width-widthNormal,height/2, widthNormal,height/2);
+		if(plotPX==null) plotPX_create();
 
 //------------- effect  eff_set2.h eff_sin
 		for (int i=0; i<sim_NUM_LEDS; i++) //clear
@@ -1039,7 +1074,7 @@ public void draw()
 
 
 
-		int matrixW=plotPX.matrix_px_per_row;
+		int matrixW=plotPX.matrix_leds_per_row;
 		int rowE=plotPX.matrix_rowsE;	
 
 		int effN=settingsVals.get("effN").valueSlider.getValueI();
@@ -1188,9 +1223,13 @@ public void draw()
 	}
 
 
-			if(bDebugXY)		{	fill(255, 0, 0);	text(mouseX, mouseX, mouseY);		text(mouseY, mouseX, mouseY+30);		}
+	if(bDebugXY)
+	{
+		fill(255, 0, 0);	
+		text(mouseX, mouseX, mouseY);		
+		text(mouseY, mouseX, mouseY+30);
+	}
 }
-
 
 
 
@@ -1315,10 +1354,65 @@ void mouseClicked() {
 }
 
 
+boolean bdebugK=false;
+boolean bdebugS=false;
+boolean bdebugC=false;
+
+void keyReleased() {
+ // print(key); print("\t");
+ // println(keyCode);
+	if(plotPX!=null && plotPX.DrawLEDs_currentPoint<NUM_LEDS_slider_startup)
+	{
+			if( (keyCode == SHIFT || keyCode == CONTROL) )
+			{
+				plotPX.bDrawLEDs_on=false;
+			}
+	}
+}
 
 
 void keyPressed() {
+	//https://jogamp.org/deployment/jogamp-next/javadoc/jogl/javadoc/com/jogamp/newt/event/KeyEvent.html
+	//https://docs.oracle.com/javase/6/docs/api/java/awt/event/KeyEvent.html
+	//print(key); print("\t");
+	//print(keyCode); println("pressed \t");
+ 
 	if (key == CODED) {
 		if (keyCode == CONTROL)		bDebugXY = !bDebugXY;
 	}
+
+  if(plotPX!=null && plotPX.bDrawLEDs_customGeometry_paint && plotPX.DrawLEDs_currentPoint<NUM_LEDS_slider_startup)
+  {
+	if(keyCode == DELETE)
+	{
+		plotPX.DrawLEDs_currentPoint=0;
+	}
+				
+	if (key == CODED) {
+			if(millis()>plotPX.DrawLEDs_next_t) //time lapsed && already drawn 
+			{
+				if (keyCode == SHIFT )
+				{
+						plotPX.bDrawLEDs_freq=55;
+
+						plotPX.bDrawLEDs_on=true;
+				}
+				else if (keyCode == CONTROL) 
+				{
+						plotPX.bDrawLEDs_freq=111;
+
+						plotPX.bDrawLEDs_on=true;
+				}
+		
+			}
+		}
+	}
+	//TODO
+	//f5 save DrawLEDs
+	//f12 save scr
+	//f11 save led hist img
+	//f4 copy current eff
+	//f3 copy current eff HTML
+	//ins add  current eff  to kit
+
 }

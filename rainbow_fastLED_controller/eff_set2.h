@@ -104,7 +104,7 @@ void fillFadeChangeAll_beatsin8()
 void fadeEvenUneven()
 {
   ibright=beatsin8(effSpeed,0,255);
-  byte ibright2=beatsin8(effSpeed,0,255,0,effLength);
+  byte ibright2=beatsin8(effSpeed,0,255,0,effLength); //w phase offset
 
   if(ibright<4)
   {
@@ -334,7 +334,7 @@ void mover_lim_mark()
 }
 
 
-void eff_sin() //!!fix not as in sim
+void eff_sin_R_G_B() //!!fix not as in sim
 {
 	for (NUM_LEDS_type i=0; i<NUM_LEDS; i++)
 	{

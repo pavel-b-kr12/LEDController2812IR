@@ -25,12 +25,16 @@
 
 //-------------------- ESP32  in arduino IDE select DOIT ESP32 devkit
 //#define ESP32_SHOW_USBWiFi  
-#define ESP32_SHOW_USB
+//#define ESP32_SHOW_USB
 //#define ESP32_SHOW_WiFi
 //#define ESP32_HTML_NO_RENDER //test on PC, control from USB app and WiFi HTML page
 
+//#define ESP32_SHOW_USB_test
+#define ESP8266_SHOW_USB_test
+
 //#define Cube4MCU // ESP32 server ( see code of render nodes in render_WiFi folder )
 //#define Cube3MCU_w_also_serverDraw //it also #define Cube4MCU  ,TODO probably have to split out. 
+//#define Cube3MCU_12p
 //#define hadrware_3btn_ESP
 //#define hadrware_3btn_nano
 //#define hadrware_1btn_1pot_nano
@@ -39,21 +43,16 @@
 	#define effN_test_RF 244 //effect to show packet loss //also this number is in switch_slot.h
 	//#define startLoadEffN 18//220//11//71//152//71,72=CubeTest	35 218 //220=CubeCornersLight		209=mus_arduinoFFT //21//effN_test_RF //151=setColors_fill
 
-
 //#define LEDs_RENDER //show to connected LEDs stripe connected to this MCU 
-
-
 //#define WiFi_SEND //send leds array to connected WiFis, also enables #define use_ESP
-
 //#define WiFi_ControlHTMLpage
 //#define SerialControl
 //#define tstFPS //if defined, by  default: send only FPS, bPrintPixels=false; , You can enable Print in GUI
-
 //#define SerialSpeed		921600 //1000000 921600 // 921600 is max for esp32 cp2102 //1M=250FPS@60LED //115200 =25FPS@60LED //57600
-
-
 //#define sound_p					39//36 //A0 //esp32: 36==GPIO36=="VP"==14   39==GPIO39=="VN"
 //#define LEDpCustom				0
+
+
 #define FASTLED_ESP8266_RAW_PIN_ORDER
 
 	//#define tstFPS
@@ -208,6 +207,48 @@
 	#define default_effN_Random
 						#define tst_BRIGHTNESS		88
 	#define gDelayMore	25
+#elif defined(ESP32_SHOW_USB_test)
+	#define startLoadEffN 215
+	#define use_ESP32
+	//#define WiFi_ControlHTMLpage
+	#define use_ESP_WiFioff
+	#define SerialControl
+	#define SerialSpeed		921600
+	//#define sound_p					39
+	#define tstFPS
+	#define LEDs_RENDER
+	#define gNUM_LEDS 			120// 30 60 120 144 150 180 240 300 145*12
+	#define NUM_LEDS_type 		uint16_t //byte uint16_t
+	//#define save_load_enable
+	//#define demo_enable
+	#define LEDp					6 //36 nw
+	//#define MULTIPLE_PINS2 //4 5 13 14 (GPIO, marks on board)
+	//byte random_demo_sw_speed_td_m=2; //s  //!!
+	//byte random_demo_sw_speed_td_M=15;
+	//#define default_effN_Random
+						#define tst_BRIGHTNESS		25
+	#define gDelayMore	5
+#elif defined(ESP8266_SHOW_USB_test)
+	#define startLoadEffN  214//215
+	#define use_ESP8266
+	//#define WiFi_ControlHTMLpage
+	//#define use_ESP_WiFioff
+	#define SerialControl
+	#define SerialSpeed		921600 //1000000
+	//#define sound_p					39
+	#define tstFPS
+	#define LEDs_RENDER
+	#define gNUM_LEDS 		300	//105// 30 60 120 144 150 180 240 300 145*12
+	#define NUM_LEDS_type 		uint16_t //byte uint16_t
+	//#define save_load_enable
+	//#define demo_enable
+	#define LEDp					4 //36 nw
+	//#define MULTIPLE_PINS2 //4 5 13 14 (GPIO, marks on board)
+	//byte random_demo_sw_speed_td_m=2; //s  //!!
+	//byte random_demo_sw_speed_td_M=15;
+	//#define default_effN_Random
+						#define tst_BRIGHTNESS		25
+	#define gDelayMore	5
 #elif defined(ESP32_SHOW_WiFi)
 	#define use_ESP32
 
@@ -399,6 +440,38 @@
 		#define CubeZp		14
 		#define LEDs_RENDER
 	#endif
+
+#elif defined(Cube3MCU_12p)
+	#define Cube4MCU
+	#define use_ESP32
+//#define WiFi_SEND
+//#define WiFi_ControlHTMLpage
+//#define WiFi_ControlHTMLpage_switch_p	32	//GPIO32==IO32==Touch9			//touchRead(T9); th=~30 //!! action btn
+
+				//#define SerialControl
+				//#define tstFPS
+	#define SerialSpeed		921600
+
+	//#define sound_p					39
+
+	#define NUM_LEDS_edge 		145//12//145//24//145
+	#define NUM_LEDS_mcu 		NUM_LEDS_edge*3
+	#define NUM_LEDSall 		NUM_LEDS_mcu*4
+	#define gNUM_LEDS			NUM_LEDSall
+
+	#define NUM_LEDS_type 		uint16_t
+#define save_load_enable
+#define demo_enable
+				//#define BlueFilter
+				//#define tst_BRIGHTNESS 		22
+	byte random_demo_sw_speed_td_m=2; //s  //!!
+	byte random_demo_sw_speed_td_M=12;
+
+	//#define NUM_LEDS_adjustable //!del
+
+#define LEDs_RENDER
+#define	MULTIPLE_PINS12
+
 #else
 	/*
 	#define LEDpCustom				2//2  //this redefine any. del to use reference hardware schematics  //2 == D4 on NODEMCU v3 when FASTLED_ESP8266_RAW_PIN_ORDER
@@ -459,7 +532,7 @@
 */
 #endif
 
-#if gNUM_LEDS<=255 // NUM_LEDS_type==byte  //not working this way 2F##
+#if gNUM_LEDS<256 // NUM_LEDS_type==byte  //not working this way 2F##
 	#define random8or16	random8
 	#define beat8or16	beat8
 #else
@@ -1178,7 +1251,7 @@ void setup()
 	//TODO  CubeLEDsFill_setup(); //ptr arrs
 	#endif
 	#ifdef LEDs_RENDER
-		#if defined(MULTIPLE_PINS2)
+		#if defined(MULTIPLE_PINS2) //pins 12-19,0,2,3,4,5,21,22,23
 			FastLED.addLeds<LEDchipType, 4, GRB>(leds, 0, gNUM_LEDS/2);
 			FastLED.addLeds<LEDchipType, 5, GRB>(leds, gNUM_LEDS/2,gNUM_LEDS/2);
 		#elif defined(MULTIPLE_PINS4)
@@ -1195,6 +1268,37 @@ void setup()
 			FastLED.addLeds<LEDchipType, 14, GRB>(leds, gNUM_LEDS/8*5,gNUM_LEDS/8);
 			FastLED.addLeds<LEDchipType, 15, GRB>(leds, gNUM_LEDS/8*6,gNUM_LEDS/8);
 			FastLED.addLeds<LEDchipType, 16, GRB>(leds, gNUM_LEDS/8*7,gNUM_LEDS/8);
+		#elif defined(MULTIPLE_PINS12)
+				// FastLED.addLeds<LEDchipType, 2, GRB>(leds, gNUM_LEDS/12*0,gNUM_LEDS/12);
+				// FastLED.addLeds<LEDchipType, 3, GRB>(leds, gNUM_LEDS/12*0,gNUM_LEDS/12);
+				// FastLED.addLeds<LEDchipType, 4, GRB>(leds, gNUM_LEDS/12*0,gNUM_LEDS/12);
+				// FastLED.addLeds<LEDchipType, 5, GRB>(leds, gNUM_LEDS/12*0,gNUM_LEDS/12);
+				// FastLED.addLeds<LEDchipType, 6, GRB>(leds, gNUM_LEDS/12*0,gNUM_LEDS/12);
+				// FastLED.addLeds<LEDchipType, 21, GRB>(leds, gNUM_LEDS/12*0,gNUM_LEDS/12);
+				// FastLED.addLeds<LEDchipType, 22, GRB>(leds, gNUM_LEDS/12*0,gNUM_LEDS/12);
+				// FastLED.addLeds<LEDchipType, 23, GRB>(leds, gNUM_LEDS/12*0,gNUM_LEDS/12);
+				// FastLED.addLeds<LEDchipType, 12, GRB>(leds, gNUM_LEDS/12*0,gNUM_LEDS/12);
+				// FastLED.addLeds<LEDchipType, 13, GRB>(leds, gNUM_LEDS/12*0,gNUM_LEDS/12);
+				// FastLED.addLeds<LEDchipType, 14, GRB>(leds, gNUM_LEDS/12*0,gNUM_LEDS/12);
+				// FastLED.addLeds<LEDchipType, 15, GRB>(leds, gNUM_LEDS/12*0,gNUM_LEDS/12);
+
+			FastLED.addLeds<LEDchipType, 23, GRB>(leds, gNUM_LEDS/12*0,gNUM_LEDS/12);
+			FastLED.addLeds<LEDchipType, 22, GRB>(leds, gNUM_LEDS/12*1,gNUM_LEDS/12);
+			FastLED.addLeds<LEDchipType, 3, GRB>(leds, gNUM_LEDS/12*2,gNUM_LEDS/12);
+
+			FastLED.addLeds<LEDchipType, 21, GRB>(leds, gNUM_LEDS/12*3,gNUM_LEDS/12);
+			FastLED.addLeds<LEDchipType, 19, GRB>(leds, gNUM_LEDS/12*4,gNUM_LEDS/12);
+			FastLED.addLeds<LEDchipType, 18, GRB>(leds, gNUM_LEDS/12*5,gNUM_LEDS/12);
+
+			FastLED.addLeds<LEDchipType, 5, GRB>(leds, gNUM_LEDS/12*6,gNUM_LEDS/12);
+			FastLED.addLeds<LEDchipType, 17, GRB>(leds, gNUM_LEDS/12*7,gNUM_LEDS/12);
+			FastLED.addLeds<LEDchipType, 16, GRB>(leds, gNUM_LEDS/12*8,gNUM_LEDS/12);
+
+			FastLED.addLeds<LEDchipType, 4, GRB>(leds, gNUM_LEDS/12*9,gNUM_LEDS/12);
+			FastLED.addLeds<LEDchipType, 2, GRB>(leds, gNUM_LEDS/12*10,gNUM_LEDS/12);
+			FastLED.addLeds<LEDchipType, 2, GRB>(leds, gNUM_LEDS/12*11,gNUM_LEDS/12);
+
+
 
 		#elif defined(server_render) //use server as 4th render node Cube
 			FastLED.addLeds<LEDchipType, CubeXp, GRB>(leds,NUM_LEDS_mcu*3, NUM_LEDS_edge);

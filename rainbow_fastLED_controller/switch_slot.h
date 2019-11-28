@@ -118,7 +118,7 @@ case 69:anim_f=RunningLights; effSpeed=123; break; //!!	//not168 not328
 #ifdef Cube4MCU
 case 70:anim_f=CubeCornersLight;				 break;					//not168 not328
 case 71:anim_f=CubeTest;				 break;					//not168 not328
-case 72:anim_f=CubeTest2;				 break;					//not168 not328
+//case 72:anim_f=CubeTest2;				 break;					//not168 not328
 
 
 case 72:anim_f=matrixCube2; clear_leds();	break;		// random 	//not168 not328 //:) //cu
@@ -157,7 +157,7 @@ case 88:anim_f=pulse_one_color_all_rev;	thishue = 0; break;	//:/	//---PULSE COLO
 case 90:anim_f=radiation;	thishue = 95; break;		//:/ //---RADIATION SYMBOL	//not168 not328
 
 ////case 91:anim_f=white_temps; break;	//:/	//not168 not328
-case 92:anim_f=sin_bright_wave;	thishue = 180; break;	//:/ //oo //!fix 	//not168 not328
+
 ////case 93:anim_f=pop_horizontal;	break;		//!fix 255 		//---POP LEFT/RIGHT moving LED	//not168 not328
 ////case 94:anim_f=quad_bright_curve;		effSpeed=0;	effLength=17; break;	//:/		//---QUADRATIC BRIGHTNESS CURVE / полумесяц	//not168 not328
 case 95:anim_f=flame; break; //!fix big
@@ -185,8 +185,7 @@ case 102:anim_f=mover_lim_mark;	effSpeed=252;	effFade=239;   	indexOrBits=221;	g
 
 
 //case 108:anim_f=Twinkle; twinkrate=100;gDelay=10;thisfade=8;thishue=50;thissat=255;thisbri=255;randhue=1;gDelay=0; break; //:/ //demonstrates blend two animations running at same time	//not168 not328
-case 109:anim_f=beatWave; effSpeed=(24-10)*10;	currentPalette = RainbowColors_p;  break;  // combines coloured wave values from several beatsin8() functions
-case 110:anim_f=blendwave;		effLength=1;	break; //:/ //! //uses beats, blend and the fill gradient functions to blend a couple of waves together	//not168 not328
+
 case 111:anim_f=confetti2;		effSpeed = 8; thishue = 50; thisinc = 1; thissat = 100; thisbri = 255; huediff = 256; break;	//not168 not328
 case 112:anim_f=confetti2_demo;		 gDelay=5; break;
 case 113:anim_f=confetti_pal; 	effSpeed=(24-10)*10;	effLength = 8*8; thishue = 50; thisinc = 1; thissat = 100; thisbri = 255; huediff = 256; gDelay = 5; currentPalette=HeatColors_p; break; //! crash
@@ -242,13 +241,6 @@ case 155:anim_f=splitModeEditor;	effLength=20; indexOrBits=0; effFade=0;	gDelay 
 
 //######
 case 157:anim_f=confetti_density;	effSpeed=4;	effLength=1;	effSpeedH=105;	effLengthH=171;	effFade=0;  break;	//not168 not328
-case 158:anim_f=eff_sin;	effSpeed=127;	effLength=14;		effLengthH=37;	 break;	//not168 not328
-case 159:anim_f=eff_sin;	effSpeed=37;	effLength=3;		effLengthH=3; break;	//not168 not328
-case 160:anim_f=eff_sin;	effSpeed=37;	effLength=85;		effLengthH=4; break;	//not168 not328
-
-
-case 161:anim_f=waveSmooth;	break;
-
 
 
 
@@ -306,16 +298,25 @@ case 211:anim_f=mus_arduinoFFT;	effSpeed=95;	effLength=96;	effSpeedH=124;	effLen
 //case 210:anim_f=mus_arduinoFFT;	effSpeed=50;	effLength=56;	effSpeedH=46;	effLengthH=5;	effFade=243;   indexOrBits=175;	break;
 #endif
 
+case 214:anim_f=kit_wand;	effSpeed=187;	effLength=128;		effFade=126;   	indexOrBits=141; break;
+
+
+case 215:anim_f=wave_adj;	effSpeed=168;	effLength=128;	effSpeedH=148;	effLengthH=221;	indexOrBits=10; break;
 case 216:anim_f=wave_H;		break; //:)
 //case 216:anim_f=wave_H;	effSpeed=32;	effLength=99;	effSpeedH=157;	effLengthH=140;	effFade=118;    indexOrBits=27;	effRGB=9; break;
 //case 216:anim_f=wave_H;	effSpeed=32;	effLength=99;	effSpeedH=157;	effLengthH=140;	effFade=118;    indexOrBits=27;	effRGB=17; break;
-
 case 217:anim_f=gen_wave_H_moveAll;	effSpeed=20;	effLength=152;	effSpeedH=123;	effLengthH=70;	effFade=109;    indexOrBits=104;	gDelay=10; break;
 //case 218:anim_f=gen_wave_H_moveAll_blinkRand;	break;
-
 case 218:anim_f=gen_wave_H_moveAll_blinkRand;	effSpeed=161;	effLength=74;	effSpeedH=151;	effLengthH=167;	effFade=245;    indexOrBits=54; gDelay=30; break;
-
 case 219:anim_f=gen_wave_H_v2_moveAll_blinkRand;	effSpeed=5;	effLength=181;	effSpeedH=7;	effLengthH=58;	effFade=100;    gColor=CRGB(146,0,0);	indexOrBits=19;	gDelay=10; break;
+case 92:anim_f=sin_bright_wave;	thishue = 180; break;	//:/ //oo //!fix 	//not168 not328
+case 158:anim_f=eff_sin_R_G_B;	effSpeed=127;	effLength=14;		effLengthH=37;	 break;	//not168 not328
+case 159:anim_f=eff_sin_R_G_B;	effSpeed=37;	effLength=3;		effLengthH=3; break;	//not168 not328
+case 160:anim_f=eff_sin_R_G_B;	effSpeed=37;	effLength=85;		effLengthH=4; break;	//not168 not328
+case 161:anim_f=waveSmooth;	break;
+case 109:anim_f=beatWave; effSpeed=(24-10)*10;	currentPalette = RainbowColors_p;  break;  // combines coloured wave values from several beatsin8() functions
+case 110:anim_f=blendwave;		effLength=1;	break; //:/ //! //uses beats, blend and the fill gradient functions to blend a couple of waves together	//not168 not328
+
 //==============================================================================================================================
 
 

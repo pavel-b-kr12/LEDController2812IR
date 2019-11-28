@@ -114,6 +114,7 @@ void (*anim_f_last)();
 #include "eff_set_cel.h"
 #include "eff_set_interactive.h"
 
+
 #ifdef WiFi_SEND
 	void test_RF(){ fill_rainbow( leds, NUM_LEDS, i_eff, NUM_LEDS); } //# ifdef  wifi
 #endif
@@ -195,6 +196,8 @@ uint16_t sampleavg = 0;                                                         
  #include "eff_matrix.h"
 #endif
 
+
+#include "eff_set_wand.h" //it uses effect from above includes
 
 //------------------------snd
 //#include "eff_setAT\fht_log.h" //for atm328
@@ -795,7 +798,7 @@ i_Square=-1;
 		//!! show_at_max_brightness_for_power();
 	#endif
 	#if defined(WiFi_SEND)
-		//######## send_LEDs_over_WiFi();
+		send_LEDs_over_WiFi();
 	#endif
 
 	i_eff++;	//if(i_eff>effLength) i_eff=0; //!!!#  i_eff%effLength	i_eff_M_is_effLength

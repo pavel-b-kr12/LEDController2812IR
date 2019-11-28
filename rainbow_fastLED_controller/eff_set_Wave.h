@@ -1,5 +1,5 @@
 //http://fastled.io/docs/3.1/group__lib8tion.html
-
+//https://github.com/FastLED/FastLED/wiki/FastLED-Wave-Functions
 
 void wave_H() //!fix разрыв
 {
@@ -30,7 +30,6 @@ void gen_wave_H_moveAll() //!fix разрыв
 		case 0: val= sin8(idex16*255/effLengthH); break;
 		case 1: val= random8(0, sin8(idex*255/effLengthH) ); break;
 		case 2: val= idex16%(2560/effLengthH); break;
-
 	}
 	
 	leds[0]=CHSV(effSpeedH + ( indexOrBits<250?effSpeedH:gHue/16 ) ,255,	val);
@@ -120,7 +119,6 @@ void gen_wave_H_moveAll_blinkRand() //!fix разрыв
 
 void gen_wave_H_v2_moveAll_blinkRand() //!fix разрыв
 {
-
 	moveOutAllRemainFirst();
 	byte val=0;
 	switch((indexOrBits/10)%5)
@@ -137,12 +135,11 @@ void gen_wave_H_v2_moveAll_blinkRand() //!fix разрыв
 	leds[0]=CHSV(gColor.r + gHue/(1+effLengthH ) ,88,	val);
 	leds[0] .fadeToBlackBy( beatsin8(40+effLength,0,1+effSpeedH*0.9) );
 
-	if( i_eff%(1+effFade/32)<2 )
-	for (int i = 20; i < NUM_LEDS; ++i)
+	if( i_eff%(1+effFade/32)<2 ) 
+	for (int i = 20; i < NUM_LEDS; ++i) //fade one side of stripe
 	{
 		 leds[i].fadeToBlackBy( 1 );
 	}
-
 
 	// 	if(effLength<128)
 	// {
@@ -150,9 +147,38 @@ void gen_wave_H_v2_moveAll_blinkRand() //!fix разрыв
 	// }
 }
 
+
+long millis_last=0;
+float posX_f=0;
+void wave_adj() //!fix разрыв
+{
+	float dx=((millis()-millis_last) )*(effSpeed/128.-1.);
+	posX_f+=dx;
+	millis_last=millis();
+	
+	for (int i = 0; i < NUM_LEDS; ++i)
+	{
+		 
+		 int v_arg=(NUM_LEDS_type)posX_f +  i*effLength/16;
+		 byte v=255;
+		 
+		switch(indexOrBits%4) //!opt   to function ptr
+		{
+			case 0: v = sin8( v_arg ); break;
+			case 1: v = sin8( v_arg ); v=v*v/255; break;
+			case 2: v = sin8( v_arg ); v=(byte)(pow(((float)v)/255.,0.5)*255); break;
+			
+			case 3: v = triwave8( v_arg ); break;
+			case 4: v = quadwave8( v_arg ); break;
+			case 5: v = cubicwave8( v_arg ); break;
+		}
+		
+		leds[i]=CHSV(effLengthH+ (sin8(millis()/200)/10-12), effSpeedH, v ); 
+	}
+}
+
 /*
 попроще, и посложнее
 youtu.be/uwffJtgg3BI
 youtube.com/watch?v=fBmtSmy2CPQ
-вариаций много. Может выбрать по этим видео, указав на время. Могу снять видео с реальной рентой или дать ему "макет"
 */

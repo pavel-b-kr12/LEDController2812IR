@@ -1,4 +1,8 @@
 
+	  // CHSV hsv=rgb2hsv_approximate(leds[Pixel]);
+	  // hsv.h+=effLengthH;
+	  // leds[Pixel]=hsv;
+	  
 unsigned int crc32b(unsigned char *message) {
    int i, j;
    unsigned int byte, crc, mask;
