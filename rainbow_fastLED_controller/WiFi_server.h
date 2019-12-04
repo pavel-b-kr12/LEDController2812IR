@@ -25,20 +25,87 @@ IPAddress local_ip(192,168,4,1);
 IPAddress gateway(192,168,4,1);
 IPAddress subnet(255,255,255,0);
 
-String SendHTML()
-{
-#include "HTML_settings.h" //not work as .html , not work as R( #incl )
-	return str;
-}
+// String SendHTML()
+// {
+// #include "HTML_settings.h" //not work as .html , not work as R( #incl )
+	// return str;
+// }
 
 //int get_sett_increment(String nm, int& ) //!
 
 void handle_OnConnect() {
-	server.send(200, "text/html", SendHTML()); 
+
+	#include "HTML_settings.h" //not work as .html , not work as R( #incl )
+	server.send(200, "text/html", str); 
+	//@https://esp8266.ru/forum/threads/kak-otpravit-ot-http-servera-web-server-na-esp8266-html-otvet-v-brauzer-kompjutera-fajlom.3136/
+	//https://gist.github.com/spacehuhn/6c89594ad0edbdb0aad60541b72b2388
+	//https://stackoverflow.com/questions/16348031/disable-scrolling-when-touch-moving-certain-element
+
+
+//nw (not send 2nd part
+/* split str with	
+	)HTM";
+const String str2=R"HTM(
+*/
+	// server.setContentLength(str.length() + str2.length());
+	// server.send(200,"text/html",str);       //Initial send includes the header
+	// server.sendContent(str2);              //Any subsequent sends use this function
 }
 
 void handle_NotFound(){
 	server.send(404, "text/plain", "404");
+}
+
+void handle_pwm() {
+	String arg = server.arg("pp");
+	if(arg.length() != 0)
+	{
+		int val=arg.toInt();
+
+	for(byte p=0;p<16;p++)
+	{	
+		int mask = 1 << p; // gets the 6th bit
+
+		if ((val & mask) != 0) {
+			leds[p]=CRGB::Orange;
+			//enable PWM // bit is set
+		} else {
+			leds[p]=CRGB::Blue;
+			//off PWM // bit is not set
+		}
+		FastLED.show(); anim_next_t=millis()+500;
+
+	}
+	}
+	/*
+	#ifdef returnToClient
+	server.send(200, "text/html", 
+	
+	"effN="+(String)effN+
+	",effSpeed="+(String)effSpeed+
+	",effSpeedH="+(String)effSpeedH+
+	",effLength="+(String)effLength+
+	",effLengthH="+(String)effLengthH+
+	",effRGB="+(String)effRGB+
+	",effFade="+(String)effFade+
+	// "gH;
+	// "gS;
+	// "gV;
+	//",gColor="+(String)
+	//",gColorBg="+(String)
+	",gFade="+(String)gFade+
+	",indexOrBits="+(String)indexOrBits+
+	",gDelay="+(String)gDelay+
+	",gBrightness="+(String)gBrightness+
+	",NUM_LEDS="+(String)n
+	
+	); //';' not working as separator, it became ','
+	#endif
+	*/
+}
+
+void handle_pin_sequencer() {
+	
 }
 
 void handle_sett() {
@@ -209,11 +276,13 @@ void handle_p() {
 }
 
 
-#ifdef WiFi_ControlHTMLpage_switch_p
+#ifdef WiFi_ControlHTMLpage_switch_p //switch WiFi with btn
 #define LED_onBoard_p		2 //HTML server status //ESP32 = 2
 //bool LED_onBoard_active=false;
 bool bServerOn=false; // ##release## false so it not affect/ed by possible(?) net problems
 long nextCanCheckBtn_t=1000;
+#elif defined(offWiFiAfter2min) //switch WiFi off automatically
+bool bServerOn=true;
 #endif
 
 void setupHTML() {
@@ -222,6 +291,8 @@ void setupHTML() {
 
 	server.on("/", handle_OnConnect);
 	server.on("/sett", handle_sett);
+	server.on("/pwm", handle_pwm);
+	server.on("/pin_sequencer", handle_pin_sequencer);
 	server.on("/p", handle_p);
 	server.onNotFound(handle_NotFound);
 	
@@ -263,15 +334,24 @@ void loopHTML()
 		// LED_onBoard_active=!LED_onBoard_active; //blink
 
 	}
-	
-	if(bServerOn)
-	#endif
+
+	if(bServerOn) server.handleClient();
+	#elif defined( offWiFiAfter2min)
+		if(bServerOn)
+		{
+			if(millis()<2*60*1000) server.handleClient();
+			else
+			{
+				 server.stop();
+				 bServerOn=false;
+			}
+		}
+	#else
 		server.handleClient();
+	#endif
 }
 #endif
 //=========================================================================================
-
-
 byte WiFi_chennel = 7; //change if byzy //! autoselect
 
 #if defined(WiFi_SEND)
@@ -300,7 +380,6 @@ byte WiFi_chennel = 7; //change if byzy //! autoselect
 	//IPAddress clientIP(192, 168, 4, 20);//239, 255, 255, 250);
 	IPAddress ip_renders[NUM_CLIENTS];
 #endif
-
 
 void setup_wifi()
 {

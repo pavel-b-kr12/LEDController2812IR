@@ -197,7 +197,22 @@ uint16_t sampleavg = 0;                                                         
 #endif
 
 
-#include "eff_set_wand.h" //it uses effect from above includes
+#ifdef PWM_enabled
+#include "eff_set_PWM_Dimmer.h"
+#endif
+#ifdef PinSequencer_enabled
+#include "eff_set_PinSequencer.h"
+#endif
+#ifdef mode_switch_enabled
+#include "eff_mode_switch.h"
+#endif
+
+
+
+#include "eff_set_wand.h" //it uses effect from above includes //! include?
+
+#include "eff_kit_DemoReel100m.h"
+
 
 //------------------------snd
 //#include "eff_setAT\fht_log.h" //for atm328
@@ -261,6 +276,10 @@ void randomSet()
 byte effNt=0;
 void change_slot(byte effSlot)
 	{
+		#ifdef off_change_slot_After2min
+			if(millis()>2*60*1000) return;
+		#endif
+		
 	effRGB=0;
 	gDelay=5; //!tst //0 good always when #define gDelayMore to avoid serial bandwidth bug
 	idex=0; idex16 = 0;
@@ -280,7 +299,7 @@ void change_slot(byte effSlot)
 	 }
 	 else
 	  switch (effSlot) {
-		#include "switch_slot.h"
+		#include SLOTS_FILE_H
 
 //this N related to button in USB app
 #define effN_off 10 //clear, nodo()
@@ -432,7 +451,7 @@ void DisableChennel(int i, byte chen)
 	if(chen==3 ||chen==6||chen==4)		leds[i].b=0; 
 }
 
-long anim_next_t=0;
+
 long animHue_next_t=0;
 
 

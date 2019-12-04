@@ -232,9 +232,9 @@ public void button_sim_click(GButton source, GEvent event) { //_CODE_:button_sim
 } //_CODE_:button_sim:689176:
 
 public void btn_copy_switch_nms_click(GButton source, GEvent event) { //_CODE_:btn_copy_switch_nms:419833:
-  
-String s="const linksNames =[";
-boolean bNotFirts=false;
+ HashMap<String,Integer> sameEffects = new HashMap<String,Integer>();
+ String s="const linksNames ={";
+ boolean bNotFirts=false;
   for(int i=0;i<255;i++)
   {
     if(EffNmsQuality[i]==null || EffNmsQuality[i]>2) continue; //skip bugged and boring: 1 = all, all-1 = best, +1 - not interesting, +2 buggy //TODO GUI
@@ -246,10 +246,22 @@ boolean bNotFirts=false;
       {
         s+=",";
       } else bNotFirts=true;
-      s+="['"+nm+"',"+Integer.toString(i)+"]";
+	  
+	  
+	  if(sameEffects.containsKey(nm)) //make names unique
+	  {
+		sameEffects.put(nm,  sameEffects.get(nm)+1);
+		nm+= String.valueOf(sameEffects.get(nm));
+	  }
+	  else
+	  {
+		sameEffects.put(nm,  0);
+	  }
+      s+="'"+nm+"':"+Integer.toString(i);
+      //s+="['"+nm+"',"+Integer.toString(i)+"]";
      }
   }
-    s+="];";
+ s+="};";
 
   copyToClipboard(s);
 } //_CODE_:btn_copy_switch_nms:419833:

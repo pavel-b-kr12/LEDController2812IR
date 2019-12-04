@@ -298,6 +298,8 @@ case 211:anim_f=mus_arduinoFFT;	effSpeed=95;	effLength=96;	effSpeedH=124;	effLen
 //case 210:anim_f=mus_arduinoFFT;	effSpeed=50;	effLength=56;	effSpeedH=46;	effLengthH=5;	effFade=243;   indexOrBits=175;	break;
 #endif
 
+
+case 213:anim_f=DemoReel101; indexOrBits=5; gDelay=5;  break;// indexOrBits/4==0 demo
 case 214:anim_f=kit_wand;	effSpeed=187;	effLength=128;		effFade=126;   	indexOrBits=141; break;
 
 
@@ -346,10 +348,21 @@ case 234:anim_f=random_len_cell_seemless;				 break;			//:)	//not168 not328
 // case 241:anim_f=demo_modeA; break;			 //! short
 // case 242:anim_f=demo_modeB; break;			 //! long
 
+
+#ifdef PWM_enabled
+case 239: anim_f=PWM_Dimmer; bPWM_Dimmer=!bPWM_Dimmer;  effLength=50; gDelay=40; break;
+#endif
+#ifdef PinSequencer_enabled
+case 240: anim_f=PinSequencer;  break;
+#endif
+#ifdef mode_switch_enabled
+case 241: anim_f=mode_switch;  break;//toggle PWM_Dimmer, PinSequencer if it defined 
+#endif
+
 #ifdef remap_LEDs
 
 //fillStriped is placeholder for name parsing TODO another get name method for this case 
-//case 240: anim_f=fillStriped; bMap_type=(bMap_type==0)?indexOrBits%4:0;			 break; //toggle sw  //not168 not328 //!! TODO parce name is USB app
+//case 242: anim_f=fillStriped; bMap_type=(bMap_type==0)?indexOrBits%4:0;			 break; //toggle sw  //not168 not328 //!! TODO parce name is USB app
 case 242: anim_f=fillStriped; bMap_type=(bMap_type==0)?bMap_type_matrix_zigZag_h:0; break;
 case 243: anim_f=fillStriped; bMap_type=(bMap_type==0)?bMap_type_matrix_spiral_cw:0; break;
 case 244: anim_f=fillStriped; bMap_type=(bMap_type==0)?bMap_type_matrix_labyrinth_cw:0; break;

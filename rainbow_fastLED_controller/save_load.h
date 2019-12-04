@@ -16,30 +16,29 @@ const byte save_addr_start = 4;
 void saveAfter2s();
 
 
-void save(byte N) //to slot N 0...9
+void save(byte N) //to slot N 0...9 // 10*19b
 {
 	byte effNum=bCurrentEff_IsRandom_AndNotSlotN?realEffN:effN;
-
-				#ifdef tst
-					Serial.print("save slot: "); Serial.print(N); Serial.print(" effN: "); Serial.println(effNum);
-					if(effNum<11 || effNum==240 || N>9) 
-					{
-						Serial.println("no save ifdef tst");	return; //!opt del
-					}
-				#endif
+							#ifdef tst
+								Serial.print("save slot: "); Serial.print(N); Serial.print(" effN: "); Serial.println(effNum);
+								if(effNum<11 || effNum==240 || N>9) 
+								{
+									Serial.println("no save ifdef tst");	return; //!opt del
+								}
+							#endif
 
 	//if(effN<10) return; //0-9 is slots, bot not effects //this for update old written, normally it can't occur
 
 	#ifndef use_EEPROMex		//https://arduino-esp8266.readthedocs.io/en/latest/libraries.html?highlight=eeprom%20
 		EEPROM.begin(512); 		//https://arduino.stackexchange.com/questions/25945/how-to-read-and-write-eeprom-in-esp8266
 		EEPROM.put(EEPROM_saved_flag_addr,saveFormat_currentVersion); //this update if different
-				#ifdef tst2
-					EEPROM.commit();
-					Serial.print("save ver:");  Serial.print(saveFormat_currentVersion);
-					Serial.print(" size: ");  Serial.print(sizeof(oostr));
-					byte vers=0;	EEPROM.get(EEPROM_saved_flag_addr,vers);
-					Serial.print(" check ver: "); Serial.println(vers);
-				#endif
+							#ifdef tst2
+								EEPROM.commit();
+								Serial.print("save ver:");  Serial.print(saveFormat_currentVersion);
+								Serial.print(" size: ");  Serial.print(sizeof(oostr));
+								byte vers=0;	EEPROM.get(EEPROM_saved_flag_addr,vers);
+								Serial.print(" check ver: "); Serial.println(vers);
+							#endif
 		EEPROM.put(save_addr_start+N*sizeof(SaveObj),oostr);
 		EEPROM.commit();
 		EEPROM.end();
@@ -51,7 +50,6 @@ void save(byte N) //to slot N 0...9
 		EEPROM.updateByte(save_addr_start+N*5+2, effLength);
 		EEPROM.updateByte(save_addr_start+N*5+3, effRGB);
 	#endif
-
 }
 
 void load(byte N)
@@ -61,7 +59,7 @@ void load(byte N)
 											Serial.print("load slot:"); Serial.print(N);			if(N>9)  {Serial.println("!! >9"); return; }
 		#endif
 
-	#ifndef use_EEPROMex
+	#ifndef use_EEPROMex //for ESP8266 ESP32
 		EEPROM.begin(512);
 		byte vers=0;	EEPROM.get(EEPROM_saved_flag_addr,vers);
 											#ifdef tst
@@ -124,10 +122,10 @@ void saveAfter2s() //for slot 0
 void saveIfNeed()
 {
 	if(bNeedSave && millis()>nextCanSave_t)
-		{
-			save(0);
-			bNeedSave=false;
-		}
+	{
+		save(0);
+		bNeedSave=false;
+	}
 }
 
 #ifdef IRkeypad
@@ -144,4 +142,26 @@ void save_load_preset(byte N)
 		load(N);
 	}
 }
+#endif
+
+
+
+#ifdef PWM_enabled
+#if defined(use_ESP8266) || defined(use_ESP32)
+void savePWM()
+{
+	int addr_start= save_addr_start+10*sizeof(SaveObj)+10;
+	
+	EEPROM.put(addr_start,oSaveObjDimmers);
+	EEPROM.commit();
+	EEPROM.end();
+}
+void loadPWM()
+{
+	int addr_start= save_addr_start+10*sizeof(SaveObj)+10;
+	EEPROM.begin(512);
+	EEPROM.get(addr_start,oSaveObjDimmers);
+	EEPROM.end();
+}
+#endif
 #endif

@@ -1,10 +1,19 @@
 # Universal LEDController2812
 ![](USB_serial_control_settings.jpg)
 
-~~Simple~~ The most universal and flexible controller for LED stripes with support of IR, WiFi, serial, keypad shield LCD, 3 or 5-buttons, USB control. Can use arduino on atmega, ESP8266, ESP32 with ws2812b ws2811 and other that is supported by FastLED library.
+~~Simple~~ The most universal and flexible controller sofware for LED stripes with support of IR, WiFi, serial, keypad shield LCD, 3 or 5-buttons, USB control. Can use arduino on atmega, ESP8266, ESP32 with ws2812b ws2811 and other that is supported by FastLED library.
  Includes a lot of effects, tools to create collection and visualize it.
 
 ### if you have interesting effects or need some new - tell me
+
+### notable features
+*💎 save/load, quick access slots
+*💎 ESP8266, ESP32, atmega168, atmega328, atmega2560 .... support as NodeMCU, pro mini, nano, uno ...
+*💎 color by music or other input sensors
+*💎 plot power, power by color chennels, leds as your led assembly geometry 
+* lightweight binary Serial protocol and UDP WIFi
+*💎 send LEDs data or control over WiFi with external MCU's dedicated for rendering pixels
+*💎 test/debug effects and LEDs constructions (how it looks like in circle or cube) without LED stripes or without MCU at all.
 
 ### Сoncept
 There are save/load slots, many effects, each rich of settings.
@@ -74,10 +83,16 @@ Some effects and test modes eat a lot of memory - disable it and use "#define sa
 ### basic instructions
 0. Assemble the device
 1. Install USB-COM programmer driver e.g. CP2102
-2. use lightweight portable HEX uploader http://xloader.russemotto.com or compile from source
+2. use lightweight portable HEX uploader http://xloader.russemotto.com (for atmega) or ESP-upload tool, or compile from source
 ![Flashing with CP2102](Flashing_pro_mini_with_CP2102.jpg)
 3. Choose hex, port, type of controller 168/328/.. Upload
 4. Connect to stripe.
+## basic compile instructions
+0. choose ONE of hardware sets in .ino , e.g. #define ESP32_SHOW_USB
+1. find it 'ESP32_SHOW_USB' next in file and check LED pin and other options
+2. open switch_slot.h to add new effect
+3. try to use existing parameters from struct SaveObj
+4. test, and if it is awesome - email effect to me
 ### Cautions
 * Don't power stripe (e.g. longer than 15px with White light LEDs) through USB-programmer-controller boards. Disconnect "+" wire beetween stripe and controller or use separate power while connectiong USB
 * Check + - and max 5v .
@@ -85,17 +100,18 @@ Some effects and test modes eat a lot of memory - disable it and use "#define sa
 * Connect power AFTER all assembled with good GND wire connection
 * Don't see on bright Blue LEDs (or white because it is from Blue) while testing if you need your eyes for a long life. Use diffuser, dim power, itc.
 ### Hints
-* to maintain max quality (bit depth) regulate brightness not by program but via DC-DC down modules like XL4005 (without current limit)
+* to maintain max quality (bit depth) regulate brightness not by program FastLED.setBrightness but via DC-DC step down modules like XL4005 XL4015 (with or without current limit)
 * Brownout and other power problems add capacitor on power in and 3,3V output of LDO, change USB diode with low voltage drop diode https://github.com/nkolban/esp32-snippets/issues/168
+* to maintain low heat and power usage, awoid WS2815 and others 12v LEDs with resisors (resistors can be internal)
+### program Hints
+*case 0:
+{ //braces are necessary
+}
 
-### notable features
-*💎 save/load, quick access slots
-*💎 ESP8266 support
-*💎 color by music or other input sensors
-*💎 plot power, power by color chennels, leds
-* lightweight binary Serial protocol and UDP WIFi
-*💎 send LEDs data or control over WiFi with external MCU's dedicated for rendering pixels
-*💎 test effects and LEDs constructions (how it looks like in circle or cube) without LED stripes or without MCU at all.
+#To work with old phones, touch:
+*use onmousedown but not click
+*use innerHTML but not appendChild. innerHTML better to sum all strings, otherwise some bugs may be
+
 
 ### TODO
 *🐛 fix WiFi on ESP32 not working without UDP.begin
@@ -125,3 +141,5 @@ Some effects and test modes eat a lot of memory - disable it and use "#define sa
 *🐛 fix UI glitches
 * check NUM_LEDS>255  rand8, itc
 * SerialControl BlueFilter
+
+

@@ -2,8 +2,18 @@
 		//168: saveMem, NUM_LEDS 150
 		//328: saveMem, NUM_LEDS 330
 		//8266: 10000
+//============================================ global options, redefined below in "hadrware kits" section
+			#define LEDchipType	WS2812B// WS2811 //
+//#define offEffChangeAfter2min //### disable checkSerial(); IR, in, wifi  //e.g. for stability and sequrity
+//#define off_change_slot_After2min //e.g. for stability and sequrity
+			//#define offWiFiAfter2min //# test
+//#define mode_switch_enabled //##
 
-#define LEDchipType	WS2812B// WS2811 //
+			// #define PWM_pin0	 //don't forget disable LEDs_RENDER if uses same pins also PinSequencer pins
+			// #define PWM_pin1
+//#define PinSequencer_enabled //see defined pins at .h //##
+//#define PinSequencer_pin0	 //don't forget disable LEDs_RENDER if uses same pins also PinSequencer pins
+//#define PinSequencer_pin1
 
 //#define use_ESP_WiFioff
 //#define BlueFilter
@@ -18,7 +28,7 @@
 
 //@@ #define eff_setX
 
-//hardware sets, choose one:
+//============================================ hardware sets, choose one:
 //#define ESP8266_SHOW
 //#define ESP8266_SHOW_60x20m
 //#define ESP8266_SHOW_MATRIX
@@ -31,6 +41,8 @@
 
 //#define ESP32_SHOW_USB_test
 #define ESP8266_SHOW_USB_test
+						//#define ESP8266_dimmer_test
+						//#define ESP8266_DemoReel101_test	
 
 //#define Cube4MCU // ESP32 server ( see code of render nodes in render_WiFi folder )
 //#define Cube3MCU_w_also_serverDraw //it also #define Cube4MCU  ,TODO probably have to split out. 
@@ -38,6 +50,7 @@
 //#define hadrware_3btn_ESP
 //#define hadrware_3btn_nano
 //#define hadrware_1btn_1pot_nano
+//#define hadrware_nano328_demo
 
 
 	#define effN_test_RF 244 //effect to show packet loss //also this number is in switch_slot.h
@@ -59,6 +72,9 @@
 	//#define tst
 	//#define tst2  //detailed print of functions call
 
+#define SLOTS_FILE_H "switch_slot.h" //contains slots №, slot mean effect + settings
+
+//============================================ hadrware kits
 
 #ifdef hadrware_3btn_nano
 	#define SerialControl //thease 3 option eat 7% of atm328 program storage space
@@ -101,6 +117,27 @@
 	
 			#define tst_BRIGHTNESS		22 
 	#define default_effN_Random
+#elif defined(hadrware_nano328_demo)
+	#undef SLOTS_FILE_H
+	#define SLOTS_FILE_H "switch_slot_old_Nano328.h"
+	
+	#define SerialControl //thease 3 option eat 7% of atm328 program storage space
+	#define SerialSpeed		1000000
+	#define tstFPS
+	
+	//#define sound_p					A2 //25% of program and 25% of mem of atm328
+	
+	#define LEDs_RENDER
+	#define gNUM_LEDS		150
+	#define NUM_LEDS_type	byte
+	#define LEDp					6
+	
+			#define tst_BRIGHTNESS		122 
+	#define default_effN_Random
+	byte random_demo_sw_speed_td_m=3; //s
+	byte random_demo_sw_speed_td_M=15;
+	#define startLoadEffN  255
+	
 #elif hadrware_3btn_ESP
 	#define use_ESP8266
 	
@@ -238,7 +275,7 @@
 	//#define sound_p					39
 	#define tstFPS
 	#define LEDs_RENDER
-	#define gNUM_LEDS 		300	//105// 30 60 120 144 150 180 240 300 145*12
+	#define gNUM_LEDS 		180	//105// 30 60 120 144 150 180 240 300 145*12
 	#define NUM_LEDS_type 		uint16_t //byte uint16_t
 	//#define save_load_enable
 	//#define demo_enable
@@ -249,6 +286,47 @@
 	//#define default_effN_Random
 						#define tst_BRIGHTNESS		25
 	#define gDelayMore	5
+#elif defined(ESP8266_DemoReel101_test)
+	#define startLoadEffN  213
+	#define use_ESP8266
+	#define WiFi_ControlHTMLpage
+	#define use_ESP_WiFioff
+	#define SerialControl
+	#define SerialSpeed		921600 //1000000
+	//#define sound_p					39
+	#define tstFPS
+	#define LEDs_RENDER
+	#define gNUM_LEDS 		150	//105// 30 60 120 144 150 180 240 300 145*12
+	#define NUM_LEDS_type 		byte // uint16_t
+	//#define save_load_enable
+	//#define demo_enable
+	#define LEDp					4 //36 nw
+	//#define MULTIPLE_PINS2 //4 5 13 14 (GPIO, marks on board)
+	//byte random_demo_sw_speed_td_m=2; //s  //!!
+	//byte random_demo_sw_speed_td_M=15;
+	//#define default_effN_Random
+						#define tst_BRIGHTNESS		25
+	#define gDelayMore	5
+#elif defined(ESP8266_dimmer_test)
+	#define PWM_enabled //see defined pins at .h //!
+				
+	#define startLoadEffN  239//dimmer
+	#define use_ESP8266
+	#define WiFi_ControlHTMLpage
+	#define SerialControl
+	#define SerialSpeed		921600
+	#define tstFPS
+	#define LEDs_RENDER
+	#define gNUM_LEDS 		144
+	#define NUM_LEDS_type 		byte
+	#define LEDp					4
+						#define tst_BRIGHTNESS		33
+	#define gDelayMore	5	
+
+	#define PWM_enabled //see defined pins at .h
+	//#define PWM_pin0	 //don't forget disable LEDs_RENDER if uses same pins also PinSequencer pins
+	//#define PWM_pin1	
+	bool bPWM_Dimmer=true; //enable output, toggled at select effect "PWM_Dimmer"
 #elif defined(ESP32_SHOW_WiFi)
 	#define use_ESP32
 
@@ -532,6 +610,8 @@
 */
 #endif
 
+//============================================ sys constants
+
 #if gNUM_LEDS<256 // NUM_LEDS_type==byte  //not working this way 2F##
 	#define random8or16	random8
 	#define beat8or16	beat8
@@ -545,7 +625,6 @@
 	#define use_ESP8266
  #endif
 #endif
-
 
 #ifdef IRkeypad
 	#define IR_mode_sw_p 					2 //! btn (IR save while press) //! LRD at start => toggle this with LDR
@@ -686,14 +765,34 @@ struct SaveObj //# sizeof
 	byte gBrightness; //#
 	NUM_LEDS_type NUM_LEDS; //work ifdef use_ESP to save progmem
 };
-#define effRGB_M	20
-
 struct SaveObj oostr;
 
+#ifdef PWM_enabled
+#define PWM_E	2
+const int PWM_sizem=6;
+const int PWM_sizeM=4090;
+struct SaveObjDimmer
+{
+	int loop_d;
+	int PWM_m;
+	int PWM_M;
+	byte segE;
+	int vals[5];
+};
+ SaveObjDimmer oSaveObjDimmers[PWM_E]=
+{
+	{5000, 6, 4090, 5, {0,4090,222,1111,0}},
+	{12000, 200, 1555, 5, {200,2222,2222,555,200}}
+};
+#endif
+
+
+#define effRGB_M	20
 	byte effSpeed_last=1; //for animate eff
 	byte effLength_last=16;
 	byte effLength2=4;//!!
 
+long anim_next_t=0; //to delay anim_f() and redraw assign millis()+XXX, dont use delay, because ESP watchdog reset, itc
 
 byte BOTTOM_INDEX = 0;
 NUM_LEDS_type CENTER_TOP_INDEX;

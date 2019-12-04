@@ -31,7 +31,7 @@ void rainbowCycle() {
     FastLED.show();
     delay(effSpeed/8);
   
-  //!  if btn
+  //!!  if btn
   #if defined(SerialSelect) || defined(SerialControl)
     checkSerial();
   #endif
