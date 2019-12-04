@@ -7,13 +7,13 @@
 ### if you have interesting effects or need some new - tell me
 
 ### notable features
-*💎 save/load, quick access slots
-*💎 ESP8266, ESP32, atmega168, atmega328, atmega2560 .... support as NodeMCU, pro mini, nano, uno ...
-*💎 color by music or other input sensors
-*💎 plot power, power by color chennels, leds as your led assembly geometry 
+* 💎 save/load, quick settings access slots
+* 💎 support and fit size/features according to ESP8266, ESP32, atmega168, atmega328, atmega2560 ....  as NodeMCU, pro mini, nano, uno ...
+* color by music or other input sensors
+* 💎 plot power, power by color chennels, leds as your led assembly geometry 
 * lightweight binary Serial protocol and UDP WIFi
-*💎 send LEDs data or control over WiFi with external MCU's dedicated for rendering pixels
-*💎 test/debug effects and LEDs constructions (how it looks like in circle or cube) without LED stripes or without MCU at all.
+* 💎 send LEDs data or control over WiFi with external MCU's dedicated for rendering pixels
+* 💎 test/debug effects and LEDs constructions (how it looks like in circle or cube) without LED stripes or without MCU at all.
 
 ### Сoncept
 There are save/load slots, many effects, each rich of settings.
