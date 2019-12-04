@@ -1,1 +1,1165 @@
-../../LEDController2812IR git/rainbow_fastLED_controller/HTML_settings.htm
+// comments has to be	"..../**comment*/...."	"....<!--comment-->...."	"....space//comment"	to be cleaned by  "HTML to h clean.py"
+
+#define STR_HELPER(x) #x
+#define STR(x) STR_HELPER(x)
+
+#ifdef use_ESP32
+	#define	bb	"true"
+#else
+	#define	bb	"false"
+#endif
+
+//assing constants
+#define constantScript2 "*/ gNum_leds="STR(NUM_LEDS)";bESP32="bb";/*"
+//#define constantScript "gNum_leds="STR(NUM_LEDS)";bESP32="bb";"
+
+
+//there are LIMIT OF RAM and 22kb of this file now
+const String str  = R"HTM(
+<!DOCTYPE html><html>
+<head>
+<style>
+html {text-align:center; font-size: 22px;} 
+* {
+ font-size: 1em;
+ font-family: Arial;
+ text-decoration: none;
+}
+
+
+.bgGr  {background-color: #ccccdd;}
+.bgOr  {background-color: #ffeeaa; padding-top:18px;}
+/**
+.grad1 {
+  height: 44px;
+  background-color: red; 
+  background-image: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet, red);
+}
+*/
+
+.divLin{
+height:3px;
+background-color:#aa0033;
+transform-origin:left 50%;
+position:absolute;
+}
+
+.tc{
+text-align:center;
+font-size: 44px;
+}
+
+.pwm_p{
+ position: absolute;
+ width:55px; height:55px;
+ border-radius:55px;
+ border: 2px solid #aaff00;/*73AD21*/
+ line-height: 55px;
+ /**
+ display: table-cell;
+ vertical-align: middle;
+ */
+ user-select: none;
+}
+/**
+.contn{
+position: relative;
+background-color: red; 
+}
+*/
+
+input[type=range] {
+  width: 100%;
+  -webkit-appearance: none;
+  /**margin: 0;*/
+}
+/**
+input[type=range]:focus {
+  outline: none;
+}*/
+input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 19px;
+  cursor: pointer;
+  box-shadow: 0 4px 4px rgba(0,0,0,0.3) inset;
+  border-radius: 20px;
+  border: 0.2px solid #010101;
+}
+input[type=range]::-webkit-slider-thumb {
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  border: 1px solid #000000;
+  height: 20px;
+  width: 20px;
+  border-radius: 20px;
+  background: white;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -1px;
+}
+
+.grad2 input[type=range]::-webkit-slider-runnable-track {
+ /** background: linear-gradient(to right, #005fc2, #35A834 40%, #ffd400 65%, #FF6400);*/
+  	background: #ff0000;
+	background: -moz-linear-gradient(right,  #ff0000 0%, #fcf535 19%, #fcf535 19%, #00ff19 36%, #38ffee 52%, #0011ff 69%, #ff00fa 85%, #ff0004 100%);
+	background: -webkit-linear-gradient(right,  #ff0000 0%,#fcf535 19%,#fcf535 19%,#00ff19 36%,#38ffee 52%,#0011ff 69%,#ff00fa 85%,#ff0004 100%);
+	background: linear-gradient(to right,  #ff0000 0%,#fcf535 19%,#fcf535 19%,#00ff19 36%,#38ffee 52%,#0011ff 69%,#ff00fa 85%,#ff0004 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ff0000', endColorstr='#ff0004',GradientType=1 );
+}
+
+
+.notImplemented
+{
+  color: #ff0000;
+  position: absolute;
+  text-align:left;
+  z-index: 99;
+}
+
+
+
+.abs {
+  float: right;
+  position: absolute;
+}
+
+
+.rOpt {
+	padding: 8px 8px 8px 32px;
+  position: fixed;
+  background-color: rgba(0,0,0,0.5);/**transparent*/
+  top: 0;
+  right: 0;
+  /**overflow-x: hidden;*/
+  /**transition: 0.5s;*/
+  /**padding-top: 40px;*/
+}
+
+.rOptItem a {
+  padding: 8px 8px 8px 32px;
+  text-decoration: none;
+  font-size: 25px;
+  color: #818181;
+  display: block;
+  transition: 0.3s;
+}
+
+
+.tst {float:left}
+
+.sett_item {
+  margin-bottom: -3px;
+  margin-right: 80px;
+  padding: 10px;
+}
+
+.ib { color:#00f;}
+.ir { color:#f00;}
+.ix { color:#ccc;}
+
+.settNm
+{
+	margin: -10px;
+}
+
+
+h2 {color: #55acee;}
+h3 {color: #444444;}
+
+p {display: inline ; background-color: #34eedb; color: white; padding: 6px 24px; color: #55acee;} /**227cae*/
+p.odd  {padding: 6px 120px;}
+
+
+
+a.btS {background-color: #aa55ff; padding: 4px 12px; margin: 4px 12px;}
+a.btL { padding: 4px 12px; margin: 4px 12px;} /**34ffaa*/
+
+.bt {background-color: #3498db; color: white;	padding: 15px 22px;  border-radius: 8px;}
+.bt:hover {background-color: #aabb00;	 cursor:pointer;}
+
+.on {background-color: #3498db;}
+.on:active {background-color: #2980b9;}
+
+.off {background-color: #34495e;}
+.off:active {background-color: #2c3e50;}
+
+.na {color: #333333; background-color: #000000;}
+
+
+
+.link {
+  text-decoration: none;
+  color: #55acee;
+  border-bottom: 2px dotted #55acee;
+  transition: .3s;
+  -webkit-transition: .3s;
+  -moz-transition: .3s;
+  -o-transition: .3s;
+}
+
+.link:hover {
+  color: #2ecc71;
+  border-bottom: 2px dotted #2ecc71;
+}
+
+
+
+#buttons {
+  padding-top: 50px;
+  text-align: center;
+}
+
+.btn {
+  border-radius: 5px;
+  padding: 6px 10px;
+/**  font-size: 16px;*/
+  text-decoration: none;
+  margin: 3px;
+  color: #fff;
+  position: relative;
+  display: inline-block;
+}
+
+.btn:active {
+  transform: translate(0px, 5px);
+  -webkit-transform: translate(0px, 5px);
+  box-shadow: 0px 1px 0px 0px;
+}
+
+.blue {
+  background-color: #55acee;
+  box-shadow: 0px 5px 0px 0px #3C93D5;
+}
+
+.blue:hover {
+  background-color: #6FC6FF;
+}
+
+.green {
+  background-color: #2ecc71;
+  box-shadow: 0px 5px 0px 0px #15B358;
+}
+
+.green:hover {
+  background-color: #48E68B;
+}
+
+
+.lime {
+  background-color: lime;
+  box-shadow: 0px 5px 0px 0px #15B358;
+}
+
+.lime:hover {
+  background-color: #88E68B;
+}
+
+.brown {
+  background-color: #98664B;
+  box-shadow: 0px 5px 0px 0px #483622;
+}
+
+.brown:hover {
+  background-color: #78864B;
+}
+
+
+
+.red {
+  background-color: #e74c3c;
+  box-shadow: 0px 5px 0px 0px #CE3323;
+}
+
+.red:hover {
+  background-color: #FF6656;
+}
+
+.purple {
+  background-color: #9b59b6;
+  box-shadow: 0px 5px 0px 0px #82409D;
+}
+
+.purple:hover {
+  background-color: #B573D0;
+}
+
+.orange {
+  background-color: #e67e22;
+  box-shadow: 0px 5px 0px 0px #CD6509;
+}
+
+.orange:hover {
+  background-color: #FF983C;
+}
+
+.yellow {
+  background-color: #f1c40f;
+  box-shadow: 0px 5px 0px 0px #D8AB00;
+}
+
+.yellow:hover {
+  background-color: #FFDE29;
+}
+
+
+
+div.scrollmenu{
+  /**background-color: #333;*/
+  overflow: auto;
+  white-space: nowrap;
+}
+.scrollmenuFlex {
+  display: flex;
+  /**flex-direction: column;*/
+  flex-wrap: wrap;
+}
+div.scrollmenu a {
+  display: block; /**inline-block;  for horizontal*/
+  color: white;
+  text-align: center;
+  padding: 14px;
+  text-decoration: none;
+}
+div.scrollmenu a:hover {
+  background-color: #777;
+}
+.vertical-menu {
+  height: 400px;
+  overflow-y: auto;
+}
+
+
+.slider{
+	width: 100%;
+	outline: none;
+	opacity: 0.7;
+	margin: 14px;
+}
+.slider:hover {
+	opacity: 1;
+}
+
+
+
+.collap {
+	background-color: #999;
+	color: white;
+	cursor: pointer;
+	padding: 18px;
+	width: 100%;
+	border: none;
+	text-align: left;
+	outline: none;
+	font-size: 15px;
+
+	margin-top: 14px;
+}
+
+.collap_content.open {
+	display: block;
+}
+
+.collap_active, .collap:hover {
+	background-color: #655;
+}
+.collap_content {
+	padding: 0 18px;
+	display: none;
+	overflow: hidden;
+	background-color: #f1f1f1;
+}
+							.tst {position: absolute; font-size: 10px; text-align: left;  top: 4px; left: 4px;}
+
+table, td {border:1px solid/**black*/;}
+.pin
+{
+ width:60px;
+ height:28px;
+ text-align: center;
+}
+.pin.on
+{
+ background-color:#ffaacc;
+ animation: blinker 1s step-start infinite;
+ /**animation-timing-function: linear;*/
+}
+@keyframes blinker {
+  50% {opacity:0;}
+}
+/**
+@keyframes mov
+{
+	from {left: 0px;}
+	to {left: 200px;}
+}*/
+.pin.sel{border:3px solid black;}
+</style>
+
+
+<script type="text/javascript">
+var valElemContainers;
+function $(s){return document.getElementById(s);}
+function $$(s){return document.getElementsByClassName(s);}
+
+function updateValuesWithNewDataFromServer(nmVal_str) 
+{
+	var s= nmVal_str.split("=");
+	/**alert(nmVal_str+ "\r\n"+ s.length+"\r\n"+s[0]+"\r\n"+s[1]+"\r\n"+String.fromCharCode(s[1]));*/
+	if(s.length>1)
+	{
+		valElemContainers = $$("sett_item");
+		for(var i=0;i<valElemContainers.length;i++)
+		{
+			if(valElemContainers[i].getAttribute("value")!=s[0]) continue; 
+										
+			var valElem=valElemContainers[i].getElementsByTagName('i')[0];
+			/**var val=String.fromCharCode(s[1]);*/
+			if(s[1]!=valElem.innerText)
+			{
+				valElem.innerText=s[1];
+				valElem.className="ir";
+				
+				valElemContainers[i].getElementsByClassName("slider")[0].value=s[1];
+			}
+			else
+				valElem.className="ib";
+		}
+		upd_sett_lnk();			
+			/**### TODO fill linksNames without numbers, only names in seq */
+		/**if(s[0]=="effN") $("eff_nm_current").innerHTML=linksNames[s[1]];  */
+	}
+}
+
+function request(url) 
+{
+  const xhr = new XMLHttpRequest();
+  xhr.open('GET', url);
+  xhr.onload = function()
+ {
+	if (xhr.status != 200) 
+	{
+		$('tst').innerHTML+="<br/>"+xhr.status;
+		/**alert("returned:"+xhr + "\n"+ xhr.responseText + "\r\n"+ xhr.readyState + "\r\n"+ xhr.status);*/
+	}
+	/** //not need as we send all data, and have to check difference onload
+	var oldActives = $$("ir");
+	for (var i = 0; i < oldActives.length; i++)
+	{
+	  oldActives[i].className="ib";
+	}
+	 */ 
+	var ss = xhr.responseText.split(",");
+	for (var i = 0; i < ss.length; i++)
+	{
+		updateValuesWithNewDataFromServer(ss[i]);
+	}
+	$('tst').innerHTML+="<br/>"+xhr.responseText;
+ };
+ xhr.send();
+ $('tst').innerHTML="<br/>"+url;
+ /** test
+	var tst="effN=12,effSpeed=6";
+	var ss = tst.split(",");
+	for (var i = 0; i < ss.length; i++)
+	{
+		updateValuesWithNewDataFromServer(ss[i]);
+	}
+	$('tst').innerHTML+=tst;
+ */
+}
+
+/**! названия не меняются , можно сделать массив рус имен*/
+/**TODO refactor w https://www.xul.fr/javascript/associative.php */
+/**TODO effQualityMark, eff geometry*/
+/**this generated in PC serial GUI app btn_copy_switch_nms_click, based on switch_slot.h*/
+const linksNames ={'fillStriped':11,'fillStriped1':12,'fillStripedFillRainbow':14,'fillStripedFillRainbow1':15,'fillByPalette':16,'fillByPalettesBlend_moving':17,'rainbow':18,'rainbowConfetti':19,'rainbowWithGlitter':20,'rainbow_beat':21,'randomBlinkRainbow':22,'randomBlinkRainbowFade':23,'rainbow_fill_slow':28,'rainbow_fill_slow1':29,'rainbow_beat1':31,'rainbow_beat2':32,'rainbowSegments_shift':33,'rainbowSegments_shift1':34,'rainbowSegments_shift2':35,'rainbowSegments_shiftSin':36,'rainbowSegments2':37,'rainbowCycle':39,'sinelon':40,'bpm':41,'juggle':42,'spawnPixel_moveAll':43,'fillFadeChangeAll':44,'fillFadeChangeAll_beat8':45,'fillFadeChangeAll_beatsin8':47,'fadeEvenUneven':48,'fadeEvenUnevenDif':49,'confetti':50,'confetti1':51,'confetti_move':52,'confetti_moveRemainFirstAdd':53,'confetti_moveRemainFirstBlend':54,'confetti_moveRemainFirstBlendByPos':55,'random_burst':56,'random_color_pop':57,'randomBlink':58,'color_bounce':62,'color_bounc_HueByPos':64,'color_bounce_multiple':65,'color_bounceFADE':66,'color_bounceFADE1':67,'CubeCornersLight':70,'CubeTest':71,'matrixCube2':72,'matrixCube':73,'movingBlendRGB':77,'pulse_one_color_all':87,'pulse_one_color_all_rev':88,'radiation':90,'Fire':96,'mover_lim_mark':101,'mover_lim_mark1':102,'beatWave':109,'confetti2':111,'confetti2_demo':112,'dot_beat':114,'dot_beat_area':115,'fill_grad':116,'inoise8_fire':117,'inoise8_mover':118,'inoise8_pal':119,'juggle_pal':120,'matrix_pal_demo':122,'matrix_ray':123,'noise16_1':124,'noise16_2':125,'noise16_3':126,'one_sine_pal_demo':128,'palettecrossfade':129,'plasma':130,'rainbow_beat2':131,'rainbow_march':132,'rainbow_march_demo':133,'sawtooth':136,'sinelon2':138,'three_sin_demo':139,'three_sin_pal_demo':140,'two_sin_pal_demo':141,'blend_test':144,'fill_colours':148,'animationA':149,'setColors_fill':151,'setColors_fill_tstRange':152,'setCurrentPalette':153,'setCurrentPalette_Test':154,'splitModeEditor':155,'confetti_density':157,'eff_sin_R_G_B':158,'eff_sin_R_G_B1':159,'eff_sin_R_G_B2':160,'waveSmooth':161,'palette_pipette':164,'test_palettes':165,'test_gradient':166,'test_blend':167,'fill_segments_anim':175,'fill_segments_anim1':176,'draw_sample':181,'soundmems_pal':201,'soundmems_noise':202,'mus_random_mov':203,'mus_random_mov1':204,'soundmems_wave':205,'soundmems_wave1':206,'soundmems_peak_ripple':207,'soundmems_fire':208,'mus_arduinoFFT':209,'mus_arduinoFFT1':210,'mus_arduinoFFT2':211,'test_easing':214,'wave_adj':215,'wave_H':216,'gen_wave_H_moveAll':217,'gen_wave_H_moveAll_blinkRand':218,'gen_wave_H_v2_moveAll_blinkRand':219,'matrix_test':220,'ems_lightsALL':224,'fillStriped2':225,'sinelon1':227,'fillStriped3':228,'fillStriped4':229,'fillStriped5':230,'random_len_cell_1':233,'random_len_cell_seemless':234,'PWM_Dimmer':239,'PinSequencer':240,'mode_switch':241,'fillStriped6':242,'fillStriped7':243,'fillStriped8':244,'fillStriped9':245,'nodo':247};
+
+const settingNms = [];
+
+//var arr = { "one": 1, "two": 2, "three": 3 }; 
+//for(var key in arr)
+// {
+  // var value = arr[key];
+  // document.write(key + " = " + value + '<br>');
+// } //https://www.xul.fr/javascript/associative.php
+
+function clickBtnEff(e){ 
+//console.log(e);
+//console.log(e.target);
+	e.preventDefault();
+	var link = e.target.getAttribute( "href" );
+
+	var re = /effN=(\w+)/;
+	var resul=re.exec(link);
+	if(resul!=null && resul.length>0)
+	{
+		var effnm=resul[1]; 
+		link = link.replace(effnm, linksNames[effnm]);  	//<a href="effN=eff1">	-to-  <a href="effN=123">
+	}
+	/** linksNames[this.innerText]; */
+	request( "http://192.168.4.1/sett?"+link); 			//console.log(link);
+	return false;
+}
+
+function linksGenerator (container, selectNm){
+  for( var linkName in linksNames){
+	if(selectNm!=null && linkName.indexOf(selectNm)==-1) continue;
+
+	container.innerHTML+= "<a class='btn green' onmousedown='clickBtnEff(event)' href='effN="+linkName+"'>"+linkName+"</a>";
+  };
+}
+
+function linksGen_SL(container,sl,styl){
+  for(var i=0;i<10;i++)
+	container.innerHTML+= "<a class='"+styl+"' onmousedown='clickBtnEff(event)' href='"+sl+'='+i+"'>"+i+"</a>";
+}
+
+function setup()
+{
+	var setts =$$("sett_item");
+  	for(i = 0;i < setts.length; i++)
+	{
+		var settNm=setts[i].getAttribute('value');
+		var htm="";
+		var tx=setts[i].innerText;
+		var bEditable = tx!="-"; /** '-' is non editable or not implemented*/
+		if(bEditable) 
+			htm+='<a class="sender item bt off" href="sett?'+settNm+'=0">-</a>';
+
+		var c="";
+		if(i%2==0) c+=" odd";
+		var txNew=(tx.length<3)?settNm:tx;
+		v='?';
+		//!  if(settNm=="NUM_LEDS" && gNum_leds!=null)v=gNum_leds;
+		htm+='<p class="settNm '+c+'">'+txNew+' <i class="ix">'+v+'</i></p>';
+
+		if(bEditable)
+			htm+='<a class="sender item bt on" href="sett?'+settNm+'=1">+</a>';
+
+		setts[i].innerHTML=htm+'<input type="range" min="0" max="255" value="20" class="slider" oninput="showSliderVal(this);sendSliderVal(this)"  onmousedown="sendSliderVal(this)">';
+	}
+  
+	var as= $$('sender');
+	for(i = 0;i < as.length; i++)
+	{
+		aelem=as[i];
+		var link = aelem.getAttribute('href');
+
+		if(link=="effN") aelem.href=link+"="+aelem.innerText; //<a href="effN">eff1	-to-  <a href="effN=eff1">eff1
+		//!  as[i].setAttribute( "href",  newstr);
+		as[i].onmousedown = clickBtnEff;						//as[i].innerHTML+="*";
+	}
+	linksGenerator($("effs"));
+	linksGenerator($("effsCube"),'Cub');
+	linksGen_SL($("btS"),'s', 'bt btS');
+	linksGen_SL($("btL"),'l','bt btL green');
+	
+	toggleSliders();/** hide */
+
+var coll = $$("collap");
+var i;
+for (i = 0; i < coll.length; i++){
+  coll[i].addEventListener("mousedown", function(){
+	this.classList.toggle("active");
+	var content = this.nextElementSibling;
+	if (content.style.display === "block") content.style.display = "none";
+	else content.style.display = "block";
+  });
+}
+init();
+}
+document.addEventListener('DOMContentLoaded',function(){setup();});
+function touchHandler(ev)
+{
+	var touches = ev.changedTouches,
+	first = touches[0],
+	type = "";
+	switch(ev.type)
+	{
+		case "touchstart": type = "mousedown"; break;
+		case "touchmove":  type = "mousemove"; break;		
+		case "touchend":	type = "mouseup";	break;
+		default:			return;
+	}
+	// initMouseEvent(type, canBubble, cancelable, view, clickCount, 
+	//				screenX, screenY, clientX, clientY, ctrlKey, 
+	//				altKey, shiftKey, metaKey, button, relatedTarget);
+
+	var simulatedEvent = document.createEvent("MouseEvent");
+	simulatedEvent.initMouseEvent(type, true, true, window, 1, 
+								  first.screenX, first.screenY, 
+								  first.clientX, first.clientY, false, 
+								  false, false, false, 0/*left*/, null);
+
+	first.target.dispatchEvent(simulatedEvent);
+	if (ev.cancelable) ev.preventDefault();
+}
+
+function init() 
+{
+	document.addEventListener("touchstart", touchHandler, true);
+	document.addEventListener("touchmove", touchHandler, true);
+	document.addEventListener("touchend", touchHandler, true);
+	document.addEventListener("touchcancel", touchHandler, true);	
+}
+
+function upd_sett_lnk(){
+	var el=$("sett_lnk");
+	/** #DOTO associative array, TODO test upd sliders pos with actual value from server after effN change */
+	var setts =$$("sett_item");
+	var str="http://192.168.4.1/sett?";
+  	for(i = 0;i < setts.length; i++)
+	{
+		var settNm=setts[i].getAttribute("value");
+		var settVal=setts[i].getElementsByClassName("slider")[0].value;
+		str+=settNm+"="+settVal+"&";
+	}
+
+	el.setAttribute( "href",str );
+	el.innerHTML=str;
+}
+
+function showSliderVal(inp){
+	/**$("tst").innerHTML=inp.value;*/
+}
+function sendSliderVal(inp){
+	request('http://192.168.4.1/sett?'+inp.parentNode.getAttribute("value")+'='+inp.value);
+}
+
+function toggleSliders(){
+toggleVisibility($$("slider"));
+}
+
+function toggleVisibility(els){
+for (var i = 0; i < els.length; i++){
+	if(els[i].style.visibility != 'hidden')  els[i].style.visibility = 'hidden';
+	else els[i].style.visibility = 'visible';
+}
+}
+</script>
+</head>
+<body>
+	<i class="tst abs" id="tst">test responce:</i>
+
+<h2>HTML ws2812b control page <a href="#">v0.4</a> <a href="mailto:pavel.b.kr12@gmail.com?subject=2812,soft">pavel.b.kr12@gmail.com</a> </h2> 
+Current effect: <b id="eff_nm_current"></b> settings: <a id="sett_lnk">?</a>
+
+<div class="rOpt">
+<p class="btn red sender rOptItem" href="P">Pause sending data</p>
+<p class="btn blue rOptItem" onmousedown="toggleSliders()">togle sliders</p>
+</div>
+
+<button type="button" class="collap">map to matrix</button>
+<div class="bgGr collap_content">
+	Act like toggle switch, but now only one active. This post processing being applied after all:
+ <a class="sender btn green" href="effN=242">bMap_type_matrix_zigZag_h</a>
+ <a class="sender btn green" href="effN=243">bMap_type_matrix_spiral_cw</a>
+ <a class="sender btn green" href="effN=244">bMap_type_matrix_labyrinth_cw</a>
+ <a class="sender btn green" href="effN=245">bMap_type_mirror_half</a>
+ <a class="sender btn green" href="effN=246">bMap_type_history</a>
+</div>
+<!--
+<button type="button" class="collap">other global effects</button>
+<div class="bgGr collap_content">
+	<hr/>
+	<hr/>
+</div>
+ -->
+<button type="button" class="collap">PWM dimer</button>
+<div class="bgGr collap_content open">
+<hr/>
+<!-- )HTM" constantScript2 R"HTM( -->
+<table id="pcb" style="width:22%;height:40%"></table>
+<button onmousedown="recalculate_vt_all(true)">send</button>
+<!-- <button onmousedown="create_PWM_Plot()">create</button> -->
+
+<!-- <svg id="svg" width="100%" height="50%" preserveAspectRatio="none"  viewBox="0 -490 600 490"></svg> -->
+<!-- <div id="svg_div"></div> -->
+
+<div id="pwm_plot" style="position: relative; width:99%; height:400px">
+<!-- 44%	class="contn"  -->
+<!-- <div  id="pwm_p0" style="position: absolute; width:20px; height20px; background-color:red">o</div> -->
+<!-- <div class="pwm_p" id="pwm_m" style="background-color:ff8888">x</div> -->
+<!-- <div class="pwm_p" id="pwm_M" style="background-color:#9999ff">x</div> -->
+</div>
+
+<script>
+var pinClick_last;
+var pwm_state=0;
+function pinClick()
+{
+ if(pinClick_last!=null && pinClick_last!=this)	pinClick_last.classList.remove('sel');
+
+ pinClick_last=this;
+
+ if(!this.classList.contains("sel"))
+ {
+ this.classList.add("sel");
+ $("pinSelN").innerHTML=this.innerHTML;
+ }
+ else
+ {
+	
+	//!! get state from MCU  //https://stackoverflow.com/questions/1436438/how-do-you-set-clear-and-toggle-a-single-bit-in-javascript
+	var mask = 1 << parseInt(this.innerHTML);
+
+	var this_p=this.classList.toggle("on");
+	if(this_p)
+		pwm_state |= mask;
+	else
+		pwm_state &= ~mask;
+	
+	request( "http://192.168.4.1/pwm?pp="+pwm_state); 	//console.log(pwm_state)
+ }
+}
+
+function newP(x, y, nm){
+ p=$(x+"_"+y);
+ p.innerHTML=nm;//! '<input class="myclass" type="button" value="'+nm+'"/>' //display:inline-block;
+ p.onmousedown=pinClick; //onclick not work with touch tap
+ //p.addEventListener("click", () => {  console.log("click")});
+}
+function fillTable(){
+ s="";
+ for(i=0;i<14;i++)
+ {
+	s+='<tr><td id="'+0+"_"+i+'" class="pin"/>';
+	if(i==0)s+='<td rowspan=14 id="pinSelN" class="tc"/>';
+	s+='<td  id="'+1+"_"+i+'" class="pin"/></tr>';
+}
+ $('pcb').innerHTML+=s;
+}
+
+PWM_min=2;
+PWM_max=4090; //## 1023
+var bPWM_Plot_Exist=false;
+draw_dx=100;
+draw_y_mul=0.08;
+var idN=0;
+
+function createdivLine(elem, id, ax,ay, bx,by, size, opacity, color){ 
+	//var newdiv = document.createElement('div'); 
+	//newdiv.setAttribute('id', id);  
+
+	//newdiv.style.height = (size||2) + "px"; 
+	
+	//newdiv.style.background = color || "red";	
+	//newdiv.style.opacity = opacity || 1;
+	//newdiv.style.transformOrigin = "left 50%";
+	//newdiv.style.position = "absolute";
+
+	//newdiv.className="divLin"
+	//elem.appendChild(newdiv); 
+
+	return '<div id="'+id+'" class="divLin"></div>';
+	
+	//console.log(d)
+	//moveDivLine(id, ax,ay, bx,by);
+}
+function moveDivLine(id, ax,ay, bx,by){
+	var length = Math.hypot(by-ay, bx-ax),
+		deg	= Math.atan2(by-ay, bx-ax) * 180 / Math.PI;
+
+	newdiv=$(id);
+	newdiv.style.width =  length + "px";
+	newdiv.style.transform = "rotate("+ deg +"deg)";
+	newdiv.style.left = ax + "px";	
+	newdiv.style.top = ay + "px";  
+}
+
+var p_m=0;
+var p_M=9;
+var p_Mlim=1023;
+var pt_m=0;
+var pt_M=9;
+var pt_Mlim=1000;
+aplot=$("pwm_plot");
+
+function dragElement(el){
+ var pos1=0,pos2=0,pos3=0,pos4=0;
+  /**
+  if ($(el.id + "header")){
+	// if present, the header is where you move the DIV from:
+	$(el.id + "header").onmousedown = dragMouseDown;
+  } else {
+	// otherwise, move the DIV from anywhere inside the DIV:
+	*/
+	el.onmousedown = dragMouseDown;
+  //}
+
+ function dragMouseDown(e){
+	e = e || window.event;
+	e.preventDefault();
+	// get the mouse cursor position at startup:
+	pos3 = e.clientX;
+	pos4 = e.clientY;
+	document.onmouseup = closeDragElement;
+	// call a function whenever the cursor moves:
+	document.onmousemove = elementDrag;
+  }
+
+  function elementDrag(e){
+	e = e || window.event;
+	e.preventDefault();
+	// calculate the new cursor position:
+	pos1 = pos3 - e.clientX;
+	pos2 = pos4 - e.clientY;
+	pos3 = e.clientX;
+	pos4 = e.clientY;
+	// set the element's new position:
+	el.style.top=(el.offsetTop-pos2)+"px";
+	el.style.left=(el.offsetLeft-pos1)+"px";
+	
+	recalculate_vt(el);
+	ptN=PlotPoints[el.id];
+	if(ptN==0)// point of min
+	{
+	 el.innerHTML+="<br/>"+el.offsetLeft;
+	 p_m=el.offsetTop;
+	 pt_m=el.offsetLeft;
+	 
+	 recalculate_vt_all();
+	}
+	else
+	if(ptN==plotPtM)// point of max
+	{
+	 el.innerHTML+="<br/>"+el.offsetLeft+" "+(el.offsetLeft-200)/(document.body.offsetWidth-20)*1000;
+	 p_M=el.offsetTop;
+	 pt_M=el.offsetLeft;
+	 
+	 recalculate_vt_all();
+	}
+	else
+	{
+	 if(PlotPoints[el.id]<plotPtM-1) //no connection to points of min and max
+	 {
+	 nm_next="pwm_p"+(PlotPoints[el.id]+1)
+	 moveDivLine((el.id+"l"), el.offsetLeft+22,el.offsetTop+22, $(nm_next).offsetLeft+22,$(nm_next).offsetTop+22)
+	 }
+	 if(PlotPoints[el.id]>1)
+	 {
+	 nm_prev="pwm_p"+(PlotPoints[el.id]-1)
+	 moveDivLine((nm_prev+"l"), el.offsetLeft+22,el.offsetTop+22, $(nm_prev).offsetLeft+22,$(nm_prev).offsetTop+22)
+	 }
+	}
+  }
+ function closeDragElement(){
+	// stop moving when mouse button is released:
+	document.onmouseup = null;
+	document.onmousemove = null;
+  }
+}
+
+function recalculate_vt(el){
+if((p_M-p_m)<1)p_M++;
+v=Math.round((el.offsetTop-p_m)/(p_M-p_m)*p_Mlim ) ;
+v=Math.min(Math.max(v, 0), p_Mlim);//clamp
+t=Math.round((el.offsetLeft-pt_m)* ((pt_M-pt_m)/document.body.offsetWidth) ) ;
+t=Math.min(Math.max(t, 0), pt_Mlim);//clamp
+el.innerHTML=v+"<br/>"+t/10+"s";
+return "v"+v+"t"+t;
+}
+function recalculate_vt_all(bReq){
+ r="";
+  for(i=1;i<plotPtM;i++)
+ {
+	r+=recalculate_vt($("pwm_p"+i));
+ }
+ //https://arduino.stackexchange.com/questions/1013/how-do-i-split-an-incoming-string
+ if(bReq){
+ request("http://192.168.4.1/pwm?v="+r); //  t/10 in MCU 
+ //console.log(r);
+ }
+}
+//!!! min max points - set lim PWM also
+PlotPoints=[];
+plotPtM=6;
+function createPlotPoint(){
+ var s="pwm_p";
+ strHTM=""
+ strHTMli=""
+ for(i=0;i<=plotPtM;i++)
+ {
+ nm=s+i;
+ 
+  c="background-color:"
+  if(i==0)c+="#9999ff;"
+  else
+  if(i==plotPtM)c+="#ff8888;"
+  else
+  {
+  c+="#ffffff;"
+	strHTMli+=createdivLine(aplot,nm+"l",  20,20,	10,444);
+  }
+
+  PlotPoints[nm]=i;
+  strHTM+='<div class="pwm_p" id="'+s+i+'" style="left:'+i*50+'px;top:'+i*50+'px;'+c+'">o</div>';
+ }
+ 
+ aplot.innerHTML+=strHTMli;
+ $("pwm_plot").innerHTML+=strHTM;
+ 
+ for(i=0;i<=plotPtM;i++)
+ {			//console.log(nm)
+  nm=s+i;
+  dragElement($(nm));
+ }
+}
+
+function create_PWM_Plot(){
+createPlotPoint();
+//createdivLine(aplot,"a",  20,20,	10,444);
+//createdivLine(a,"b",  10,10,  60,80,  5,  0.3,  "#0bf");
+//createdivLine(a,"c",  60,80,  70,50);
+//reatediv(a,"d",  70,50,  150,90, null, null, "gold");
+fillTable();
+newP(0,3,10);
+newP(0,4,9);
+newP(1,0,16);
+newP(1,1,5);
+//newP(1,2,4); //FastLED
+newP(1,3,0); //GPIO_0 //ESP-01
+newP(1,4,2); //GPIO_2 //ESP-01
+newP(1,7,14);
+newP(1,8,12);
+newP(1,9,13);
+newP(1,10,15);
+newP(1,11,3);
+newP(1,12,1);
+/**
+if(!bPWM_Plot_Exist)
+{
+var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute('style', 'border: 1px solid black');
+svg.setAttribute('width', '600');
+svg.setAttribute('height', '250');
+svg.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:xlink", "http://www.w3.org/1999/xlink");
+$("svg_div").appendChild(svg);
+
+addLine(2,0,draw_dx,222);
+appendNextLine(draw_dx,4090);
+appendNextLine(draw_dx*2,444);
+appendNextLine(draw_dx*3,111);
+appendNextLine(draw_dx*4,2);
+
+drawLine(0,0,800,0,"","black");
+drawLine(0,-4096*draw_y_mul,800,-4096*draw_y_mul,"","black");
+drawLine(0,0,0,-4096*draw_y_mul,"","black");
+
+drawLine(0,-PWM_min*draw_y_mul,800,-PWM_min*draw_y_mul,"PWM_min","red");
+drawLine(0,-PWM_max*draw_y_mul,800,-PWM_max*draw_y_mul,"PWM_max","red");
+
+bPWM_Plot_Exist=true;
+}
+*/
+}
+/**
+var ys=[];
+var lines=[];
+function appendNextLine(x9,y9)
+{
+	var id=idN-1;
+	addLine(
+	x9,	ys[id], //### ys
+	x9+draw_dx,y9);
+	
+	//lines[idN-1].getAttribute('x2'),
+	//-lines[idN-1].getAttribute('y2'),
+}
+
+function addLine(x,y,x9,y9)
+{
+	ys[idN]=y9
+	
+	lines[idN]=drawLineN(x,-y *draw_y_mul,x9,-y9*draw_y_mul);
+	
+	idN++;
+}
+function drawLineN(x,y,x9,y9)
+{
+	return drawLine(x,y,x9,y9, 'line'+idN, "black")
+}
+
+function drawLine(x,y,x9,y9, id, c)
+{
+	var newLine = document.createElementNS('http://www.w3.org/2000/svg','line');
+	newLine.setAttribute('id',id); 
+	newLine.setAttribute('x1',x);
+	newLine.setAttribute('y1',y);
+	newLine.setAttribute('x2',x9);
+	newLine.setAttribute('y2',y9);
+	
+	newLine.setAttribute("stroke", c)
+	$("svg").append(newLine);
+  
+	return newLine;
+}
+*/
+create_PWM_Plot();
+</script>
+		
+	<hr/>
+</div>
+<!--
+<button type="button" class="collap">pin Sequencer</button>
+<div class="bgGr collap_content">
+	<hr/>
+TODO
+	<hr/>
+</div>
+<button type="button" class="collap">mode_switch</button>
+<div class="bgGr collap_content">
+	<hr/>
+TODO
+	<hr/>
+</div>
+-->
+
+<button type="button" class="collap">eff wave</button>
+<div class="bgGr collap_content">
+<!--
+possible syntax:
+<a class="sender btn green" href="effN">wave_adj</a>
+<a class="sender btn green" href="effN=wave_adj&effSpeed=3"></a>  (button without text)
+<a class="sender btn green" href="effN=wave_adj&effSpeed=3">wave adj with speed3</a>
+this parces in  "$$('sender'); ...."
+-->
+<!--
+ <a class="sender btn green" href="effN">wave_adj</a>
+ <a class="sender btn green" href="effN">effSpeed</a>
+ <a class="sender btn green" href="effN">gen_wave_H_moveAll</a>
+ 
+ <a class="sender btn green" href="effN">gen_wave_H_moveAll_blinkRand</a>
+ <a class="sender btn green" href="effN">gen_wave_H_v2_moveAll_blinkRand</a>
+ <a class="sender btn green" href="effN">sin_bright_wave</a>
+ <a class="sender btn green" href="effN">eff_sin_R_G_B</a>
+ <a class="sender btn green" href="effN">waveSmooth</a>
+ <a class="sender btn green" href="effN">beatWave</a>
+	<br>
+	<br>
+
+  <div value="effSpeed" class="sett_item">Speed</div> 
+  <div value="effLength" class="sett_item">Length</div>
+  <div value="effSpeedH" class="sett_item">hue</div>
+  <div value="effLengthH" class="sett_item">saturation</div>
+  function:
+  <br>
+  <a class="sender btn blue" href="indexOrBits=0">sin</a>
+  <a class="sender btn blue" href="indexOrBits=4">sin^2</a>
+  <a class="sender btn blue" href="indexOrBits=8">sin^05</a>
+  <a class="sender btn blue" href="indexOrBits=12">triwave8</a>
+  <a class="sender btn blue" href="indexOrBits=16">quadwave8</a>
+	-->
+  <!-- <a class="sender btn blue" href="indexOrBits=20">cubicwave8</a> -->
+  <!-- <div value="indexOrBits" class="sett_item">function</div> -->
+<hr/>
+<hr/>
+</div>
+
+<button type="button" class="collap">eff</button>
+<div class="collap_content">
+<div class="bgOr">
+<div class="sett_menu">
+  <div value="effN" class="sett_item"> </div>
+  <div value="effSpeed" class="sett_item"></div> 
+  <div value="effSpeedH" class="sett_item"></div>
+  <div value="effLength" class="sett_item"></div>
+  <div value="effLengthH" class="sett_item"></div>
+  <div value="effRGB" class="sett_item"></div>
+  <div value="gColor" class="sett_item grad2">-</div>
+  <div value="gColorBg" class="sett_item grad2">-</div>
+  <div value="effFade" class="sett_item"></div>
+  <div value="gFade" class="sett_item"></div>
+  <div value="indexOrBits" class="sett_item"></div>
+  <div value="gDelay" class="sett_item"></div>
+  <div value="gBrightness" class="sett_item"></div>
+  <div value="NUM_LEDS" class="sett_item">-</div>
+</div>
+</div>
+
+<div class="bgGr">
+<a class="sender btn green" href="effN=10">N off</a>
+<a class="sender btn green" href="effN=249">N random</a>
+<!--<a class="sender btn green" href="effN=251">animate_to_slot1</a>-->
+<a class="sender btn green" href="effN=252">animate_SW</a><br/>
+<a class="sender btn green" href="effN=250">N random_demo_animated_SW</a>
+<a class="sender btn green" href="effN=253">N predefined_show_seq</a><br/>
+<a class="sender btn green" href="effN=254">N random_demo_fast_SW</a>
+<a class="sender btn green" href="effN=255">N random_demo_SW</a><br/><br/>
+</div>
+
+<div class="bgOr">
+<div id="btS">
+<b>save to slot :</b>
+</div>
+<br/>
+<div id="btL">
+<b>load slot:</b>
+</div>
+</div>
+
+<div class="bgGr">
+<br/>
+<div class="scrollmenuFlex" id="effsCube"></div> <!-- filling by linksGenerator('Cub') -->
+<!-- 
+<hr/>
+List may contain disabled effect that lead to RUNDOM eff.
+Some are buggy or not optimised to current leds number
+ -->
+<div class="scrollmenu vertical-menu">
+<div class="scrollmenuFlex" id="effs"></div>
+</div>
+</div>
+<br/>
+</div>
+<!--
+<button id="testB">test</button>
+<div id="test">test</div>
+    <script>
+      document.getElementById("test").addEventListener("mousedown", () => {
+        console.log("down");
+      });
+      document.getElementById("test").addEventListener("click", () => {
+        console.log("click");
+      });
+      document.getElementById("test").addEventListener("mouseup", () => {
+        console.log("up");
+      });
+	  
+
+      document.getElementById("1_2").addEventListener("mousedown", () => {
+        console.log("mousedown");
+      });
+    </script>
+-->
+/**
+this made a bit clean to test, also this removes by clean.py and not come to MCU
+<script>
+document.addEventListener('DOMContentLoaded',function(){debugClean();});
+
+function removeChild(child)
+{
+while (child) {
+    nextSibling = child.nextSibling;
+    if (child.nodeType == 3) {
+        child.parentNode.removeChild(child);
+    }
+    child = nextSibling;
+}
+}
+function debugClean()
+{
+var child = document.body.firstChild, nextSibling;//?? what means nextSibling here? //getElementById("XXX")
+removeChild(child);
+removeChild(document.body.lastChild, nextSibling);
+}
+</script>
+*/
+<script>
+//var gNum_leds;
+//var bESP32;
+/*
+)HTM" constantScript2 R"HTM(
+*/
+//## alert(gNum_leds+" "+bESP32);
+</script>
+)HTM";
