@@ -76,7 +76,7 @@ void one_sine_pal_demo () {
   one_sine_pal_ChangeMe();
 
   EVERY_N_MILLISECONDS(100) {
-    nblendPaletteTowardPalette(currentPalette, targetPalette, maxChanges);   // AWESOME palette blending capability.
+    nblendPaletteTowardPalette(currentPalette, targetPalette, maxChanges);
   }
 
     thishue += thisrot;                                    // Motion speed

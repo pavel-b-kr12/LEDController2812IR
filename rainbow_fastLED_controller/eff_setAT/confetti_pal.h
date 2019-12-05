@@ -34,7 +34,7 @@ void confetti_pal () {
   confetti_pal_ChangeMe();                                                 // Check the demo loop for changes to the variables.
 
   EVERY_N_MILLISECONDS(100) {
-    nblendPaletteTowardPalette(currentPalette, targetPalette, 8+effSpeed/8);   // AWESOME palette blending capability.
+    nblendPaletteTowardPalette(currentPalette, targetPalette, 8+effSpeed/8);
   }
 
   confetti_pal_();

@@ -23,7 +23,7 @@ xscale = effLength/4; yscale = effLength/8;
 }
 
 void inoise8_mover() {
-	nblendPaletteTowardPalette(currentPalette, targetPalette, maxChanges);   // AWESOME palette blending capability.
+	nblendPaletteTowardPalette(currentPalette, targetPalette, maxChanges);
 
 	inoise8_mover_();                                          // Update the LED array with noise at the new location
 	fadeToBlackBy(leds, NUM_LEDS, 4);     

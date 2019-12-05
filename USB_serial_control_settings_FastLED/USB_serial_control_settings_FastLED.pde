@@ -21,9 +21,9 @@ boolean b_Cube=true; //set NUM_LEDS_slider to Max; Use to calculate current.
 boolean b_NUM_LEDS_adj=false;//true false //! fix adj mode especially if no adjustable set in MCU
 
 //5 30 60 120 144 150 180 300 450
-int NUM_LEDS_slider_startup=150;//105;//60*3;//105; //145*3*4 60*8 15*8 8*8 16*16  //this is also max for draw gemetry arr DrawLEDs_pointsX 
+int NUM_LEDS_slider_startup=144;//105;//60*3;//105; //145*3*4 60*8 15*8 8*8 16*16  //this is also max for draw gemetry arr DrawLEDs_pointsX 
 int NUM_LEDS_slider_m=105;
-int NUM_LEDS_slider_M=32*32;
+int NUM_LEDS_slider_M=16*16;
 
 int matrix_rowsE=12;//16; //for plotPX
 boolean NUM_LEDS_x8=false;// true false // have to be true if gNUM_LEDS>255 , so we can send it with 1 byte

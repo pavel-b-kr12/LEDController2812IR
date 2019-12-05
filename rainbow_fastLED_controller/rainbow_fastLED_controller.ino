@@ -40,8 +40,8 @@
 //#define ESP32_HTML_NO_RENDER //test on PC, control from USB app and WiFi HTML page
 
 //#define ESP32_SHOW_USB_test
-#define ESP8266_SHOW_USB_test
-						//#define ESP8266_dimmer_test
+//#define ESP8266_SHOW_USB_test
+						#define ESP8266_dimmer_test
 						//#define ESP8266_DemoReel101_test	
 
 //#define Cube4MCU // ESP32 server ( see code of render nodes in render_WiFi folder )

@@ -93,6 +93,7 @@ Some effects and test modes eat a lot of memory - disable it and use "#define sa
 2. open switch_slot.h to add new effect
 3. try to use existing parameters from struct SaveObj
 4. test, and if it is awesome - email effect to me
+5. run "HTML to h clean.py" to get .h (don't remember do it after each HTML edits)
 ### Cautions
 * Don't power stripe (e.g. longer than 15px with White light LEDs) through USB-programmer-controller boards. Disconnect "+" wire beetween stripe and controller or use separate power while connectiong USB
 * Check + - and max 5v .

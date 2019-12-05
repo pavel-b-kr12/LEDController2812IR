@@ -38,7 +38,7 @@ void animationA_() {                                             // running red 
 void animationA() {
 
   EVERY_N_MILLISECONDS(100) {
-    nblendPaletteTowardPalette(currentPalette, targetPalette, maxChanges);   // AWESOME palette blending capability.
+    nblendPaletteTowardPalette(currentPalette, targetPalette, maxChanges);
   }
 
   EVERY_N_SECONDS(5) {                                        // Change the target palette to a random one every 5 seconds.

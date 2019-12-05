@@ -1,5 +1,5 @@
 // comments has to be	"..../**comment*/...."	"....<!--comment-->...."	"....space//comment"	to be cleaned by  "HTML to h clean.py"
-
+//http://192.168.4.1/pwm?pv=5v0t14v1023t16v1013t43v92t55v33t96T98  without leading zeroes
 #define STR_HELPER(x) #x
 #define STR(x) STR_HELPER(x)
 
@@ -19,16 +19,20 @@ const String str  = R"HTM(
 <!DOCTYPE html><html>
 <head>
 <style>
-html {text-align:center; font-size: 22px;} 
+html {
+text-align:center; 
+font-size: 1.5vh;
+}
+
 * {
- font-size: 1em;
+/** font-size: 2vh;*/
  font-family: Arial;
  text-decoration: none;
 }
 
+.bgGr  {background-color: #ccccdd; padding-top: 0.8vh; padding-bottom: 0.5em;}
+.bgOr  {background-color: #ffeeaa; padding-top: 0.8vh; padding-bottom: 0.5em;}
 
-.bgGr  {background-color: #ccccdd;}
-.bgOr  {background-color: #ffeeaa; padding-top:18px;}
 /**
 .grad1 {
   height: 44px;
@@ -46,20 +50,21 @@ position:absolute;
 
 .tc{
 text-align:center;
-font-size: 44px;
+font-size: 3vh;
 }
 
 .pwm_p{
  position: absolute;
- width:55px; height:55px;
- border-radius:55px;
+ width:5vh; height:5vh;
+ border-radius:5vh;
  border: 2px solid #aaff00;/*73AD21*/
- line-height: 55px;
+ line-height: 5vh;
  /**
  display: table-cell;
  vertical-align: middle;
  */
  user-select: none;
+ text-align:center;
 }
 /**
 .contn{
@@ -103,40 +108,14 @@ input[type=range]::-webkit-slider-thumb {
 	background: -moz-linear-gradient(right,  #ff0000 0%, #fcf535 19%, #fcf535 19%, #00ff19 36%, #38ffee 52%, #0011ff 69%, #ff00fa 85%, #ff0004 100%);
 	background: -webkit-linear-gradient(right,  #ff0000 0%,#fcf535 19%,#fcf535 19%,#00ff19 36%,#38ffee 52%,#0011ff 69%,#ff00fa 85%,#ff0004 100%);
 	background: linear-gradient(to right,  #ff0000 0%,#fcf535 19%,#fcf535 19%,#00ff19 36%,#38ffee 52%,#0011ff 69%,#ff00fa 85%,#ff0004 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ff0000', endColorstr='#ff0004',GradientType=1 );
+/*	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ff0000', endColorstr='#ff0004',GradientType=1 );*/
 }
 
+.tst {font-size:0.7em; text-align: left;}
 
-.notImplemented
-{
-  color: #ff0000;
-  position: absolute;
-  text-align:left;
-  z-index: 99;
-}
-
-
-
-.abs {
-  float: right;
-  position: absolute;
-}
-
-
-.rOpt {
-	padding: 8px 8px 8px 32px;
-  position: fixed;
-  background-color: rgba(0,0,0,0.5);/**transparent*/
-  top: 0;
-  right: 0;
-  /**overflow-x: hidden;*/
-  /**transition: 0.5s;*/
-  /**padding-top: 40px;*/
-}
 
 .rOptItem a {
   padding: 8px 8px 8px 32px;
-  text-decoration: none;
   font-size: 25px;
   color: #818181;
   display: block;
@@ -144,11 +123,8 @@ input[type=range]::-webkit-slider-thumb {
 }
 
 
-.tst {float:left}
-
 .sett_item {
-  margin-bottom: -3px;
-  margin-right: 80px;
+  /*margin-bottom: -13px;*/
   padding: 10px;
 }
 
@@ -162,18 +138,20 @@ input[type=range]::-webkit-slider-thumb {
 }
 
 
-h2 {color: #55acee;}
-h3 {color: #444444;}
-
-p {display: inline ; background-color: #34eedb; color: white; padding: 6px 24px; color: #55acee;} /**227cae*/
-p.odd  {padding: 6px 120px;}
-
+h2 {color: #55acee; font-size: 1.4em; margin: 0.8em;}
+h3 {color: #444444;font-size: 1.3em; margin: 0.8em;}
+h4 {color: #444444;font-size: 0.8em; margin: 0;}
+i {font-size: 0.4em;}
 
 
-a.btS {background-color: #aa55ff; padding: 4px 12px; margin: 4px 12px;}
-a.btL { padding: 4px 12px; margin: 4px 12px;} /**34ffaa*/
+.sett_item p  {display: inline ; background-color:#7df2e6; color: white; padding:0.3em 2em; color:#1379c5;} /** bg #34eedb   c #085c9b #55acee 227cae    6px 24px;*/
+.sett_item p.odd  {padding: 0.3em 6em;}
 
-.bt {background-color: #3498db; color: white;	padding: 15px 22px;  border-radius: 8px;}
+
+a.btS {padding:0.3em 0.7em; margin: 4px 4px; font-size: 1em; background-color: #aa55ff; } /**0.3em 0.7em;*/
+a.btL {padding:0.3em 0.7em; margin: 4px 4px; font-size: 1em;} /**34ffaa*/     /**0.3em 0.7em;*/
+
+.bt {background-color: #3498db; color: white; padding: 0.7em 1.1em;  border-radius: 0.4em;} /** square btn + - around sett_item*/
 .bt:hover {background-color: #aabb00;	 cursor:pointer;}
 
 .on {background-color: #3498db;}
@@ -184,10 +162,28 @@ a.btL { padding: 4px 12px; margin: 4px 12px;} /**34ffaa*/
 
 .na {color: #333333; background-color: #000000;}
 
+/**@media only screen and (max-device-width : 640px) {*/
+.slider{
+	width: 95% !important; 
+	margin:1.5vh; /**2vh;  good value, but too long*/
+}
+/**
+}
+@media screen and (min-width: 1024px){
+.slider{
+	width: 98%;
+	outline: none;
+	opacity: 0.6;
+	margin: 1vh;
+}
+.slider:hover {
+	opacity: 1;
+}
+}
+*/
 
 
 .link {
-  text-decoration: none;
   color: #55acee;
   border-bottom: 2px dotted #55acee;
   transition: .3s;
@@ -202,17 +198,10 @@ a.btL { padding: 4px 12px; margin: 4px 12px;} /**34ffaa*/
 }
 
 
-
-#buttons {
-  padding-top: 50px;
-  text-align: center;
-}
-
 .btn {
   border-radius: 5px;
   padding: 6px 10px;
 /**  font-size: 16px;*/
-  text-decoration: none;
   margin: 3px;
   color: #fff;
   position: relative;
@@ -261,8 +250,6 @@ a.btL { padding: 4px 12px; margin: 4px 12px;} /**34ffaa*/
 .brown:hover {
   background-color: #78864B;
 }
-
-
 
 .red {
   background-color: #e74c3c;
@@ -315,9 +302,8 @@ div.scrollmenu{
 div.scrollmenu a {
   display: block; /**inline-block;  for horizontal*/
   color: white;
-  text-align: center;
-  padding: 14px;
-  text-decoration: none;
+  padding: 0.2em;
+  margin: 0.1em;
 }
 div.scrollmenu a:hover {
   background-color: #777;
@@ -328,46 +314,62 @@ div.scrollmenu a:hover {
 }
 
 
-.slider{
-	width: 100%;
-	outline: none;
-	opacity: 0.7;
-	margin: 14px;
-}
-.slider:hover {
-	opacity: 1;
-}
-
-
-
 .collap {
 	background-color: #999;
 	color: white;
 	cursor: pointer;
-	padding: 18px;
+	padding: 0.3em;
 	width: 100%;
 	border: none;
 	text-align: left;
-	outline: none;
-	font-size: 15px;
-
-	margin-top: 14px;
+	font-size: 1em;
+	margin-top: 0.2em;
+	font-size: 1.7em;
 }
 
-.collap_content.open {
-	display: block;
-}
-
+.collap_content.open {display: block;}
 .collap_active, .collap:hover {
 	background-color: #655;
 }
 .collap_content {
-	padding: 0 18px;
 	display: none;
 	overflow: hidden;
 	background-color: #f1f1f1;
 }
-							.tst {position: absolute; font-size: 10px; text-align: left;  top: 4px; left: 4px;}
+/**
+.gradRainbow{
+background: linear-gradient(
+to right,
+rgb(255, 90, 90) 0%,
+rgb(255, 255, 90) 15%,
+rgb(90, 255, 90) 30%,
+rgb(90, 255, 255) 50%,
+rgb(90, 90, 255) 65%,
+rgb(255, 90, 255) 80%,
+rgb(255, 90, 90) 100%
+);
+}
+*/
+.gradRainbowRB{
+background: linear-gradient(
+to right,
+rgb(255, 90, 90) 0%,
+rgb(255, 255, 90) 35%,
+rgb(90, 255, 90) 50%,
+rgb(90, 255, 255) 65%,
+rgb(90, 90, 255) 100%
+);
+}
+.gradBG{
+background: linear-gradient(
+to bottom,
+rgb(222, 222, 222) 0%,
+rgb(255, 222, 222) 55%,
+rgb(255, 122, 122) 62%,
+rgb(122, 122, 255) 100%
+);
+}
+
 
 table, td {border:1px solid/**black*/;}
 .pin
@@ -455,7 +457,7 @@ function request(url)
 	$('tst').innerHTML+="<br/>"+xhr.responseText;
  };
  xhr.send();
- $('tst').innerHTML="<br/>"+url;
+ $('tst').innerHTML=url;
  /** test
 	var tst="effN=12,effSpeed=6";
 	var ss = tst.split(",");
@@ -468,7 +470,6 @@ function request(url)
 }
 
 /**! названия не меняются , можно сделать массив рус имен*/
-/**TODO refactor w https://www.xul.fr/javascript/associative.php */
 /**TODO effQualityMark, eff geometry*/
 /**this generated in PC serial GUI app btn_copy_switch_nms_click, based on switch_slot.h*/
 const linksNames ={'fillStriped':11,'fillStriped1':12,'fillStripedFillRainbow':14,'fillStripedFillRainbow1':15,'fillByPalette':16,'fillByPalettesBlend_moving':17,'rainbow':18,'rainbowConfetti':19,'rainbowWithGlitter':20,'rainbow_beat':21,'randomBlinkRainbow':22,'randomBlinkRainbowFade':23,'rainbow_fill_slow':28,'rainbow_fill_slow1':29,'rainbow_beat1':31,'rainbow_beat2':32,'rainbowSegments_shift':33,'rainbowSegments_shift1':34,'rainbowSegments_shift2':35,'rainbowSegments_shiftSin':36,'rainbowSegments2':37,'rainbowCycle':39,'sinelon':40,'bpm':41,'juggle':42,'spawnPixel_moveAll':43,'fillFadeChangeAll':44,'fillFadeChangeAll_beat8':45,'fillFadeChangeAll_beatsin8':47,'fadeEvenUneven':48,'fadeEvenUnevenDif':49,'confetti':50,'confetti1':51,'confetti_move':52,'confetti_moveRemainFirstAdd':53,'confetti_moveRemainFirstBlend':54,'confetti_moveRemainFirstBlendByPos':55,'random_burst':56,'random_color_pop':57,'randomBlink':58,'color_bounce':62,'color_bounc_HueByPos':64,'color_bounce_multiple':65,'color_bounceFADE':66,'color_bounceFADE1':67,'CubeCornersLight':70,'CubeTest':71,'matrixCube2':72,'matrixCube':73,'movingBlendRGB':77,'pulse_one_color_all':87,'pulse_one_color_all_rev':88,'radiation':90,'Fire':96,'mover_lim_mark':101,'mover_lim_mark1':102,'beatWave':109,'confetti2':111,'confetti2_demo':112,'dot_beat':114,'dot_beat_area':115,'fill_grad':116,'inoise8_fire':117,'inoise8_mover':118,'inoise8_pal':119,'juggle_pal':120,'matrix_pal_demo':122,'matrix_ray':123,'noise16_1':124,'noise16_2':125,'noise16_3':126,'one_sine_pal_demo':128,'palettecrossfade':129,'plasma':130,'rainbow_beat2':131,'rainbow_march':132,'rainbow_march_demo':133,'sawtooth':136,'sinelon2':138,'three_sin_demo':139,'three_sin_pal_demo':140,'two_sin_pal_demo':141,'blend_test':144,'fill_colours':148,'animationA':149,'setColors_fill':151,'setColors_fill_tstRange':152,'setCurrentPalette':153,'setCurrentPalette_Test':154,'splitModeEditor':155,'confetti_density':157,'eff_sin_R_G_B':158,'eff_sin_R_G_B1':159,'eff_sin_R_G_B2':160,'waveSmooth':161,'palette_pipette':164,'test_palettes':165,'test_gradient':166,'test_blend':167,'fill_segments_anim':175,'fill_segments_anim1':176,'draw_sample':181,'soundmems_pal':201,'soundmems_noise':202,'mus_random_mov':203,'mus_random_mov1':204,'soundmems_wave':205,'soundmems_wave1':206,'soundmems_peak_ripple':207,'soundmems_fire':208,'mus_arduinoFFT':209,'mus_arduinoFFT1':210,'mus_arduinoFFT2':211,'test_easing':214,'wave_adj':215,'wave_H':216,'gen_wave_H_moveAll':217,'gen_wave_H_moveAll_blinkRand':218,'gen_wave_H_v2_moveAll_blinkRand':219,'matrix_test':220,'ems_lightsALL':224,'fillStriped2':225,'sinelon1':227,'fillStriped3':228,'fillStriped4':229,'fillStriped5':230,'random_len_cell_1':233,'random_len_cell_seemless':234,'PWM_Dimmer':239,'PinSequencer':240,'mode_switch':241,'fillStriped6':242,'fillStriped7':243,'fillStriped8':244,'fillStriped9':245,'nodo':247};
@@ -493,7 +494,8 @@ function clickBtnEff(e){
 	if(resul!=null && resul.length>0)
 	{
 		var effnm=resul[1]; 
-		link = link.replace(effnm, linksNames[effnm]);  	//<a href="effN=eff1">	-to-  <a href="effN=123">
+		if(isNaN(effnm))// skip <a href="effN=123">
+			link = link.replace(effnm, linksNames[effnm]);//<a href="effN=eff1">	-to-  <a href="effN=123">  
 	}
 	/** linksNames[this.innerText]; */
 	request( "http://192.168.4.1/sett?"+link); 			//console.log(link);
@@ -559,13 +561,15 @@ var coll = $$("collap");
 var i;
 for (i = 0; i < coll.length; i++){
   coll[i].addEventListener("mousedown", function(){
-	this.classList.toggle("active");
 	var content = this.nextElementSibling;
-	if (content.style.display === "block") content.style.display = "none";
-	else content.style.display = "block";
+	content.classList.toggle("open");
+	if (content.classList.contains("open"))this.scrollIntoView();
+	else  window.scrollTo(0,0);
   });
 }
 init();
+
+ //$('tst').innerHTML=window.screen.availHeight+'<br/>'+window.screen.height
 }
 document.addEventListener('DOMContentLoaded',function(){setup();});
 function touchHandler(ev)
@@ -626,51 +630,91 @@ function sendSliderVal(inp){
 }
 
 function toggleSliders(){
-toggleVisibility($$("slider"));
+toggleDisplay($$("slider"));
 }
+function toggleDisplay(els){
+for (var i = 0; i < els.length; i++){
+ console.log(els[i].style.display)
+ 	if(els[i].style.visibility != 'hidden') 
+	{
+		els[i].style.visibility = 'hidden';
+		els[i].style.margin = '0em';
+	}
+	else
+	{
+		els[i].style.visibility = 'visible';
+		els[i].style.margin = '1.5em';
+	}
 
+}
+/**
+for (var i = 0; i < els.length; i++){
+ console.log(els[i].style.display)
+	if(els[i].style.display != 'block')  els[i].style.display = 'block';
+	else els[i].style.display = 'none';
+}*/
+}
+/** //toggleVisibility($$("slider"));
 function toggleVisibility(els){
 for (var i = 0; i < els.length; i++){
 	if(els[i].style.visibility != 'hidden')  els[i].style.visibility = 'hidden';
 	else els[i].style.visibility = 'visible';
 }
 }
+*/
 </script>
 </head>
 <body>
-	<i class="tst abs" id="tst">test responce:</i>
-
-<h2>HTML ws2812b control page <a href="#">v0.4</a> <a href="mailto:pavel.b.kr12@gmail.com?subject=2812,soft">pavel.b.kr12@gmail.com</a> </h2> 
+<p class='tst'>
+<a id="tst">test responce:</a><br/>
 Current effect: <b id="eff_nm_current"></b> settings: <a id="sett_lnk">?</a>
+</p>
 
-<div class="rOpt">
+<button type="button" class="collap">global</button>
+<div class="gradRainbowRB collap_content">
+<h2>HTML ws2812b control page <a href="#">v0.4</a> <a href="mailto:pavel.b.kr12@gmail.com?subject=2812,soft">pavel.b.kr12@gmail.com</a></h2> 
+ <!-- <div class="rOpt"> --> <!--to make float -->
 <p class="btn red sender rOptItem" href="P">Pause sending data</p>
 <p class="btn blue rOptItem" onmousedown="toggleSliders()">togle sliders</p>
+<!-- </div> -->
+
+<!--class="bgGr" -->
+<h4>show:</h3>
+<div >
+<a class="sender btn green" href="effN=10">N off</a>
+<a class="sender btn green" href="effN=249">N random</a>
+<!--<a class="sender btn green" href="effN=251">animate_to_slot1</a>-->
+<a class="sender btn green" href="effN=252">animate_SW</a><br/>
+<a class="sender btn green" href="effN=250">N random_demo_animated_SW</a>
+<a class="sender btn green" href="effN=253">N predefined_show_seq</a><br/>
+<a class="sender btn green" href="effN=254">N random_demo_fast_SW</a>
+<a class="sender btn green" href="effN=255">N random_demo_SW</a><br/><br/>
 </div>
 
+
+<h4>map to matrix:</h3><i>Act like toggle switch, but now only one active. This post processing being applied after all:</i>
+<div>
+<a class="sender btn green" href="effN=242">bMap_type_matrix_zigZag_h</a>
+<a class="sender btn green" href="effN=243">bMap_type_matrix_spiral_cw</a>
+<a class="sender btn green" href="effN=244">bMap_type_matrix_labyrinth_cw</a>
+<a class="sender btn green" href="effN=245">bMap_type_mirror_half</a>
+<a class="sender btn green" href="effN=246">bMap_type_history</a>
+</div>
+</div>
+
+<!-- 
 <button type="button" class="collap">map to matrix</button>
-<div class="bgGr collap_content">
-	Act like toggle switch, but now only one active. This post processing being applied after all:
- <a class="sender btn green" href="effN=242">bMap_type_matrix_zigZag_h</a>
- <a class="sender btn green" href="effN=243">bMap_type_matrix_spiral_cw</a>
- <a class="sender btn green" href="effN=244">bMap_type_matrix_labyrinth_cw</a>
- <a class="sender btn green" href="effN=245">bMap_type_mirror_half</a>
- <a class="sender btn green" href="effN=246">bMap_type_history</a>
-</div>
-<!--
-<button type="button" class="collap">other global effects</button>
-<div class="bgGr collap_content">
-	<hr/>
-	<hr/>
-</div>
- -->
+<div class="bgGr collap_content"></div>
+-->
+
 <button type="button" class="collap">PWM dimer</button>
-<div class="bgGr collap_content open">
+<div class="gradBG collap_content">
 <hr/>
 <!-- )HTM" constantScript2 R"HTM( -->
-<table id="pcb" style="width:22%;height:40%"></table>
+<table id="pcb" style="width:26vh;height:33vh"></table>
+<!-- 
 <button onmousedown="recalculate_vt_all(true)">send</button>
-<!-- <button onmousedown="create_PWM_Plot()">create</button> -->
+<button onmousedown="create_PWM_Plot()">create</button> -->
 
 <!-- <svg id="svg" width="100%" height="50%" preserveAspectRatio="none"  viewBox="0 -490 600 490"></svg> -->
 <!-- <div id="svg_div"></div> -->
@@ -685,6 +729,7 @@ Current effect: <b id="eff_nm_current"></b> settings: <a id="sett_lnk">?</a>
 <script>
 var pinClick_last;
 var pwm_state=0;
+var pwm_p_sel=5;//now selected pin
 function pinClick()
 {
  if(pinClick_last!=null && pinClick_last!=this)	pinClick_last.classList.remove('sel');
@@ -694,6 +739,7 @@ function pinClick()
  if(!this.classList.contains("sel"))
  {
  this.classList.add("sel");
+ pwm_p_sel=parseInt(this.innerHTML);
  $("pinSelN").innerHTML=this.innerHTML;
  }
  else
@@ -720,10 +766,10 @@ function newP(x, y, nm){
 }
 function fillTable(){
  s="";
- for(i=0;i<14;i++)
+ for(i=0;i<13;i++) //for(i=0;i<15;i++)
  {
 	s+='<tr><td id="'+0+"_"+i+'" class="pin"/>';
-	if(i==0)s+='<td rowspan=14 id="pinSelN" class="tc"/>';
+	if(i==0)s+='<td rowspan=13 id="pinSelN" class="tc"/>'; //15
 	s+='<td  id="'+1+"_"+i+'" class="pin"/></tr>';
 }
  $('pcb').innerHTML+=s;
@@ -751,7 +797,6 @@ function createdivLine(elem, id, ax,ay, bx,by, size, opacity, color){
 	//elem.appendChild(newdiv); 
 
 	return '<div id="'+id+'" class="divLin"></div>';
-	
 	//console.log(d)
 	//moveDivLine(id, ax,ay, bx,by);
 }
@@ -773,6 +818,16 @@ var pt_m=0;
 var pt_M=9;
 var pt_Mlim=1000;
 aplot=$("pwm_plot");
+
+
+function vh(v) {
+  var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+  return (v * h) / 100;
+}
+function vw(v) {
+  var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+  return (v * w) / 100;
+}
 
 function dragElement(el){
  var pos1=0,pos2=0,pos3=0,pos4=0;
@@ -813,50 +868,55 @@ function dragElement(el){
 	ptN=PlotPoints[el.id];
 	if(ptN==0)// point of min
 	{
-	 el.innerHTML+="<br/>"+el.offsetLeft;
+	 //el.innerHTML+="<br/>"+el.offsetLeft;
 	 p_m=el.offsetTop;
 	 pt_m=el.offsetLeft;
 	 
-	 recalculate_vt_all();
+	 recalculate_vt_all(0);
 	}
 	else
 	if(ptN==plotPtM)// point of max
 	{
-	 el.innerHTML+="<br/>"+el.offsetLeft+" "+(el.offsetLeft-200)/(document.body.offsetWidth-20)*1000;
-	 p_M=el.offsetTop;
+	 //el.innerHTML+="<br/>"+el.offsetLeft+" "+(el.offsetLeft-200)/(document.body.offsetWidth-20)*1000;
+	 pwm_t_Mc=pwm_tc;
+	 p_M=el.offsetTop; //!!probably need upd this first before save pwm_t_Mc and recalc it
 	 pt_M=el.offsetLeft;
 	 
-	 recalculate_vt_all();
+	 recalculate_vt_all(0);
 	}
 	else
 	{
+		var centerWx=vh(2);
 	 if(PlotPoints[el.id]<plotPtM-1) //no connection to points of min and max
 	 {
 	 nm_next="pwm_p"+(PlotPoints[el.id]+1)
-	 moveDivLine((el.id+"l"), el.offsetLeft+22,el.offsetTop+22, $(nm_next).offsetLeft+22,$(nm_next).offsetTop+22)
+	 moveDivLine((el.id+"l"), el.offsetLeft+centerWx,el.offsetTop+centerWx, $(nm_next).offsetLeft+centerWx,$(nm_next).offsetTop+centerWx)
 	 }
 	 if(PlotPoints[el.id]>1)
 	 {
 	 nm_prev="pwm_p"+(PlotPoints[el.id]-1)
-	 moveDivLine((nm_prev+"l"), el.offsetLeft+22,el.offsetTop+22, $(nm_prev).offsetLeft+22,$(nm_prev).offsetTop+22)
+	 moveDivLine((nm_prev+"l"), el.offsetLeft+centerWx,el.offsetTop+centerWx, $(nm_prev).offsetLeft+centerWx,$(nm_prev).offsetTop+centerWx)
 	 }
 	}
+	//recalculate_vt_all(0); //send only on closeDragElement or every move //this slow down CPU
   }
  function closeDragElement(){
 	// stop moving when mouse button is released:
 	document.onmouseup = null;
 	document.onmousemove = null;
+	recalculate_vt_all(1);
   }
 }
-
-function recalculate_vt(el){
+var pwm_tc;//calculated time of current point
+var pwm_t_Mc=10;//calculated time of max point == total length ms 
+function recalculate_vt(el){ //also store pwm_tc, that we use in last point as t Max
 if((p_M-p_m)<1)p_M++;
 v=Math.round((el.offsetTop-p_m)/(p_M-p_m)*p_Mlim ) ;
 v=Math.min(Math.max(v, 0), p_Mlim);//clamp
-t=Math.round((el.offsetLeft-pt_m)* ((pt_M-pt_m)/document.body.offsetWidth) ) ;
-t=Math.min(Math.max(t, 0), pt_Mlim);//clamp
-el.innerHTML=v+"<br/>"+t/10+"s";
-return "v"+v+"t"+t;
+pwm_tc=Math.round((el.offsetLeft-pt_m)* ((pt_M-pt_m)/document.body.offsetWidth) ) ;
+pwm_tc=Math.min(Math.max(pwm_tc, 0), pt_Mlim);//clamp
+el.innerHTML=v+"<br/>"+pwm_tc/10+"s";
+return "v"+v+"t"+pwm_tc;
 }
 function recalculate_vt_all(bReq){
  r="";
@@ -866,7 +926,7 @@ function recalculate_vt_all(bReq){
  }
  //https://arduino.stackexchange.com/questions/1013/how-do-i-split-an-incoming-string
  if(bReq){
- request("http://192.168.4.1/pwm?v="+r); //  t/10 in MCU 
+ request("http://192.168.4.1/pwm?pv="+pwm_p_sel+r+"T"+pwm_t_Mc); //  t/10 in MCU 
  //console.log(r);
  }
 }
@@ -892,7 +952,7 @@ function createPlotPoint(){
   }
 
   PlotPoints[nm]=i;
-  strHTM+='<div class="pwm_p" id="'+s+i+'" style="left:'+i*50+'px;top:'+i*50+'px;'+c+'">o</div>';
+  strHTM+='<div class="pwm_p" id="'+s+i+'" style="left:'+i*vw(10)+'px;top:'+i*vh(2)+'px;'+c+'">o</div>';
  }
  
  aplot.innerHTML+=strHTMli;
@@ -916,7 +976,7 @@ newP(0,3,10);
 newP(0,4,9);
 newP(1,0,16);
 newP(1,1,5);
-//newP(1,2,4); //FastLED
+//newP(1,2,4); //! color  FastLED
 newP(1,3,0); //GPIO_0 //ESP-01
 newP(1,4,2); //GPIO_2 //ESP-01
 newP(1,7,14);
@@ -1014,7 +1074,7 @@ TODO
 </div>
 -->
 
-<button type="button" class="collap">eff wave</button>
+<button type="button" class="collap">eff wave, cube</button>
 <div class="bgGr collap_content">
 <!--
 possible syntax:
@@ -1052,6 +1112,7 @@ this parces in  "$$('sender'); ...."
   <!-- <a class="sender btn blue" href="indexOrBits=20">cubicwave8</a> -->
   <!-- <div value="indexOrBits" class="sett_item">function</div> -->
 <hr/>
+<div class="scrollmenuFlex" id="effsCube"></div> <!-- filling by linksGenerator('Cub') -->
 <hr/>
 </div>
 
@@ -1076,17 +1137,6 @@ this parces in  "$$('sender'); ...."
 </div>
 </div>
 
-<div class="bgGr">
-<a class="sender btn green" href="effN=10">N off</a>
-<a class="sender btn green" href="effN=249">N random</a>
-<!--<a class="sender btn green" href="effN=251">animate_to_slot1</a>-->
-<a class="sender btn green" href="effN=252">animate_SW</a><br/>
-<a class="sender btn green" href="effN=250">N random_demo_animated_SW</a>
-<a class="sender btn green" href="effN=253">N predefined_show_seq</a><br/>
-<a class="sender btn green" href="effN=254">N random_demo_fast_SW</a>
-<a class="sender btn green" href="effN=255">N random_demo_SW</a><br/><br/>
-</div>
-
 <div class="bgOr">
 <div id="btS">
 <b>save to slot :</b>
@@ -1098,8 +1148,7 @@ this parces in  "$$('sender'); ...."
 </div>
 
 <div class="bgGr">
-<br/>
-<div class="scrollmenuFlex" id="effsCube"></div> <!-- filling by linksGenerator('Cub') -->
+
 <!-- 
 <hr/>
 List may contain disabled effect that lead to RUNDOM eff.

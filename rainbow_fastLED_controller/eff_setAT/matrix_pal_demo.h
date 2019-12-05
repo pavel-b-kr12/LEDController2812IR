@@ -166,7 +166,7 @@ void matrix_pal_demo () {
 
   EVERY_N_MILLISECONDS(100) {
     uint8_t maxChanges = 24; 
-    nblendPaletteTowardPalette(currentPalette, targetPalette, maxChanges);   // AWESOME palette blending capability.
+    nblendPaletteTowardPalette(currentPalette, targetPalette, maxChanges);
   }
 
   matrix_();

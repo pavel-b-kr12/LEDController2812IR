@@ -70,7 +70,7 @@ void soundmems_noise() {
 
   EVERY_N_MILLISECONDS(10) {
     uint8_t maxChanges = 24; 
-    nblendPaletteTowardPalette(currentPalette, targetPalette, maxChanges);   // AWESOME palette blending capability.
+    nblendPaletteTowardPalette(currentPalette, targetPalette, maxChanges);
     fillnoise8();                                             // Update the LED array with noise based on sound input
     fadeToBlackBy(leds, NUM_LEDS, 1);                         // 8 bit, 1 = slow, 255 = fast
     sndwave();                                                // Move the pixels to the left/right.

@@ -77,6 +77,15 @@ void handle_pwm() {
 
 	}
 	}
+	
+	String arg ="5v0t14v1023t16v1013t43v92t55v33t96T98"; //server.arg("pv"); //pv=5v0t14v1023t16v1013t43v92t55v33t96T98
+	if(arg.length() != 0)
+	{
+		//int val=arg.toInt();
+		https://stackoverflow.com/questions/2827714/whats-the-easiest-way-to-parse-a-string-in-c
+				https://www.bitdegree.org/learn/string-to-int-c-plus-plus
+	}
+
 	/*
 	#ifdef returnToClient
 	server.send(200, "text/html", 
@@ -389,7 +398,7 @@ void setup_wifi()
 		Udp.begin(portServer);
 		for(byte i=0;i<NUM_CLIENTS;i++)	ip_renders[i]=IPAddress(192, 168, 4, 10+i);
 	#elif defined(enableUDP)
-		Udp.begin(portServer); //???????????###### need this to work HTML
+		Udp.begin(portServer); //???????????###### need this to work HTML on ESP(? don't remember waht MCU) 
 	#endif
 
 	#if defined(WiFi_ControlHTMLpage)

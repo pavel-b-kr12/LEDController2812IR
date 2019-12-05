@@ -30,11 +30,9 @@ void inoise8_pal_() {
 }
 
 void inoise8_pal() {
-// EVERY_N_MILLISECONDS(10) { 
 	//maxChanges=effLength/8; //!@@@
-    nblendPaletteTowardPalette(currentPalette, targetPalette, maxChanges);   // AWESOME palette blending capability.
+    nblendPaletteTowardPalette(currentPalette, targetPalette, maxChanges);
     inoise8_pal_();                                                            // Update the LED array with noise at the new location
-// }
  
   EVERY_N_SECONDS(5) {                                        // Change the target palette to a random one every 5 seconds.
     targetPalette = CRGBPalette16(CHSV(random8(), 255, random8(128,255)), CHSV(random8(), 255, random8(128,255)), CHSV(random8(), 192, random8(128,255)), CHSV(random8(), 255, random8(128,255)));
@@ -55,11 +53,9 @@ CRGBPalette16 PaletterRnd_frost()
 	);
 }
 void inoise8_pal_frost() {
-// EVERY_N_MILLISECONDS(10) { 
 	maxChanges=effLength/8; //!
-    nblendPaletteTowardPalette(currentPalette, targetPalette, maxChanges);   // AWESOME palette blending capability.
+    nblendPaletteTowardPalette(currentPalette, targetPalette, maxChanges);
     inoise8_pal_();                                                            // Update the LED array with noise at the new location
-// }
  
   EVERY_N_SECONDS(5) {                                        // Change the target palette to a random one every 5 seconds.
     targetPalette=PaletterRnd_frost();

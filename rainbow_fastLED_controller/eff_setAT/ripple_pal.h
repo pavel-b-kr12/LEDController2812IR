@@ -51,7 +51,7 @@ void ripple_pal () {
 
   EVERY_N_MILLISECONDS(100) {
     
-    nblendPaletteTowardPalette(currentPalette, targetPalette, maxChanges);   // AWESOME palette blending capability.
+    nblendPaletteTowardPalette(currentPalette, targetPalette, maxChanges);
   }
 
   EVERY_N_SECONDS(3) {
