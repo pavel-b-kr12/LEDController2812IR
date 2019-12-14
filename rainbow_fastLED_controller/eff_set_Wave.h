@@ -136,7 +136,7 @@ void gen_wave_H_v2_moveAll_blinkRand() //!fix разрыв
 	leds[0] .fadeToBlackBy( beatsin8(40+effLength,0,1+effSpeedH*0.9) );
 
 	if( i_eff%(1+effFade/32)<2 ) 
-	for (int i = 20; i < NUM_LEDS; ++i) //fade one side of stripe
+	for (NUM_LEDS_type i = 20; i < NUM_LEDS; ++i) //fade one side of stripe
 	{
 		 leds[i].fadeToBlackBy( 1 );
 	}
@@ -156,7 +156,7 @@ void wave_adj() //!fix разрыв
 	posX_f+=dx;
 	millis_last=millis();
 	
-	for (int i = 0; i < NUM_LEDS; ++i)
+	for (NUM_LEDS_type i = 0; i < NUM_LEDS; ++i)
 	{
 		 
 		 int v_arg=(NUM_LEDS_type)posX_f +  i*effLength/16;
@@ -174,6 +174,164 @@ void wave_adj() //!fix разрыв
 		}
 		
 		leds[i]=CHSV(effLengthH+ (sin8(millis()/200)/10-12), effSpeedH, v ); 
+	}
+}
+
+
+void oppositeWavesBlend()
+{
+	//beatsin8(24,0,NUM_LEDS-1);
+	//beatsin8(24,NUM_LEDS-1,0);
+	//triwave8(24,0,NUM_LEDS-1);
+	//i_eff%NUM_LEDS
+	
+	uint16_t it=millis()/10;
+	
+	 if(pos1==NUM_LEDS-1)pos1=0;
+		else pos1++;
+	
+	 if(pos2==0) pos2=NUM_LEDS-1;
+		else  pos2--;
+	
+			//		// leds[i].fadeToBlackBy( 1 );
+	for (NUM_LEDS_type i = 0; i < NUM_LEDS; ++i) //fade one side of stripe
+	{
+
+		switch(indexOrBits/10)
+		{
+		case 0:
+		leds[i]=CHSV( it*(1+(effLengthH/16))/100,255,triwave8(i+it*effLength/8));
+		leds[i]+=CHSV( 30*(it*(1+(effLengthH/16))/2000)+it*(1+(effLengthH/16))/100,255,triwave8(i-it*effLength/8));
+		break;
+
+		case 1:
+			leds[i]=CHSV( (i+it*(1+(effLengthH/16))/100)%255 + ((NUM_LEDS-i)+it*(1+(effLengthH/16))/100)%255,255,triwave8((i+it*effLength/8)*255/NUM_LEDS)); //1
+		break;
+		case 2:
+			leds[i]=CHSV( (i+it*(1+(effLengthH/16))/100)%255 + ((NUM_LEDS-i)+it*(1+(effLengthH/16))/100)%255,255,triwave8((i+it*effLength/8)*255/NUM_LEDS)+triwave8((NUM_LEDS-i+it*effLength/8)*255/NUM_LEDS)); //:)
+		break;
+		case 3:
+			leds[i]=CHSV(
+			sin8((i+it*effLength/256)*255/NUM_LEDS) +
+			sin8((i-it*effLengthH/256)*255/NUM_LEDS)
+			,255,255); // triwave8((i+it*(1+(effLengthH/16))/100)%255 )+ triwave8(((NUM_LEDS-i)-it*(1+(effLengthH/16))/100)%255)
+		break;			
+		case 4:
+			leds[i]=CHSV( (i+it*(1+effLengthH/8)/100)%255 * ((NUM_LEDS-i)+it*(1+(effLengthH/16))/100)%255,255,triwave8((i+it*effLength/32)*255/NUM_LEDS)); //:) when slow
+		break;
+
+		case 5: //+
+		{
+		uint16_t b1=sin8((i+it*(effLength/16))*255/NUM_LEDS);
+		b1=b1*b1/256;
+		uint16_t b2=sin8(((NUM_LEDS/2+i)-it*(effLength/16))*255/NUM_LEDS);
+		b2=b2*b2/256;
+		byte h1=it/(10+effLengthH);
+		leds[i]=CHSV( h1,255,		b1); //fix crack
+		leds[i]+=CHSV(h1+60+sin8(it/100)/4,255,	b2);
+		}
+		break;
+		
+		case 6: //==5
+		{
+		uint16_t b1=sin8((i+it*(effLength/16))*255/NUM_LEDS);
+		b1=b1*b1/256;
+		uint16_t b2=sin8(((NUM_LEDS/2+i)-it*(effLength/16))*255/NUM_LEDS);
+		b2=b2*b2/256;
+		byte h1=it/(10+effLengthH);
+		leds[i]=CHSV( h1  + h1+60+sin8(it/100)/4,255,		b1+b2); //fix crack
+		}
+		break;
+		
+		 
+		case 7: //oposite
+		leds[i]=CHSV(
+		it*(1+(effLengthH/16))/100  +  30*(it*(1+(effLengthH/16))/2000)+it*(1+(effLengthH/16))/100,
+		255 ,
+		sin8((i-it*effLength/8)*255/NUM_LEDS*2)+sin8((NUM_LEDS/2+i-it*effLength/8)*255/NUM_LEDS*2)/256
+		);
+		break;
+				 
+		case 8: //one dir
+		leds[i]=CHSV(
+		it*(1+(effLengthH/16))/100  +  30*(it*(1+(effLengthH/16))/2000)+it*(1+(effLengthH/16))/100,
+		255 ,
+		sin8((i+it*effLength/8)*255/NUM_LEDS*2)+sin8((NUM_LEDS/2+i+it*(effLength/13))*255/NUM_LEDS*2)/256
+		);
+		break;
+
+		case 9: //+
+		leds[i]=CHSV( 
+		it*(1+(effLengthH/16))/100
+		+30*(it*(1+effLengthH/8)/2000)+it*(1+effLengthH/8)/100,
+		255,
+		qadd8( beatsin8(effLength/3,0,255,0,i)/2,beatsin8(effLength/4,255,0,NUM_LEDS/2-i)/2)
+		);
+
+		//nwae
+		// leds[i]=CHSV( it/100,255,beatsin8(24,0,255));
+		// leds[i]+=CHSV( 30*(it/2000)+it/100,255,beatsin8(24,255,0));
+		break;
+		
+		case 10: //:)
+		{
+			leds[i].fadeToBlackBy( 1+effFade/16 );
+			byte h1=0;
+			byte h2=122;
+			if(effSpeedH>50 && effSpeedH<150) 
+			{
+				h1=it/100;
+				h2=150+it/50;
+			}
+			else
+			if(effSpeedH>150)
+			{
+				h1=i+it/5;
+				h1=it/3;
+			}
+				
+			if(i==pos1) leds[i]+=CHSV( h1,millis()/4000%2?255:(i_eff+i)%2*255,255);//
+			if(i==pos2) leds[i]+=CHSV( h2,255,millis()/4000%2?255:(i_eff+i)%2*255);//
+		}
+		break;
+		
+		case 11:
+		
+		break;
+		
+		/*
+		case 9:
+		leds[i]=CHSV( it*(1+(effLengthH/16))/100,255, (i+it*(effLength/8))%128);
+		leds[i]+=CHSV( 30*(it*(1+(effLengthH/16))/2000)+it*(1+(effLengthH/16))/100,255,(i-it*(effLength/8))%128);
+		break;
+
+		case 10:
+		leds[i]=CHSV(
+		it*(1+(effLengthH/16))/100  +   (NUM_LEDS/2-it)*(1+(effLengthH/16))/100,
+		255,
+		it*effLength/8%128 +(NUM_LEDS/2-i-it*effLength/8)%128
+		)
+		+
+		CHSV(
+		it*(1+(effLengthH/16))/100  +   (NUM_LEDS/2-it)*(1+(effLengthH/16))/100,
+		255,
+		it*effLength/8%128 +(i-it*effLength/8)%128
+		)
+		;
+
+		 break;
+		 
+		 		case 11:
+		leds[i]=CHSV(
+		i+it*(1+(effLengthH/16))/100  +   (NUM_LEDS-it)*(1+(effLengthH/16))/100,
+		255,
+		NUM_LEDS-i+it*effLength/8%128 +(-it*effLength/8)%128
+		);
+
+		 break;
+		 */
+
+		}
 	}
 }
 

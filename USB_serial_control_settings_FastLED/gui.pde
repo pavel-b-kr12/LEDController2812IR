@@ -56,6 +56,7 @@ public void button_pause_click1(GButton source, GEvent event) { //_CODE_:button_
 
 public void button_clear_click1(GButton source, GEvent event) { //_CODE_:button_clear:383723:
 	SendMsg(settingsVals.get("clear").message_code, 0);
+	if(bSim) bclear_msg_buffer_now=true;
 } //_CODE_:button_clear:383723:
 
 public void slider_effN_change1(GSlider source, GEvent event) { //_CODE_:slider_effN:684540:

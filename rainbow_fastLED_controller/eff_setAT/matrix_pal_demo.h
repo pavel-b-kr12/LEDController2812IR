@@ -78,7 +78,7 @@ void matrixCube() //TODO
 
 }
 #endif
-void matrix() {                                   //-m29-ONE LINE MATRIX
+void Matrix() {                                   //-m29-ONE LINE MATRIX
   byte rand = random8(0, 100);
 
   if(effLength<125) thishue = effLength*2;

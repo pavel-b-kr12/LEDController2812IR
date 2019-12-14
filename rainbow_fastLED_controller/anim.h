@@ -15,94 +15,16 @@ CRGB ledsX_[gNUM_LEDS];//!opt	 //-ARRAY FOR COPYING WHATS IN THE LED STRIP CURRE
 //int ledsX_[NUM_LEDS][3];
 #endif
 
-byte thisstep = 10;
-
-
-
-unsigned long randomShow_next_effN_sw_t=0;
-
-// Define variables used by the sequences.
-byte		twinkrate = 100; // The higher the value, the lower the number of twinkles.
-byte		thisfade =	  8; // How quickly does it fade? Lower = slower fade rate.
-//nscale					 // Trail behind the LED's. Lower => faster fade.
-byte		thishue =	 50; // Starting hue.
-byte		thissat =	255; // The saturation, where 255 = brilliant colours.
-byte		thisbri =	255; // Brightness of a sequence.
-bool		randhue =	  1; // Do we want random colours all the time? 1 = yes.
-uint8_t		thisinc =	  1; // Incremental value for rotating hues
-int			huediff =	256; // Range of random #'s to use for hue
-
-
-uint8_t bgH;
-uint8_t bgHinc = 0;
-uint8_t bgbri = 0;                                        // Brightness of background colour
-
-uint8_t deltahue = 15; // Hue change between pixels.
-uint8_t xscale = 30;                                         // Wouldn't recommend changing this on the fly, or the animation will be really blocky.
-uint8_t yscale = 30;                                         // Wouldn't recommend changing this on the fly, or the animation will be really blocky.
-uint8_t maxChanges = 24;            //! set every time or not chane                          // Value for blending between palettes.
-uint8_t thisbeat;
-uint8_t huerot;
-uint8_t palIndex;
-
-
-uint8_t thiscutoff = 128;
-uint8_t allfreq = 32;
-
-
-uint8_t   numdots =   4;                                     // Number of dots in use.
-uint8_t   thisdiff =  16;                                     // Incremental change in hue between each dot.
-
-
-
-int8_t thisrot = 1;                                           // Hue rotation speed. Includes direction.
-bool thisdir = 0;  // I use a direction variable instead of signed math so I can use it in multiple routines. //-SWITCH FOR COLOR BOUNCE (0-1)
-
-
-int wave1=0;                                                  // Current phase is calculated.
-int wave2=0;
-int wave3=0;
-
-uint8_t inc1 = 2;                                             // Phase shift. Keep it low, as this is the speed at which the waves move.
-uint8_t inc2 = 1;
-uint8_t inc3 = -2;
-
-uint8_t lvl1 = 80;                                            // Any result below this value is displayed as 0.
-uint8_t lvl2 = 80;
-uint8_t lvl3 = 80;
-
-uint8_t mul1 = 20;                                            // Frequency, thus the distance between waves
-uint8_t mul2 = 25;
-uint8_t mul3 = 22;
-
-
-//static int16_t randStatic;
-
-NUM_LEDS_type idex = 0;		//-LED INDEX (0 to NUM_LEDS-1
-uint16_t idex16 = 0;
-NUM_LEDS_type idex_last = 0;
-float idex_f = 0;
-byte ihue = 0;
-byte ibright = 0;
-byte isat = 0;
-float tcount = 0.0;		  //-INC VAR FOR SIN LOOPS
-byte lcount = 0;			  //-ANOTHER COUNTING VAR
-
-// Palette definitions
-CRGBPalette16 currentPalette;
-CRGBPalette16 targetPalette;
-TBlendType	currentBlending; //currentBlending = LINEARBLEND;                  // NOBLEND or LINEARBLEND
+#include "eff__variables.h"
 
 void (*anim_f)();
 void (*anim_f_last)();
 
 #include "UTILITY_FXNS.h"
-#ifdef eff_setX
-	#include "eff_setX.h"
-	#include "eff_set_Edges.h"
-#endif
 
-#include "eff_common.h"
+
+#include "common_f.h" 
+#include "eff_common.h" //independent functions, no need any var
 #include "eff_set_sys.h"
 
 #include "LED_EFFECT_FUNCTIONS.h"
@@ -192,10 +114,18 @@ uint16_t sampleavg = 0;                                                         
 #include "eff_setAT\three_sin_pal_demo.h"
 #include "eff_setAT\two_sin_pal_demo.h"
 
-#ifdef MATRIX_ROWS
+#include "eff_set_3\fire.h"
+#include "eff_set_3\firework1000.h"
+
+#ifdef MATRIX_ROWS //!!##
  #include "eff_matrix.h"
 #endif
-
+#ifdef NUMMATRIX
+ #include "eff_set_matrix_text.h"
+#endif
+#ifdef MATRIXfonth
+ #include "eff_set_matrix_RU_font.h"
+#endif
 
 #ifdef PWM_enabled
 #include "eff_set_PWM_Dimmer.h"
@@ -213,10 +143,17 @@ uint16_t sampleavg = 0;                                                         
 
 #include "eff_kit_DemoReel100m.h"
 
+#ifdef eff_setX
+	#include "eff_setX.h"
+	#include "eff_set_Edges.h"
+#endif
+
+
 
 //------------------------snd
 //#include "eff_setAT\fht_log.h" //for atm328
 //#include "eff_setAT\fht_log_ripple.h"
+
 
 
 #ifdef remap_LEDs
@@ -269,8 +206,9 @@ void randomSet()
 	#endif
 
 	bCurrentEff_IsRandom_AndNotSlotN=true;
-
+#if defined(tst) || defined(SerialControl)|| defined(SerialSelect)|| defined(LCD2004_i2c)|| defined(keypad1602)
 	display_upd();
+#endif
 }
 
 byte effNt=0;
@@ -279,7 +217,7 @@ void change_slot(byte effSlot)
 		#ifdef off_change_slot_After2min
 			if(millis()>2*60*1000) return;
 		#endif
-		
+
 	effRGB=0;
 	gDelay=5; //!tst //0 good always when #define gDelayMore to avoid serial bandwidth bug
 	idex=0; idex16 = 0;
@@ -299,7 +237,7 @@ void change_slot(byte effSlot)
 	 }
 	 else
 	  switch (effSlot) {
-		#include SLOTS_FILE_H
+		#include switch_slot_FILE_H
 
 //this N related to button in USB app
 #define effN_off 10 //clear, nodo()
@@ -444,22 +382,67 @@ void change_slot(byte effSlot)
 				// #endif
 }
 
-void DisableChennel(int i, byte chen)
-{
-	if(chen==1 ||chen==4||chen==5)		leds[i].r=0; 
-	if(chen==2 ||chen==5||chen==6)		leds[i].g=0;
-	if(chen==3 ||chen==6||chen==4)		leds[i].b=0; 
-}
 
 
 long animHue_next_t=0;
 
+void DisableChennel(int i, byte chen) //!! move to file
+{
+	if(chen==1 ||chen==4||chen==5)	leds[i].r=0; 
+	if(chen==2 ||chen==5||chen==6)	leds[i].g=0;
+	if(chen==3 ||chen==6||chen==4)	leds[i].b=0; 
+}
+void re_effRGB()
+{
+	if(effRGB!=0)  //!! move to file
+	{
+		for(NUM_LEDS_type i = 0; i < NUM_LEDS; i++)
+		{
+			if(effRGB==7) DisableChennel(i, 3+(i_eff/16)%3);
+			else if(effRGB==8) DisableChennel(i, (i/4)%6);
+			else if(effRGB==9) DisableChennel(i, ((i+millis()/(512-effSpeed))/4)%6);
+			//else if(effRGB==10)  //! dis each 3rd
+			//
+			else if(effRGB<=6) DisableChennel(i, effRGB); //0..6  10..16
+			else if(effRGB>=10 && effRGB<=16)
+			{
+				DisableChennel(i, effRGB-10); //0..6  10..16
+				i++;
+			}
+			else
+			if(effRGB==17)
+			{
+				//! fadeToBlackBy(leds, NUM_LEDS, 16);
+				addGlitter(20);
+			}
+			else
+			if(effRGB==18)
+			{
+				addGlitter(effLength/16);
+			}
+			else
+			if(effRGB==19)
+			{
+				fadeToBlackBy(leds, NUM_LEDS, effLength/32);
+				addGlitter(effLength/16);
+			}
+			else
+			if(effRGB==20)
+			{
+				addGlitterBlack(effLength/4);
+			}
+			//!confetti
+			//! black separators, 
+			//! black separators moving 
+			//! gFade
+		}
+	}
+}
 
 
 void LED_anim()
 {
 	if(bPause) return; //!! ifdef 
-
 
 //EVERY_N_MILLISECONDS(  )  //not working when argument changed
 //  EVERY_N_MILLIS_I(thistimer, gDelay) { //!test
@@ -533,8 +516,8 @@ if(millis()>anim_next_t)
 		}
 
 	#endif
-
-	if(banimate)
+#ifndef only1eff
+	if(banimate) //## define
 	{
 		effSpeed=beatsin8(4, effSpeed_last/4, effSpeed_last>55?255:(15+effSpeed_last*4) ); //! speed
 		effLength=beatsin8(3, 1+effLength_last/4, effLength_last>55?255:(15+effLength_last*4) );
@@ -562,53 +545,14 @@ if(millis()>anim_next_t)
 			memcpy8( &leds_out[0],	&leds[0], NUM_LEDS*3 ); //!!opt TODO avoid douple copy and copy at all
 		}
 	#endif
+#endif
 	anim_f();
 
+//#ifndef only1eff
 //--------------------------------------------------------------- post processing
-	if(effRGB!=0)
-	{
-		for(NUM_LEDS_type i = 0; i < NUM_LEDS; i++)
-		{
-			if(effRGB==7) DisableChennel(i, 3+(i_eff/16)%3);
-			else if(effRGB==8) DisableChennel(i, (i/4)%6);
-			else if(effRGB==9) DisableChennel(i, ((i+millis()/(512-effSpeed))/4)%6);
-			//else if(effRGB==10)  //! dis each 3rd
-			//
-			else if(effRGB<=6) DisableChennel(i, effRGB); //0..6  10..16
-			else if(effRGB>=10 && effRGB<=16)
-			{
-				DisableChennel(i, effRGB-10); //0..6  10..16
-				i++;
-			}
-			else
-			if(effRGB==17)
-			{
-				//! fadeToBlackBy(leds, NUM_LEDS, 16);
-				addGlitter(20);
-			}
-			else
-			if(effRGB==18)
-			{
-				addGlitter(effLength/16);
-			}
-			else
-			if(effRGB==19)
-			{
-				fadeToBlackBy(leds, NUM_LEDS, effLength/32);
-				addGlitter(effLength/16);
-			}
-			else
-			if(effRGB==20)
-			{
-				addGlitterBlack(effLength/4);
-			}
-			//!confetti
-			//! black separators, 
-			//! black separators moving 
-			//! gFade
-		}
-	}
+re_effRGB();
 
+//#endif
 
 
 
@@ -813,8 +757,13 @@ i_Square=-1;
 	//--------------------------------------------------------------- 
 
 	#if defined(LEDs_RENDER)
-		FastLED.show();
+		#ifndef NUMMATRIX
+			FastLED_show_DIRECTION //dir FastLED.show(); dir
+		#else
+			matrix->show();
+		#endif
 		//!! show_at_max_brightness_for_power();
+		// Serial.println(LEDp); Serial.println(leds[0].r); 
 	#endif
 	#if defined(WiFi_SEND)
 		send_LEDs_over_WiFi();

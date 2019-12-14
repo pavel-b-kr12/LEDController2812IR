@@ -55,64 +55,123 @@ const String str2=R"HTM(
 void handle_NotFound(){
 	server.send(404, "text/plain", "404");
 }
-
+#ifdef PWM_enabled
+int PWM_ps_enabled=0;
 void handle_pwm() {
+	/*
+	if (server.hasHeader("User-Agent")) {
+    Serial.println(server.header("User-Agent"));
+	//Mozilla/5.0 (Linux; Android 4.4.2; V8 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/30.0.0.0 Mobile Safari/537.36
+  }
+  */
+
+ 
+
 	String arg = server.arg("pp");
 	if(arg.length() != 0)
 	{
+								//Serial.print(arg);Serial.print(" ");Serial.println();
+		
 		int val=arg.toInt();
+		PWM_ps_enabled=val;
 
-	for(byte p=0;p<16;p++)
-	{	
-		int mask = 1 << p; // gets the 6th bit
+		for(byte p=0;p<16;p++)
+		{	
+			int mask = 1 << p; // gets the 6th bit
 
-		if ((val & mask) != 0) {
-			leds[p]=CRGB::Orange;
-			//enable PWM // bit is set
-		} else {
-			leds[p]=CRGB::Blue;
-			//off PWM // bit is not set
+			if ((val & mask) != 0) {
+				//!! enable
+						leds[p]=CRGB::Orange;
+				//enable PWM // bit is set
+			} else {
+						leds[p]=CRGB::Blue;
+				//off PWM // bit is not set
+			}
+						FastLED.show(); anim_next_t=millis()+500;
 		}
-		FastLED.show(); anim_next_t=millis()+500;
-
-	}
 	}
 	
-	String arg ="5v0t14v1023t16v1013t43v92t55v33t96T98"; //server.arg("pv"); //pv=5v0t14v1023t16v1013t43v92t55v33t96T98
+	arg =server.arg("pv"); //"5v0t14v1023t16v1013t43v92t55v33t96T98"; // //pv=5v0t14v1023t16v1013t43v92t55v33t96T98
 	if(arg.length() != 0)
 	{
-		//int val=arg.toInt();
-		https://stackoverflow.com/questions/2827714/whats-the-easiest-way-to-parse-a-string-in-c
-				https://www.bitdegree.org/learn/string-to-int-c-plus-plus
+								//Serial.print(arg);Serial.print(" ");Serial.println();
+		byte i0=arg.indexOf('v');
+		byte pn=atoi(arg.substring(0,i0).c_str());//atoi ret 0 on error      stoi exeption
+					if(pn>NUM_DIGITAL_PINS) return;
+		pwm_p_selected=pn;
+		
+					//Serial.println(pwm_p_selected);
+
+		byte iT=arg.indexOf('T')+1;
+
+					//Serial.println(arg.substring(iT));
+
+		byte pwm_N=255;//N of obj in list
+		for(byte i=0;i<PWM_E;i++)
+		{
+			if(dimmers_ps[i]==pwm_p_selected)
+			{
+				pwm_N=i;												//Serial.println("loop_d ");  Serial.println(oSaveObjDimmers[pwm_N].loop_d);
+				oSaveObjDimmers[pwm_N].loop_d=atoi(arg.substring(iT).c_str())*100; //10x, so 100 is 10sec for
+																		// Serial.println("loop_d now: ");  Serial.println(oSaveObjDimmers[pwm_N].loop_d);
+			}
+		}
+		
+
+		for(byte i=0, ns_v=i0, ns_t=11;i<pwm_vsE && ns_v<iT-1;i++) //or only ns_v<iT-1  so we can set new NUM of Points 
+		{
+			ns_t= arg.indexOf('t',ns_v);
+			uint16_t v=atoi(arg.substring(ns_v+1,ns_t).c_str());
+
+			if(ns_t>iT-5)
+				ns_v=iT-1;
+			else	ns_v= arg.indexOf('v',ns_t);
+			uint16_t t=atoi(arg.substring(ns_t+1,ns_v).c_str());
+			
+			if(pwm_N<17) //obj available in list, can be saved
+			{ 
+				oSaveObjDimmers[pwm_N].pwm_vs[i]=v;
+					//Serial.print("ns_t");Serial.print(" ");
+					//Serial.print(ns_t);Serial.print(" ");
+					// Serial.print(arg.substring(ns_v,ns_t));Serial.print(" ");
+					// Serial.print(pwm_vs[i]);Serial.print(" ");
+				oSaveObjDimmers[pwm_N].pwm_ts[i]=t;
+					//Serial.print("ns_v");Serial.print(" ");
+					//Serial.print(ns_v);Serial.print(" ");
+					// Serial.print(arg.substring(ns_t,ns_v));Serial.print(" ");
+					// Serial.print(pwm_vs[i]);Serial.print(" ");
+					// Serial.println();
+					
+					leds[60+i]=CHSV(oSaveObjDimmers[pwm_N].pwm_ts[i],255,255);
+					leds[80+i]=CHSV(oSaveObjDimmers[pwm_N].pwm_vs[i]/4,255,255);
+							// Serial.print(v);Serial.print("v set ");
+							// Serial.print(t);Serial.print("t set ");Serial.println();
+			}
+			else //only set PWM
+			{
+				if(i==0)
+				{
+							//Serial.print(v);Serial.print(" ");Serial.println();
+					// if(v==0) //##  digitalPinHasPWM   supportsDigitalInput  https://arduino.stackexchange.com/questions/33383/how-to-detect-pinout-at-run-time
+						// digitalWrite(pwm_p_selected,0);
+					// else
+					//if( digitalPinHasPWM(pwm_p_selected))
+						// alanogWrite(pwm_p_selected, constrain(v,0,1020));//0...1020
+				}
+			}
+		}
+					
+					leds[(20+pwm_p_selected)%NUM_LEDS]+=CRGB::Yellow;
+					leds[(40+oSaveObjDimmers[pwm_N].loop_d/4)%NUM_LEDS]+=CRGB::Green;
+					FastLED.show(); anim_next_t=millis()+500;
+
+						//Serial.print(pwm_p_selected);Serial.print("sel, ");Serial.println();
+						//Serial.print(oSaveObjDimmers[pwm_N].loop_d);Serial.print("ld, ");Serial.println();
+				saveDimmer(0);
 	}
-
-	/*
-	#ifdef returnToClient
-	server.send(200, "text/html", 
-	
-	"effN="+(String)effN+
-	",effSpeed="+(String)effSpeed+
-	",effSpeedH="+(String)effSpeedH+
-	",effLength="+(String)effLength+
-	",effLengthH="+(String)effLengthH+
-	",effRGB="+(String)effRGB+
-	",effFade="+(String)effFade+
-	// "gH;
-	// "gS;
-	// "gV;
-	//",gColor="+(String)
-	//",gColorBg="+(String)
-	",gFade="+(String)gFade+
-	",indexOrBits="+(String)indexOrBits+
-	",gDelay="+(String)gDelay+
-	",gBrightness="+(String)gBrightness+
-	",NUM_LEDS="+(String)n
-	
-	); //';' not working as separator, it became ','
-	#endif
-	*/
+	// server.send(200, "text/html",
 }
-
+#endif
 void handle_pin_sequencer() {
 	
 }
@@ -300,12 +359,20 @@ void setupHTML() {
 
 	server.on("/", handle_OnConnect);
 	server.on("/sett", handle_sett);
-	server.on("/pwm", handle_pwm);
-	server.on("/pin_sequencer", handle_pin_sequencer);
+	#ifdef PWM_enabled
+	server.on("/pwm", handle_pwm); //! add alias dimmer
+	#endif
+	#ifdef PinSequencer_enabled
+	server.on("/pin_sequencer", handle_pin_sequencer); //! renm blink
+	#endif
 	server.on("/p", handle_p);
 	server.onNotFound(handle_NotFound);
 	
-	//Serial.println("HTTP server start");
+			// const char * headerkeys[] = {"User-Agent", "Cookie"} ;
+			// size_t headerkeyssize = sizeof(headerkeys)/sizeof(char*);
+			// server.collectHeaders(headerkeys, headerkeyssize );
+	
+			//Serial.println("HTTP server start");
 
 	#ifdef WiFi_ControlHTMLpage_switch_p
 		pinMode(WiFi_ControlHTMLpage_switch_p, INPUT_PULLUP);

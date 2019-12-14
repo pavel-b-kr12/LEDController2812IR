@@ -1,27 +1,25 @@
-//// Параметры эффектов
+
 // Шаг разгорания звезды
 #define RGB_ST_ADD_STEP        6//16
 // Шаг угасания звезды
 #define RGB_ST_DEC_STEP        1
-// Период между тактами анимации, мс
-#define RGB_ST_d          20
-
-uint16_t rgb_stars_start()
-{
-	// Зажигаем новую цветную звезду, медленно гася все светодиоды
-	DotPos = random8or16(NUM_LEDS); // Позиция звезды
-
-	color1=CHSV(random8(),random8(),50); //start color
-	color2=CHSV(random8(),random8(),255); //end color
-
-	blend_amount=0;
-
-	return (256 / RGB_ST_ADD_STEP) + 1; 
-}
 
 // Функция, реализующая очередной шаг анимации. Возвращает период до следующего шага
-int16_t rgb_stars_tick()
+void rgb_stars_tick()
 {
+	if(pattern_il==0)
+	{
+		// Зажигаем новую цветную звезду, медленно гася все светодиоды
+		DotPos = random8or16(NUM_LEDS); // Позиция звезды
+
+		color1=CHSV(random8(),random8(111),50); //start color
+		color2=CHSV(random8(),random8(40),255); //end color
+
+		blend_amount=0;
+
+	}
+	pattern_il++;
+	
 	fadeToBlackBy(leds, NUM_LEDS,RGB_ST_DEC_STEP);
 	
 	 blend_amount=qadd8 (blend_amount,RGB_ST_ADD_STEP);
@@ -38,5 +36,4 @@ int16_t rgb_stars_tick()
 	// leds[1]=color2;
 	// leds[2]=blend(color1, color2, blend_amount);
 	// leds[3]=leds[DotPos2];
-	return RGB_ST_d;
 }

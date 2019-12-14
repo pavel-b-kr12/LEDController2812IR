@@ -17,9 +17,12 @@
 
 //case 1:anim_f=fillAll; gColor=CRGB::White;	break; //---ALL ON
    
-   
-
+#ifdef only1eff
+   case 214:anim_f=kit_wand;	effSpeed=187;	effLength=128;		effFade=126;   	indexOrBits=141; break;
+#else
 //case 11:anim_f=fillStriped;			effSpeed=0;		effLength=10; indexOrBits=88; gColor=CRGB::White; gColorBg=CRGB::Black;  break; //:)
+//case 14:anim_f=fillStripedFillRainbow;	effSpeed=38;	effLength=73;	effSpeedH=110;	effLengthH=57;	effFade=178;    effRGB=12;	indexOrBits=88; break; //:)
+	//case 14:anim_f=fillStripedFillRainbow;	effSpeed=176;	effLength=22;	effSpeedH=214;	effLengthH=24;	effFade=88;    effRGB=12;	indexOrBits=80; break;
 case 11:anim_f=fillStriped;			effSpeed=18;		effLength=22; indexOrBits=88; gColor=CRGB::White; gColorBg=CRGB::Black; effRGB=9; break; //:) //cu //!!!! effRGB not printed in pde
 case 12:anim_f=fillStriped;			effSpeed=6;	/*0;6;255*/	 effLength=10;/*0;255*/ 	effFade=178;    indexOrBits=131;	gDelay=10; effRGB=9; break;
 case 13:anim_f=fillStripedInvert;			effSpeed=0;		effLength=10; indexOrBits=88; gColor=CRGB::White; gColorBg=CRGB::Black; break; //!
@@ -106,8 +109,14 @@ case 67:anim_f=color_bounceFADE;		effSpeed=44;	effLength=1; break;		//not168
 
 //case 68:anim_f=CylonBounce; 			effSpeed=96;	effLength=65; break;	//!fix cube crush	//moving group	//not168
 
-case 69:anim_f=RunningLights; effSpeed=123; break; //!!	//not168 not328
+case 68: anim_f=movers;		effFade=80; break;
 
+case 69:anim_f=RunningLights; effSpeed=123; break; //!!	//not168 not328
+case 70:anim_f=meadow; effSpeed=123; break;
+#ifdef eff_setX
+case 71: anim_f=movers_f;	effFade=80; break;			//not168 not328
+case 72:anim_f=meadow_cow; effSpeed=123; effLength=22; break; //!!	//not168 not328
+#endif
 
 ////case 70:anim_f=ems_lightsONE;		thishue = 0; break;			//---POLICE LIGHTS SINGLE 	//not168 not328 //not big
 ////case 71:anim_f=ems_lightsALL;		 break;			//---POLICE LIGHTS SOLID //cycle around	//not168 not328 //not big
@@ -116,15 +125,15 @@ case 69:anim_f=RunningLights; effSpeed=123; break; //!!	//not168 not328
 ////case 73:anim_f=color_loop_vardelay;	effSpeed=255;	effLength=255; break;	//!fix possible crash //<126 switch colorize	//not168 not328
 
 #ifdef Cube4MCU
-case 70:anim_f=CubeCornersLight;				 break;					//not168 not328
-case 71:anim_f=CubeTest;				 break;					//not168 not328
+case 71:anim_f=CubeCornersLight;				 break;					//not168 not328
+case 72:anim_f=CubeTest;				 break;					//not168 not328
 //case 72:anim_f=CubeTest2;				 break;					//not168 not328
 
 
-case 72:anim_f=matrixCube2; clear_leds();	break;		// random 	//not168 not328 //:) //cu
-case 73:anim_f=matrixCube; clear_leds();	break;		// random 	//not168 not328
+case 73:anim_f=matrixCube2; clear_leds();	break;		// random 	//not168 not328 //:) //cu
+case 74:anim_f=matrixCube; clear_leds();	break;		// random 	//not168 not328
 #endif
-// case 74:anim_f=matrix;	break;		// random 	//not168 not328 //not big
+// case 74:anim_f=Matrix;	break;		// random 	//not168 not328 //not big
 ////case 75:anim_f=rwb_march;	break;		//!slo		//---MARCH RWB COLORS moving (circular) //<125 <200	switch colorize 	//not168 not328 //not big
 case 76:anim_f=random_march;	break;	//!slo	 //---MARCH RANDOM COLORS random 	//not168 not328
 
@@ -240,7 +249,7 @@ case 155:anim_f=splitModeEditor;	effLength=20; indexOrBits=0; effFade=0;	gDelay 
 ////case 153:anim_f=nodo;					break;	//not168 not328
 
 //######
-case 157:anim_f=confetti_density;	effSpeed=4;	effLength=1;	effSpeedH=105;	effLengthH=171;	effFade=0;  break;	//not168 not328
+case 157:anim_f=confetti_density;	effSpeed=4;	effLength=1;	effSpeedH=105;	effLengthH=171;	effFade=10;  break;	//not168 not328
 
 
 
@@ -299,8 +308,11 @@ case 211:anim_f=mus_arduinoFFT;	effSpeed=95;	effLength=96;	effSpeedH=124;	effLen
 #endif
 
 
-case 213:anim_f=DemoReel101; indexOrBits=5; gDelay=5;  break;// indexOrBits/4==0 demo
-case 214:anim_f=kit_wand;	effSpeed=187;	effLength=128;		effFade=126;   	indexOrBits=141; break;
+
+case 212:anim_f=firework1000;	effSpeed=45;	effLength=70;	effSpeedH=28;	effLengthH=148;	effFade=55; 	gDelay=10; break;
+case 213:anim_f=oppositeWavesBlend; effLength=22; effLengthH=133; break;// sub eff: indexOrBits/10
+case 214:anim_f=DemoReel101; indexOrBits=5; gDelay=5;  break;// indexOrBits/4==0 demo //!!
+//case 214:anim_f=kit_wand;	effSpeed=187;	effLength=128;		effFade=126;   	indexOrBits=141; break;
 
 
 case 215:anim_f=wave_adj;	effSpeed=168;	effLength=128;	effSpeedH=148;	effLengthH=221;	indexOrBits=10; break;
@@ -325,6 +337,12 @@ case 110:anim_f=blendwave;		effLength=1;	break; //:/ //! //uses beats, blend and
 #ifdef MATRIX_ROWS
 case 220:anim_f=matrix_test;	effFade=1; break;		//not168 not328
 #endif
+#ifdef NUMMATRIX
+case 221:anim_f=text_test;	break;		//not168 not328
+#endif
+#ifdef MATRIXfonth
+case 222:anim_f=text_test_arr_RU;	break;		//not168 not328
+#endif
 
 
 //======
@@ -342,11 +360,13 @@ case 230:anim_f=fillStriped;	effSpeed=15;	effLength=125;	effSpeedH=31;	effLength
 
 
 case 233:anim_f=random_len_cell_1;				 break;					//not168 not328
-case 234:anim_f=random_len_cell_seemless;				 break;			//:)	//not168 not328
+case 234:anim_f=random_len_cell_seemless;		 break;			//:)	//not168 not328
 
 
 // case 241:anim_f=demo_modeA; break;			 //! short
 // case 242:anim_f=demo_modeB; break;			 //! long
+
+//case 235:anim_f=fillRange_anim;		 break;			//!!	//not168 not328
 
 
 #ifdef PWM_enabled
@@ -379,11 +399,11 @@ case 246: anim_f=fillStriped; bMap_type=(bMap_type==0)?bMap_type_history:0; brea
 
 case 247:	anim_f=nodo;	 break; //TODO fix last item not appear in USB app
 
+#endif
 
 
-
-
-
+//eff sw with actions @ transition
+//!! eff-blur-eff
 
 
 

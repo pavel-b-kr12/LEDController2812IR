@@ -148,20 +148,30 @@ void save_load_preset(byte N)
 
 #ifdef PWM_enabled
 #if defined(use_ESP8266) || defined(use_ESP32)
-void savePWM()
+void saveDimmer(byte N)
 {
+	EEPROM.begin(512);
 	int addr_start= save_addr_start+10*sizeof(SaveObj)+10;
 	
 	EEPROM.put(addr_start,oSaveObjDimmers);
 	EEPROM.commit();
 	EEPROM.end();
 }
-void loadPWM()
+void loadDimmer(byte N)
 {
 	int addr_start= save_addr_start+10*sizeof(SaveObj)+10;
 	EEPROM.begin(512);
 	EEPROM.get(addr_start,oSaveObjDimmers);
 	EEPROM.end();
+	
+				// Serial.print(oSaveObjDimmers[0].p);Serial.print(" ");Serial.println();
+				// Serial.print(oSaveObjDimmers[0].loop_d);Serial.print(" ");Serial.println();
+				// Serial.print(oSaveObjDimmers[0].pwm_ts[0]);Serial.print(" ");Serial.println();
+				// Serial.print(oSaveObjDimmers[0].pwm_vs[0]);Serial.print(" ");Serial.println();
+				// Serial.print(oSaveObjDimmers[1].p);Serial.print(" ");Serial.println();
+				// Serial.print(oSaveObjDimmers[1].loop_d);Serial.print(" ");Serial.println();
+				// Serial.print(oSaveObjDimmers[1].pwm_ts[0]);Serial.print(" ");Serial.println();
+				// Serial.print(oSaveObjDimmers[1].pwm_vs[0]);Serial.print(" ");Serial.println();
 }
 #endif
 #endif

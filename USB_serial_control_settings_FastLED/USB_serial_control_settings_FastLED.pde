@@ -15,17 +15,17 @@ ask again for fix g4p event for press because bo fix absense  of drag tolerance 
 */
 int useSerialPortN=0;
 
-static int serialSpeed=921600; //! for ESP32 change to 921600 otherwise it buggy work and you spend many time to find why.  //1000000 921600 500000 115200 57600
+static int serialSpeed=1000000;//1000000 921600 500000 115200 57600//this may be redefined with command line arg. For ESP32 (cp2102) change to 921600 otherwise it buggy work and you spend many time to find why.
 
 boolean b_Cube=true; //set NUM_LEDS_slider to Max; Use to calculate current.
 boolean b_NUM_LEDS_adj=false;//true false //! fix adj mode especially if no adjustable set in MCU
 
 //5 30 60 120 144 150 180 300 450
-int NUM_LEDS_slider_startup=144;//105;//60*3;//105; //145*3*4 60*8 15*8 8*8 16*16  //this is also max for draw gemetry arr DrawLEDs_pointsX 
-int NUM_LEDS_slider_m=105;
+int NUM_LEDS_slider_startup=16*16;//150;//105;//60*3;//105; //145*3*4 60*8 15*8 8*8 16*16  //this is also max for draw gemetry arr DrawLEDs_pointsX 
+int NUM_LEDS_slider_m=60;
 int NUM_LEDS_slider_M=16*16;
 
-int matrix_rowsE=12;//16; //for plotPX
+int matrix_rowsE=8;//8 16  horizontal L-to-R //for plotPX //TODO2 vertiacal
 boolean NUM_LEDS_x8=false;// true false // have to be true if gNUM_LEDS>255 , so we can send it with 1 byte
 
 
@@ -51,7 +51,7 @@ boolean bSendSimDataToMCU=true;
 
  boolean bPlot_FPS_enabled=true; //# but show FPS num
  
- 
+ boolean bSim=false; //startup state
 /*
  boolean bRecieveLEDdata=true;
 
@@ -135,9 +135,6 @@ String printVal(String str, String nm, int bSkipIfEqual)
 	return "	"+str+"="+	Integer.toString(value)+";";
 }
 //====================================================
-
-
-
 
 int bConnected=1; //0 off, 1 try connect, 2 connected
 boolean bSkipEvent=false;
@@ -231,7 +228,6 @@ class settingsVal
 		}
 		else
 					SendMsg(message_code, value);
-		
 	}
 
 	void add()
@@ -396,7 +392,7 @@ void SendMsg(int msgCode, int val)
 	myPort.write(val);
 }
 
-void  put(String n, int v, int vm, int vM, int code, GLabel label, GSlider slider)
+void put(String n, int v, int vm, int vM, int code, GLabel label, GSlider slider)
 {
 	settingsVals.put(n, new settingsVal(n, v, vm, vM, code, label, slider));
 }
@@ -416,15 +412,24 @@ int labelColor=-1;
 int widthNormal=920;
 public void setup(){
 	size(920, 640); //, P3D); //widthNormal
-	frameRate(144);
+	frameRate(144); //!! TODO test wht is rate is slower than USB
 	surface.setResizable(true); 
+	
+    try
+    {
+	if (args != null && args.length != 0){ //$ processing-java --sketch=sketchname --run argu "arg o"
+		serialSpeed=Integer.parseInt(args[0]);
+    if(args.length >1)
+        useSerialPortN=Integer.parseInt(args[1]);
+	}
+ }catch(Exception e){ button_disconnect.setText("err"); }
 
 
 	//-------------------------------------------
 	float rnd=random(200);
-	if ( day()==1 && month()%5==0) {gColorBg= color(255,0,0); labelColor=0;} //changeSilerTextColor(color(0));
+	if ( day()==1 && month()%5==0) {gColorBg= color(200,0,0); labelColor=0;} //changeSilerTextColor(color(0));
 	else 
-	if ( day()%4==0 && rnd<20) {gColorBg= color(0,0,0);labelColor=255;} //! also labels
+	if ( day()%4==0 && rnd<10) {gColorBg= color(0,0,0);labelColor=255;} //!! also labels
 	else 
 	if ( day()%3==0 && rnd<20) {gColorBg= color(44);labelColor=255;}
 	else 
@@ -850,7 +855,6 @@ struct SaveObj //# sizeof
 	for (int i=0; i<100; i++) 	msg_buffer[i]=-1;
 }
 //=========================================================================================================================== sim
-boolean bSim=false;
 void bSim_set(boolean b)
 {
 	bSim=b;
@@ -862,13 +866,8 @@ void bSim_set(boolean b)
 			DisableSerial();
 		}
 	}
-	else 
-		button_sim.setText("sim");
-
+	else button_sim.setText("sim");
 }
-
-
-
 //===========================================================================================================================
 int bDrawFPSnow=-1;
 int bDrawPownow=-1;
@@ -1049,146 +1048,7 @@ public void draw()
 	}
 
 
-
-
-	if(bSim)
-	{
-		int sim_NUM_LEDS=settingsVals.get("NUM_LEDS").value;
-		int sim_NUM_LEDS_arr_size=sim_NUM_LEDS*3;
-		if(plotPX==null) plotPX_create();
-
-//------------- effect  eff_set2.h eff_sin
-		for (int i=0; i<sim_NUM_LEDS; i++) //clear
-		{
-			msg_buffer[i*3]=0;
-			msg_buffer[i*3+1]=0;
-			msg_buffer[i*3+2]=0;
-		}
-																		if(myPort==null) bSendSimDataToMCU = false;
-																		if(bSendSimDataToMCU)
-																		{
-
-																			myPort.write(232);
-																			myPort.write(232);
-																		}
-
-
-
-		int matrixW=plotPX.matrix_leds_per_row;
-		int rowE=plotPX.matrix_rowsE;	
-
-		int effN=settingsVals.get("effN").valueSlider.getValueI();
-
-		switch(effN)
-		{
-			case 0:
-			{
-				for (int i=0; i<sim_NUM_LEDS_arr_size; i++) 
-					msg_buffer[i]=i/3/matrixW%2 *255; //odd row
-			}
-			break;
-
-			case 1:
-			{
-				for (int r=0; r<rowE; r++) 
-				{
-					for (int c=0; c<matrixW; c++) 
-					{
-							//if(c==r) msg_buffer[(r*matrixW+c)*3]=255;
-						msg_buffer[(r*matrixW+c)*3 +1]=r*16;
-						msg_buffer[(r*matrixW+c)*3]=(int) (  (float)c/matrixW*255 );
-
-						// switch(r)
-						// {
-						// 	case 0:
-							 
-						// 	break;
-						// }
-						
-
-					}
-				}
-			}
-			break;
-
-			case 2:
-			{
-				for (int r=0; r<rowE; r++) 
-				{
-					for (int c=0; c<matrixW; c++) 
-					{
-						if(c==r) msg_buffer[(r*matrixW+c)*3]=255;
-
-						// switch(r)
-						// {
-						// 	case 0:
-							 
-						// 	break;
-						// }
-						
-
-					}
-				}
-			}
-			break;
-
-			default:
-				for (int i=0; i<sim_NUM_LEDS_arr_size; i++) 
-				{
-					msg_buffer[i]=(int) ( (sin(i/1.+millis()/1000.) +1) *255);
-				}
-			break;
-		}
-
-
-		if(bFlipArr_sim_to_zigZag_matrix)
-		{
-								// msg_buffer[0*3+1]=255;
-								// msg_buffer[8*3]=255;
-								// msg_buffer[16*3+1]=255;
-								// msg_buffer[24*3]=255;
-				//flip odd row due zig-zag connection //also plot b_matrix_arr_is_zigZag=true by default
-				for (int r=0; r<rowE; r++) 
-				{
-					for (int c=0; c<matrixW/2; c++) 
-					{
-						if(r%2==1)
-						{
-							 int t=msg_buffer[(r*matrixW+c)*3];
-							 msg_buffer[(r*matrixW+c)*3]=msg_buffer[((r+1)*matrixW-c-1)*3];
-							 msg_buffer[((r+1)*matrixW-c-1)*3]=t;
-						}
-					}
-				}
-		}
-		
-		if(bSendSimDataToMCU) 
-			for (int i=0; i<sim_NUM_LEDS_arr_size; i++)
-				myPort.write(((int)msg_buffer[i])%255);
-
-		
-//-------------
-		if(bDrawLEDs_PXHistory_enabled)
-		{	
-			plotPX.push(msg_buffer, sim_NUM_LEDS_arr_size);
-			bplotPX=true;
-			bDraw_plotPX_until_t=millis()+10000;
-		}
-		if(bDraw_plot_RGB_pow)
-		{
-			plotR.push(plotPX.rE); plotR.tik();
-			plotG.push(plotPX.gE); plotG.tik();
-			plotB.push(plotPX.bE); plotB.tik();
-		}
-		// bDrawFPSnow=rec_fps;//!!
-		// plotFPS.push(bDrawFPSnow); //plotFPS.push(((float)bDrawFPSnow)/10.);
-		// bDrawFPS_until_t=millis()+1000;
-
-
-		bDrawPownow=plotPX.rE+plotPX.gE+plotPX.bE;
-		plot_pow.push(bDrawPownow);
-		bDrawPow_until_t=millis()+1000; //!! move to push
-	}
+	if(bSim) sim();
 	else
 	{
 //---------------------------------------- serial
@@ -1233,33 +1093,7 @@ public void draw()
 
 
 
-
-
-void arrow(int x1, int y1, int x2, int y2) {
-  line(x1, y1, x2, y2);
-  pushMatrix();
-  translate(x2, y2);
-  float a = atan2(x1-x2, y2-y1);
-  rotate(a);
-  line(0, 0, -10, -10);
-  line(0, 0, 10, -10);
-  popMatrix();
-} 
-
-void polygon(int n, float cx, float cy, float r) {
-  float angle = 360.0 / n;
-
-  beginShape();
-  for (int i = 0; i < n; i++) {
-	vertex(	cx + r * cos(radians(angle * i)),
-			cy + r * sin(radians(angle * i)));
-  }
-  endShape(CLOSE);
-}
-
-
-// Use this method to add additional statements
-// to customise the GUI controls
+// Use this method to add additional statements to customise the GUI controls
 public void customGUI(){
 
 }
@@ -1313,8 +1147,8 @@ void mouseClicked() {
 		if(millis()<bDraw_plotPX_until_t && bMadeScreenshot_thisTime) //!! show save btn on mouse over			//screen save,
 		{
 			plotPX.save(EffNms[settingsVals.get("effN").valueSlider.getValueI()]);
-			bMadeScreenshot_thisTime=!bMadeScreenshot_thisTime;
-		}
+			
+		} bMadeScreenshot_thisTime=!bMadeScreenshot_thisTime; //!!
 
 		if(!bSim)  //!! toggle betwen pixel source or make 2 separate plots
 		{
