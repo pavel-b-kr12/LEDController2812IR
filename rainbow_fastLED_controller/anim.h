@@ -75,47 +75,50 @@ uint16_t sampleavg = 0;                                                         
 #include "eff_set_Sound\soundmems_pal.h"
 #endif
 
-#include "eff_setAT\aatemplate.h"
-#include "eff_setAT\beatwave.h"
-#include "eff_setAT\blend_test.h"
-#include "eff_setAT\blendwave.h"
-#include "eff_setAT\blur_try.h"
-#include "eff_setAT\confetti2.h"
-#include "eff_setAT\confetti_pal.h"
-#include "eff_setAT\easing_test.h"
-#include "eff_setAT\dot_beat.h"
-#include "eff_setAT\every_n_example.h"
-#include "eff_setAT\fill_colours.h"
-#include "eff_setAT\fill_grad.h"
-#include "eff_setAT\inoise8_fire.h"
-#include "eff_setAT\inoise8_mover.h"
-#include "eff_setAT\inoise8_pal_demo.h"
-#include "eff_setAT\juggle_pal.h"
-#include "eff_setAT\lightnings.h"
-#include "eff_setAT\matrix_pal_demo.h"
-#include "eff_setAT\matrix_ray.h"
-#include "eff_setAT\mover.h"
-#include "eff_setAT\noise16_1.h"
-#include "eff_setAT\noise16_2.h"
-#include "eff_setAT\noise16_3.h"
-#include "eff_setAT\one_sine_pal.h"
-#include "eff_setAT\one_sine_pal_demo.h"
-#include "eff_setAT\palettecrossfade.h"
-#include "eff_setAT\plasma.h"
-#include "eff_setAT\rainbow_beat2.h"
-#include "eff_setAT\rainbow_march.h"
-#include "eff_setAT\rainbow_march_demo.h"
-#include "eff_setAT\ripple_pal.h"
-#include "eff_setAT\ripples.h"
-#include "eff_setAT\sawtooth.h"
-#include "eff_setAT\serendipitous.h"
-#include "eff_setAT\sinelon.h"
-#include "eff_setAT\three_sin_demo.h"
-#include "eff_setAT\three_sin_pal_demo.h"
-#include "eff_setAT\two_sin_pal_demo.h"
+#include "eff_set_AT\aatemplate.h"
+#include "eff_set_AT\beatwave.h"
+#include "eff_set_AT\blend_test.h"
+#include "eff_set_AT\blendwave.h"
+#include "eff_set_AT\blur_try.h"
+#include "eff_set_AT\confetti2.h"
+#include "eff_set_AT\confetti_pal.h"
+#include "eff_set_AT\easing_test.h"
+#include "eff_set_AT\dot_beat.h"
+#include "eff_set_AT\every_n_example.h"
+#include "eff_set_AT\fill_colours.h"
+#include "eff_set_AT\fill_grad.h"
+#include "eff_set_AT\inoise8_fire.h"
+#include "eff_set_AT\inoise8_mover.h"
+#include "eff_set_AT\inoise8_pal_demo.h"
+#include "eff_set_AT\juggle_pal.h"
+#include "eff_set_AT\lightnings.h"
+#include "eff_set_AT\matrix_pal_demo.h"
+#include "eff_set_AT\matrix_ray.h"
+#include "eff_set_AT\mover.h"
+#include "eff_set_AT\noise16_1.h"
+#include "eff_set_AT\noise16_2.h"
+#include "eff_set_AT\noise16_3.h"
+#include "eff_set_AT\one_sine_pal.h"
+#include "eff_set_AT\one_sine_pal_demo.h"
+#include "eff_set_AT\palettecrossfade.h"
+#include "eff_set_AT\plasma.h"
+#include "eff_set_AT\rainbow_beat2.h"
+#include "eff_set_AT\rainbow_march.h"
+#include "eff_set_AT\rainbow_march_demo.h"
+#include "eff_set_AT\ripple_pal.h"
+#include "eff_set_AT\ripples.h"
+#include "eff_set_AT\sawtooth.h"
+#include "eff_set_AT\serendipitous.h"
+#include "eff_set_AT\sinelon.h"
+#include "eff_set_AT\three_sin_demo.h"
+#include "eff_set_AT\three_sin_pal_demo.h"
+#include "eff_set_AT\two_sin_pal_demo.h"
 
 #include "eff_set_3\fire.h"
 #include "eff_set_3\firework1000.h"
+
+
+#include "eff_set_MK\kit_MK.h"
 
 #ifdef MATRIX_ROWS //!!##
  #include "eff_matrix.h"
@@ -151,8 +154,8 @@ uint16_t sampleavg = 0;                                                         
 
 
 //------------------------snd
-//#include "eff_setAT\fht_log.h" //for atm328
-//#include "eff_setAT\fht_log_ripple.h"
+//#include "eff_set_AT\fht_log.h" //for atm328
+//#include "eff_set_AT\fht_log_ripple.h"
 
 
 
@@ -237,7 +240,11 @@ void change_slot(byte effSlot)
 	 }
 	 else
 	  switch (effSlot) {
+	#ifdef only1eff
+		only1eff
+	#else
 		#include switch_slot_FILE_H
+	#endif
 
 //this N related to button in USB app
 #define effN_off 10 //clear, nodo()
@@ -256,7 +263,8 @@ void change_slot(byte effSlot)
 
 
 
-	  case effN_random_endless: //randomEff endless when press btn left 
+	case effN_random_endless: //randomEff endless when press btn left 
+	{
 		#ifdef demo_enable
 		brandom_demo=false;
 		#endif
@@ -264,34 +272,36 @@ void change_slot(byte effSlot)
 
 		randomSet();
 		effN++; //so we stay at same slot, when move left
-	  break;  
+	}
+	break;  
 
-		case effN_animate_to_slot1: //animate settings from current to settings of slot 1
-			#ifdef demo_enable
-			brandom_demo=false;
-			#endif
-			banimate=false;
+	case effN_animate_to_slot1: //animate settings from current to settings of slot 1
+	{
+		#ifdef demo_enable
+		brandom_demo=false;
+		#endif
+		banimate=false;
 
-			if(!anim_f) anim_f = rainbow_beat;
+		if(!anim_f) anim_f = rainbow_beat;
 
-			effSpeed_last=effSpeed;
-			effLength_last=effLength;
-		break;
+		effSpeed_last=effSpeed;
+		effLength_last=effLength;
+	}
+	break;
 
-	  case effN_animate_SW: 
+	case effN_animate_SW: 
+	{
 		banimate=true;
 		#ifdef demo_enable
 		brandom_demo=false;
 		#endif
 
 		if(!anim_f) anim_f = fillStriped;
+	}
+	break;
 
-		
-	  break;
-
-	  #ifdef demo_enable
-
-	  case effN_random_demo_animated_SW:
+	#ifdef demo_enable
+		case effN_random_demo_animated_SW:
 		if(brandom_demo && banimate) //! del
 		{
 			brandom_demo=false;
@@ -310,51 +320,44 @@ void change_slot(byte effSlot)
 			random_demo_sw_speed_td_M=20;
 			#endif
 		}
-	  break;
+		break;
 
-	  case effN_predefined_show_seq:
-		brandom_demo=false;
-		banimate=false;
-	  break;
+		case effN_predefined_show_seq:
+			brandom_demo=false;
+			banimate=false;
+		break;
 
-	  case effN_random_demo_fast_SW:
-	  case effN_random_demo_SW: //! now not a SWich
-		brandom_demo=true;
-		banimate=false;
-		//if( brandom_demo)
+		case effN_random_demo_fast_SW:
+		case effN_random_demo_SW: //! now not a SWich
 		{
-			random_demo_sw_speed_td_m=(effSlot<effN_random_demo_SW)?1: ( 2+effLength/32 ); //*1000
-			random_demo_sw_speed_td_M=(effSlot<effN_random_demo_SW)?6: ( 8+effLength/4 ); 
-			// random_demo_sw_speed_td_m=8+effLength/32; //*1000
-			// random_demo_sw_speed_td_M=10+effLength/4; 
-			randomSet();
+			brandom_demo=true;
+			banimate=false;
+			//if( brandom_demo)
+			{
+				random_demo_sw_speed_td_m=(effSlot<effN_random_demo_SW)?1: ( 2+effLength/32 ); //*1000
+				random_demo_sw_speed_td_M=(effSlot<effN_random_demo_SW)?6: ( 8+effLength/4 ); 
+				// random_demo_sw_speed_td_m=8+effLength/32; //*1000
+				// random_demo_sw_speed_td_M=10+effLength/4; 
+				randomSet();
+			}
 		}
-	  break;
-	  #endif
-	  
+		break;
+		#endif
+
 		case effN_random:
 		default: //randomEff
+		{
 			#ifdef default_effN_Random
-			randomSet();
+				randomSet();
 			#else
-			FastLED.clear();
+				FastLED.clear();
 								anim_f=fillStriped; //## if not defined default_effN_Random  is NULL
 			#endif
 			//effN =0;
+		}
 		break;
-	  
-	 //!	#ifndef saveMem
-	 //	case 111: one_color_all(255, 0, 0); LEDS.show(); break; //---ALL RED
-	 //	case 112: one_color_all(0, 255, 0); LEDS.show(); break; //---ALL GREEN
-	 //	case 113: one_color_all(0, 0, 255); LEDS.show(); break; //---ALL BLUE
-	 //	case 114: one_color_all(255, 255, 0); LEDS.show(); break; //---ALL COLOR X
-	 //	case 115: one_color_all(0, 255, 255); LEDS.show(); break; //---ALL COLOR Y
-	 //	case 116: one_color_all(255, 0, 255); LEDS.show(); break; //---ALL COLOR Z
-		// #endif
   }
-  
-											if(!anim_f) anim_f = fillStriped;
-
+										if(!anim_f) anim_f = fillStriped;
 
 	if(anim_f!=anim_f_last) //!
 	{
@@ -372,8 +375,6 @@ void change_slot(byte effSlot)
 		
 		//saveAfter2s(); // need after eff changed global options - so it will save in slot 0
 	}
-
-
 				// #ifdef tst2
 				//	Serial.print("slot changed"); 
 				//	Serial.print(anim_f==NULL); 
@@ -381,7 +382,6 @@ void change_slot(byte effSlot)
 				//	Serial.println(effSlot);
 				// #endif
 }
-
 
 
 long animHue_next_t=0;

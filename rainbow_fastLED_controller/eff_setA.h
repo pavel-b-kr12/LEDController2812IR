@@ -273,7 +273,6 @@ void spawnPixel_moveAll() //!
 }
 
 //----------------------------------------------------
-
 void random_burst() {                         //-m4-RANDOM INDEX/COLOR
   for(NUM_LEDS_type i=0;i<effSpeed/4+1;i++)
   {
@@ -293,7 +292,6 @@ void confetti() {                                             // Random colored 
       NUM_LEDS_type pos = random16(NUM_LEDS);
       leds[pos] += CHSV(gHue + random8(64), 200, 255);
   }
-  
 }
 void confetti_move() {
   EVERY_N_MILLISECONDS(40)

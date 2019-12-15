@@ -5,8 +5,7 @@ void confetti2() {                                            // random colored 
   int pos = random16(NUM_LEDS);                               // Pick an LED at random.
   leds[pos] += CHSV((thishue + random16(huediff))/4 , thissat, thisbri);  // I use 12 bits for hue so that the hue increment isn't too quick.
   thishue = thishue + thisinc;                                // It increments here.
-} // confetti()
-
+}
 
 void confetti2_ChangeMe() {                                             // A time (rather than loop) based demo sequencer. This gives us full control over the length of each sequence.
   uint8_t secondHand = (millis() / 1000) % 15;                // IMPORTANT!!! Change '15' to a different value to change duration of the loop.
@@ -22,9 +21,8 @@ void confetti2_ChangeMe() {                                             // A tim
   }
 } 
 
-
 void confetti2_demo () {
   confetti2_ChangeMe();                                                 // Check the demo loop for changes to the variables.
 
   confetti2();
-} 
+}

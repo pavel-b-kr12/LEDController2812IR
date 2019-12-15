@@ -232,8 +232,8 @@ case 141:anim_f=two_sin_pal_demo;		gDelay = 0;	currentPalette = RainbowColors_p;
 ////case 150:anim_f=setColors;				gDelay = 20; 	break;	//not168 not328
 //case 151:anim_f=setColors_fill;	effSpeed=143;	effLength=254;	effSpeedH=39;	effLengthH=171;	gDelay=20; break;
 //case 152:anim_f=setColors_fill_tstRange;	effSpeedH=31;	effSpeed=255; effLength=255;	effFade=35;	gDelay=20; break; //HSV , len %255
-//case 153:anim_f=setCurrentPalette;		gDelay = 20; 	break;	//not168 not328
-//case 154:anim_f=setCurrentPalette_Test;	gDelay = 20;	break;	//not168 not328
+//case 153:anim_f=currentPal_mod_w_gColor;		gDelay = 20; 	break;	//not168 not328
+//case 154:anim_f=currentPal_mod_w_gColor_Test;	gDelay = 20;	break;	//not168 not328
 //case 155:anim_f=splitModeEditor;	effLength=20; indexOrBits=0; effFade=0;	gDelay = 20;	break;	//not168 not328
 
 

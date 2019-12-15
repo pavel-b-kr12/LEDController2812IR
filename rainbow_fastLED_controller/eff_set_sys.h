@@ -1,4 +1,4 @@
-// @@ "C:\_wr\_Arduino\__LEDaddr\rainbow_fastLED_controller\rainbow_fastLED_controller\eff_setAT\fill_colours.h"
+// @@ "C:\_wr\_Arduino\__LEDaddr\rainbow_fastLED_controller\rainbow_fastLED_controller\eff_set_AT\fill_colours.h"
 
 void waveSmooth()
 {
@@ -81,15 +81,14 @@ void setColors_fill_tstRange()
 	fill_solid(leds+0, map(effFade,0,255,1,NUM_LEDS), gColor);
 }
 
-void setCurrentPalette()
+void currentPal_mod_w_gColor() //show nothing only modify currentPalette
 {  
 	setColors();
 	currentPalette[indexOrBits/16]=CHSV(gColor.r, gColor.g, gColor.b);
 }
-
-void setCurrentPalette_Test() //from palette_pipette
+void currentPal_mod_w_gColor_Test() //from palette_pipette
 {  
-	setCurrentPalette();
+	currentPal_mod_w_gColor();
 	
   	for(NUM_LEDS_type i=0;i<NUM_LEDS;i++)
 	{

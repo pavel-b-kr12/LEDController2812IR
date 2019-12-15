@@ -11,7 +11,6 @@
 #define LET_HEIGHT 8      // высота буквы шрифта
 #define SPACE 1           // пробел
 
-int offset = WIDTH;
 
 
 // **************** НАСТРОЙКА МАТРИЦЫ ****************
@@ -84,20 +83,20 @@ uint8_t getFont(uint8_t font, uint8_t row) {
 }
 
 
-void drawLetter(uint8_t letter_i, uint8_t letter, int16_t offset, CRGB color) {
+void drawLetter(uint8_t letter_i, uint8_t letter, int16_t text_offset, CRGB color) {
   int8_t start_pos = 0, finish_pos = LET_WIDTH;
   int8_t LH = LET_HEIGHT;
   if (LH > HEIGHT) LH = HEIGHT;
-  int8_t offset_y = (HEIGHT - LH) / 2;     // по центру матрицы по высоте
+  int8_t text_offset_y = (HEIGHT - LH) / 2;     // по центру матрицы по высоте
   
   CRGB letterColor;
-  if (color.r == 0 && color.g==0&& color.b==0) letterColor = CHSV(byte(offset * 10), 255, 255);
+  if (color.r == 0 && color.g==0&& color.b==0) letterColor = CHSV(byte(text_offset * 10), 255, 255);
   else if (color.r == 1 && color.g==1&& color.b==1) letterColor = CHSV(byte(letter_i * 30), 255, 255);
   else letterColor = color;
 
-  if (offset < -LET_WIDTH || offset > WIDTH) return;
-  if (offset < 0) start_pos = -offset;
-  if (offset > (WIDTH - LET_WIDTH)) finish_pos = WIDTH - offset;
+  if (text_offset < -LET_WIDTH || text_offset > WIDTH) return;
+  if (text_offset < 0) start_pos = -text_offset;
+  if (text_offset > (WIDTH - LET_WIDTH)) finish_pos = WIDTH - text_offset;
 
   for (int8_t i = start_pos; i < finish_pos; i++) {
     int thisByte;
@@ -111,18 +110,16 @@ void drawLetter(uint8_t letter_i, uint8_t letter, int16_t offset, CRGB color) {
       else thisBit = thisByte & (1 << (LH - 1 - j));
 
       // рисуем столбец (i - горизонтальная позиция, j - вертикальная)
-      if (thisBit) leds[getPixelNumber(offset + i, offset_y + TEXT_HEIGHT + j)] = letterColor;
+      if (thisBit) leds[getPixelNumber(text_offset + i, text_offset_y + TEXT_HEIGHT + j)] = letterColor;
     }
   }
 }
 
 
 void fillString(String text, CRGB color) {
-									//if(millis()%10000%2)	offset = WIDTH;
-									offset=-effLength*4+10-millis()/50%250;
 									
   // if (loadingFlag) {
-    // offset = WIDTH;   // перемотка в правый край
+    // text_offset = WIDTH;   // перемотка в правый край
     // loadingFlag = false;    
 // #if (SMOOTH_CHANGE == 1)
     // loadingFlag = modeCode == MC_TEXT && fadeMode < 2 ;
@@ -140,17 +137,18 @@ void fillString(String text, CRGB color) {
     while (text[i] != '\0') {
       if ((byte)text[i] > 191) {    // работаем с русскими буквами!
         i++;
-      } else {
-        drawLetter(j, text[i], offset + j * (LET_WIDTH + SPACE), color);
-        i++;
-        j++;
-      }
+      } else
+		{
+			drawLetter(j, text[i], text_offset + j * (LET_WIDTH + SPACE), color);
+			i++;
+			j++;
+		}
     }
     // fullTextFlag = false;
 
-    //offset--;
-    if (offset < -j * (LET_WIDTH + SPACE)) {    // строка убежала
-      offset = WIDTH + 3;
+    //text_offset--;
+    if (text_offset < -j * (LET_WIDTH + SPACE)) {    // строка убежала
+      text_offset = WIDTH + 3;
       // fullTextFlag = true;
     }
 

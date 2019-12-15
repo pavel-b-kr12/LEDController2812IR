@@ -14,7 +14,7 @@
 * lightweight binary Serial protocol and UDP WIFi
 * 💎 send LEDs data or control over WiFi with external MCU's dedicated for rendering pixels
 * 💎 test/debug effects and LEDs constructions (how it looks like in circle or cube) without LED stripes or without MCU at all.
-
+* draw text on matrix with adafruit GFX or from custom array (Cyrillic font included, можно писать русскими буквами)
 ### Сoncept
 There are save/load slots, many effects, each rich of settings.
 
@@ -115,9 +115,12 @@ Some effects and test modes eat a lot of memory - disable it and use "#define sa
 
 
 ### TODO
-*🐛 fix WiFi on ESP32 not working without UDP.begin
-
-*🐛 fix last uncommented case in GUI not appears
+* 🐛 fix WiFi on ESP32 not working without UDP.begin
+* 🐛 fix last uncommented case in GUI not appears
+* fix 22kb limit of server send. so use multiple send or  spiffs but it will add 1 build and 1 deplayment stages...
+	https://randomnerdtutorials.com/esp8266-web-server-spiffs-nodemcu/
+		https://randomnerdtutorials.com/install-esp8266-filesystem-uploader-arduino-ide/
+		
 * rewrite printPalette as usual PX
 
 * map action to btn, save selected
@@ -130,17 +133,22 @@ Some effects and test modes eat a lot of memory - disable it and use "#define sa
 * uniform speed of effects
 * implement colorize function, lengthH, speedH, set main gColor and BG colors. Rewrite effects that use existing settings for it.
 * save to file
-* reorder
+* reorder, categorize
 * group effect related to (circular) stripe ring
-*🐛 fix g4p clicks (with movement | drag) if author would update it
+* 🐛 fix g4p clicks (with movement | drag) if author would update it
 * not clear whole stripe with FastLED.clear() in effect that use it while NUM_LEDS adj mode
 "//!" - in code this mean need to write new, recheck of fix existing
-* add support of multiple lists, not only switch_slot.h
+
 * fill switch_slot.h with newline to see free space
 
+
+
 * fix UI aligment
-*🐛 fix UI glitches
+* 🐛 fix UI glitches
 * check NUM_LEDS>255  rand8, itc
 * SerialControl BlueFilter
+* 2-byte slot N  or sub-effects. e.g. if(slot==245) eff=slot;  if( ==246) eff++
+* add USB app support of multiple lists, not only switch_slot.h
+* more descriptable button names of effects
 
 

@@ -1,18 +1,23 @@
 //============================================ global options that has higher priority and redefines of other definitions
-
-#define SerialSpeedRedefine 921600 //921600 for CP2102,     1000000 for CH340
+#define SerialSpeed_redef 921600 //921600 for CP2102,     1000000 for CH340
 //#define debugSerial //to disable other data send and allow Serial.print();Serial.print(" ");Serial.println();
+//#define debugSerialMemoryHeap
 
 //#define REVERSE_STRIPE //reverse array, show, reverse back (1ms @ 400LEDs). Also effects that show itself have to use FastLED_show_DIRECTION instead of FastLED.show 
 //! have to be deleted after FastLED REVERSE functions will be available. 
 
+//#define LEDp_redef				0
+#define startLoadEffN_redef 222//115 //18//220//11//71//152//71,72=CubeTest	35 218 //220=CubeCornersLight		209=mus_arduinoFFT //21//effN_test_RF //151=setColors_fill
 
 //============================================ global options, that can be redefined below in "hadrware kits" section
 #define LEDchipType	WS2812B // WS2811
+//#define BlueFilter
+
 //#define offEffChangeAfter2min //### disable checkSerial(); IR, in, wifi  //e.g. for stability and sequrity
 //#define off_change_slot_After2min //e.g. for stability and sequrity
 			//#define offWiFiAfter2min //# test
 //#define mode_switch_enabled //##
+//#define use_ESP_WiFioff
 
 			// #define PWM_pin0	 //don't forget disable LEDs_RENDER if uses same pins also PinSequencer pins
 			// #define PWM_pin1
@@ -20,28 +25,27 @@
 //#define PinSequencer_pin0	 //don't forget disable LEDs_RENDER if uses same pins also PinSequencer pins
 //#define PinSequencer_pin1
 
-//#define use_ESP_WiFioff
-//#define BlueFilter
 
-//#define saveMem
+//#define saveMem //use on 168 and 328 to turn off some features. //!tst (may be outdated)
 //#define legacy_pinout
 
 // don't forget to change pins or disdable "#define LEDs_RENDER"  if not used, so it not affect serial or other stuff for different dev-boards
 
-	//#define tstFPS
-	//#define tst
-	//#define tst2  //detailed print of functions call
 
 //#define LEDs_RENDER //show to connected LEDs stripe connected to this MCU 
 //#define WiFi_SEND //send leds array to connected WiFis, also enables #define use_ESP
 //#define WiFi_ControlHTMLpage
 //#define SerialControl
 //#define tstFPS //if defined, by  default: send only FPS, bPrintPixels=false; , You can enable Print in GUI
+	//#define tst //debug.    use together with debugSerial to off send leds data
+	//#define tst2  //detailed print of functions call
 //#define SerialSpeed		921600 //1000000 921600 // 921600 is max for esp32 cp2102 //1M=250FPS@60LED //115200 =25FPS@60LED //57600
 //#define sound_p					39//36 //A0 //esp32: 36==GPIO36=="VP"==14   39==GPIO39=="VN"
-//#define LEDpCustom				0
+
 
 //@@ #define eff_setX
+//#define effN_test_RF 244 //effect to show packet loss //also this number is in switch_slot.h
+
 
 //============================================ hardware sets, choose one:
 //#define ESP8266_SHOW
@@ -53,7 +57,7 @@
 //#define ESP32_HTML_NO_RENDER //test on PC, control from USB app and WiFi HTML page
 //------- ----------------------- test
 //#define ESP32_SHOW_USB_test
-#define ESP8266_SHOW_USB_test
+									//#define ESP8266_SHOW_USB_test
 //#define ESP8266_dimmer_test
 //------- ----------------------- w keys and kits
 //#define hadrware_3btn_ESP
@@ -69,16 +73,18 @@
 //------- ----------------------- matrix
 //#define ESP8266_SHOW_MATRIX
 //#define ESP8266_text8x32_test //adafruit GFX
-//#define ESP8266_text_RU_8x32_MATRIX //font in array .h
-
-
-	#define effN_test_RF 244 //effect to show packet loss //also this number is in switch_slot.h
-	//#define startLoadEffN 18//220//11//71//152//71,72=CubeTest	35 218 //220=CubeCornersLight		209=mus_arduinoFFT //21//effN_test_RF //151=setColors_fill
+#define ESP8266_text_RU_8x32_MATRIX //font in array .h
+//------- -----------------------
 
 
 #define FASTLED_ESP8266_RAW_PIN_ORDER //ifdef D2 on ESP == 4, othervice D2 is 2   //! may be better move to hardware kits
 
+
+
 #define switch_slot_FILE_H "switch_slot.h" //contains slots №, slot mean effect + settings
+//to use only this eff without switch_slot.h file:
+//#define only1eff	case 214:anim_f=kit_wand;	effSpeed=187;	effLength=128;		effFade=126;   	indexOrBits=141; break;
+//#define only1eff	case 214:anim_f=kit_MK; break;
 
 //============================================ hadrware kits
 
@@ -165,7 +171,7 @@
 	#define demo_enable
 	#define default_effN_Random // switch default to randomSet() or FastLED.clear();
 
-	#define LEDpCustom				2
+	#define LEDp_redef				2
 
 	#define tst_BRIGHTNESS 		155 // to dimm AND see good colors use lower voltage but not software brightness
 		//#define tst_POW_LIM	1000
@@ -628,7 +634,7 @@
 
 #else
 	/*
-	#define LEDpCustom				2//2  //this redefine any. del to use reference hardware schematics  //2 == D4 on NODEMCU v3 when FASTLED_ESP8266_RAW_PIN_ORDER
+	#define LEDp_redef				2//2  //this redefine any. del to use reference hardware schematics  //2 == D4 on NODEMCU v3 when FASTLED_ESP8266_RAW_PIN_ORDER
 
 	//#define MULTIPLE_PINS //4
 	//#define sound_p					A0 // enebles sound effects  //!fix used by keypad
@@ -690,6 +696,20 @@
  #undef tstFPS
  #undef SerialControl
 #endif
+
+//============================= redefine by global options that has higher priority
+	#ifdef LEDp_redef
+		#undef	LEDp
+		#define LEDp	LEDp_redef
+	#endif
+	#ifdef startLoadEffN_redef
+		#undef	startLoadEffN
+		#define startLoadEffN	startLoadEffN_redef
+	#endif
+	#ifdef SerialSpeed_redef
+		#undef	SerialSpeed
+		#define	SerialSpeed	SerialSpeed_redef
+	#endif
 //============================================ sys constants
 
 #if gNUM_LEDS<256 // NUM_LEDS_type==byte  //not working this way 2F##
@@ -1494,13 +1514,11 @@ void switch_LCDoption_selected_value_sub()
 
 	long nextCanInputRead_t=0;
 #endif
-
+	
 //=========================================================================
 void setup()
 {
-	#ifdef LEDpCustom
-		#define LEDp	LEDpCustom
-	#endif
+
 
 	#if defined( WiFi_SEND) || defined(WiFi_ControlHTMLpage)
 		setup_wifi();
@@ -1629,10 +1647,18 @@ void setup()
 	//---------------------------------------------------------
 
 	#if defined(tst) || defined(SerialSelect) || defined(SerialControl)  || defined(debugSerial)
-		#ifdef SerialSpeedRedefine
-		Serial.begin(SerialSpeedRedefine);
-		#else
 		Serial.begin(SerialSpeed);
+		#ifdef debugSerial
+			Serial.print( F("Heap: ") ); Serial.println(system_get_free_heap_size());
+			Serial.print( F("Boot Vers: ") ); Serial.println(system_get_boot_version());
+			Serial.print( F("CPU: ") ); Serial.println(system_get_cpu_freq());
+			Serial.print( F("SDK: ") ); Serial.println(system_get_sdk_version());
+			Serial.print( F("Chip ID: ") ); Serial.println(system_get_chip_id());
+			Serial.print( F("Flash ID: ") ); Serial.println(spi_flash_get_id());
+			Serial.print( F("Flash Size: ") ); Serial.println(ESP.getFlashChipRealSize());
+			Serial.print( F("Vcc: ") ); Serial.println(ESP.getVcc());
+			Serial.println();
+			Serial.setDebugOutput(true);
 		#endif
 	#endif
 
@@ -2407,4 +2433,10 @@ byte aVal;
  // #endif
 //=============================================
  // il++;
+ 
+	#ifdef debugSerialMemoryHeap
+		EVERY_N_SECONDS(1) {
+		  Serial.print( F("Heap: ") ); Serial.println(system_get_free_heap_size());
+		}
+	#endif
 }

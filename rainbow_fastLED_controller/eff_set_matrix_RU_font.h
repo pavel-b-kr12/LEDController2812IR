@@ -1,10 +1,20 @@
+int text_offset = WIDTH;
+
 #include "fonts.h" 
 #include "runningText.h" 
+
+
+
 void text_test_arr_RU()
 {
-	FastLED.clear();
-	fillString("ЙЦувввонононитьсимивапвq1я№7@", CHSV(44,222,255));//gHue //color 1/2/c
+	colorWaves_pal();
 	
+									//if(millis()%10000%2)	text_offset = WIDTH;
+								text_offset=-effLength*4+10-millis()/50%250;
+									
+	FastLED.clear();
+	fillString("ЙЦук+QWer 12@", CHSV(44,222,255));//gHue //color 1/2/c
+	//case 0: fillString("Йц Qw яч_+%;$#2*", CHSV(gHue,beatsin8(11,0,111),255)); break;
 	for(NUM_LEDS_type i=0;i<NUM_LEDS;i++)
 	{
 		if(leds[i].r>10 || leds[i].g>10 || leds[i].b>10)
@@ -27,3 +37,26 @@ void text_test_arr_RU()
 	
 	FastLED.show();
 }
+
+void text_arr_RU_greetings()
+{
+	text_offset=-effLength*4+10-millis()/50%350;
+	
+	FastLED.clear();
+	
+	switch (indexOrBits/10%4)
+	{
+	 case 0: fillString("З Новим роком! :) С новым годом! : Happy New Year", CHSV(gHue,beatsin8(11),255)); break;	// Happy New Year  Нарру пеш уеаг!
+	 case 1: fillString("Любовi й миру ! Всяких благ ! ", CHSV(0,0,255));break;
+	 case 2: fillString("Усiх благ!", CHSV(155,111,255));break;
+	 case 3: fillString("З Рiздвом Христовим! С Рождеством вас! : Merry Christmas! :) ", CHSV(111,111,255));break;  //Merry Christmas Меггу СНг1$тма$$
+	 case 4: fillString(":) lol . Be happy 8)    @  ", CHSV(44,255,255));break;
+	}
+	
+	// Good morning, Good afternoon, or Good evening
+	//good day
+	//проходи не задерживайтся
+	
+	FastLED.show();
+}
+
