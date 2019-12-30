@@ -31,12 +31,12 @@ case 12:anim_f=fillStriped;			effSpeed=6;	/*0;6;255*/	 effLength=10;/*0;255*/ 	e
 case 13:anim_f=fillStripedInvert;			effSpeed=0;		effLength=10; indexOrBits=88; gColor=CRGB::White; gColorBg=CRGB::Black; break; //!
 case 14:anim_f=fillStripedFillRainbow;	effSpeed=70;	effLength=70;	gColor=CRGB::White; break;
 case 15:anim_f=fillStripedFillRainbow;	effSpeed=70;	effLength=70;	gColor=CRGB::White;	effRGB=14; break; //not168 not328
-//case 16:anim_f=fillStripedFillRainbow;				effSpeed=56;	effLength=35; effSpeedH=186;		effLengthH=29; break; //not168 not328
+case 16:anim_f=fillStripedFillRainbow;				effSpeed=56;	effLength=35; effSpeedH=186;		effLengthH=29; break; //not168 not328
 case 17:anim_f=fillByPalette;				currentPalette=ForestColors_p; break;
 case 18:anim_f=fillByPalettesBlend_moving;	currentPalette=ForestColors_p; break;
 case 19:anim_f=rainbow;					gDelay=6;		effLengthH=8;break;
 case 20:anim_f=rainbowConfetti;			gDelay=4;		effLengthH=14;	effFade=16;break;
-//case 21:anim_f=rainbowWithGlitter;		effSpeed=20;	effLengthH=14; effFade=50; gColor=CRGB::White;  break;
+case 21:anim_f=rainbowWithGlitter;		effSpeed=20;	effLengthH=14; effFade=50; gColor=CRGB::White;  break;
 case 22:anim_f=rainbowWithGlitter;		effSpeed=15;	effLength=125;	effLengthH=2;effFade=70; 	gColor=CRGB(255,255,255);	indexOrBits=141;	gDelay=4; break; //cu
 //15 11 217 9
 //15 5 71 7
@@ -48,13 +48,12 @@ case 25:anim_f=randomBlinkRainbowFade;	effSpeed=99;	effLength=155; break;
 case 26:anim_f=rainbowSpawn_moveFromStartWithSeparators; break; //!		//not168 not328
 case 27:anim_f=rainbowSpawn_moveFromStartWithSeparatorsB; break; //!	//not168 not328
 
-
-//case 28:anim_f=rainbow_fade;			effSpeed=13;	effLength=14; break;	//Hue on all or rare LEDs 	//not168 	//!!freeze esp32 800	
-//case 29:anim_f=rainbow_fade;			effSpeed=28;	effLength=3;		effRGB=12; break;	//not168				//!!freeze esp32 800
+//case 28:anim_f=rainbow_fade;			effSpeed=13;	effLength=14; break;	//Hue on all or rare LEDs 	//not168 	//!!freeze esp32 8266 300 800	
+//case 29:anim_f=rainbow_fade;			effSpeed=28;	effLength=3;		effRGB=12; break;	//not168				//!!freeze esp32 8266 300 800
 
 case 30:anim_f=rainbow_fill_slow;		effSpeed=10;	effLength=1; break; //---RAINBOW LOOP // slow rainbow fill with shift //not big
 case 31:anim_f=rainbow_fill_slow;		effSpeed=10;	effLength=1;		effRGB=16; break;
-////case 32:anim_f=rainbow_vertical; break; //---VERITCAL RAINBOW (circular)	//not168 not328 //not big
+case 32:anim_f=rainbow_vertical; break; //---VERITCAL RAINBOW (circular)	//not168 not328 //not big
 
 case 33:anim_f=rainbow_beat;			effSpeed=130;	effLength=1; break;	//here and there
 case 34:anim_f=rainbow_beat;			effSpeed=82;	effLength=150; break;	//:)
@@ -98,7 +97,7 @@ case 61: anim_f=Sparkle;	gColor=CRGB(255,255,255);	break;						//! Sparkle // с
 case 62: anim_f=SnowSparkle; gColor=CRGB(10,10,10); effLength=random8();	break;	//!! SnowSparkle with background	//not168 not328
 case 63: anim_f=SnowSparkle_changeBG; gColor=CRGB(10,10,10);effLength=8; effFade=1;	break;	//!! SnowSparkle with background	//not168 not328
 
-////case 64:anim_f=flicker; break;	//:/	// random_burst	//not168 not328
+case 64:anim_f=flicker; break;	//:/	// random_burst	//not168 not328
 
 
 case 65:anim_f=color_bounce;			effSpeed=16;	effLength=62; break;		//---CYLON v1 moving LED
@@ -110,7 +109,7 @@ case 68:anim_f=color_bounce_multiple;	effSpeed=16;	effLength=17; break;	//not168
 case 69:anim_f=color_bounceFADE; 		effSpeed=0;		effLength=33; break;	//CYLON v2 moving LED group	//effSpeed effLength - are COLORS //not168
 case 70:anim_f=color_bounceFADE;		effSpeed=44;	effLength=1; break;		//not168
 
-//case 71:anim_f=CylonBounce; 			effSpeed=96;	effLength=65; break;	//!fix cube crush	//moving group	//not168
+//case 71:anim_f=CylonBounce; 			effSpeed=96;	effLength=65; break;	//!!fix cube crush	//moving group	//not168
 
 case 72: anim_f=movers;		effFade=80; break;
 
@@ -121,9 +120,9 @@ case 75: anim_f=movers_f;	effFade=80; break;			//not168 not328
 case 76:anim_f=meadow_cow; effSpeed=123; effLength=22; break; //!!	//not168 not328
 #endif
 
-////case 77:anim_f=ems_lightsONE;		thishue = 0; break;			//---POLICE LIGHTS SINGLE 	//not168 not328 //not big
-////case 78:anim_f=ems_lightsALL;		 break;			//---POLICE LIGHTS SOLID //cycle around	//not168 not328 //not big
-//case 79:anim_f=ems_lightsSTROBE;	 break;			//!fix cube nwp //:) //---EMERGECNY STROBE //! palette 	//not168
+case 77:anim_f=ems_lightsONE;		thishue = 0; break;			//---POLICE LIGHTS SINGLE 	//not168 not328 //not big
+case 78:anim_f=ems_lightsALL;		 break;			//---POLICE LIGHTS SOLID //cycle around	//not168 not328 //not big
+case 79:anim_f=ems_lightsSTROBE;	 break;			//!fix cube nwp //:) //---EMERGECNY STROBE //! palette 	//not168
 
 ////case 80:anim_f=color_loop_vardelay;	effSpeed=255;	effLength=255; break;	//!fix possible crash //<126 switch colorize	//not168 not328
 
@@ -136,19 +135,19 @@ case 82:anim_f=CubeTest;				 break;					//not168 not328
 case 84:anim_f=matrixCube2; clear_leds();	break;		// random 	//not168 not328 //:) //cu
 case 85:anim_f=matrixCube; clear_leds();	break;		// random 	//not168 not328
 #endif
-// case 86:anim_f=Matrix;	break;		// random 	//not168 not328 //not big
+case 86:anim_f=Matrix;	break;		// random 	//not168 not328 //not big
 ////case 87:anim_f=rwb_march;	break;		//!slo		//---MARCH RWB COLORS moving (circular) //<125 <200	switch colorize 	//not168 not328 //not big
 case 88:anim_f=random_march;	break;	//!slo	 //---MARCH RANDOM COLORS random 	//not168 not328
 
 case 89:anim_f=movingBlendRGB;			effSpeed=169;	effLength=127; break; //:)
-//case 90:anim_f=movingBlendRGB_A;		effSpeed=136;	effLength=132; break; //!fix blink 	//not168 not328
+case 90:anim_f=movingBlendRGB_A;		effSpeed=136;	effLength=132; break; //!fix blink 	//not168 not328
 
-//case 91:anim_f=rgb_propeller;	break; //!! RGB пропеллер //---RGB PROPELLER 
+case 91:anim_f=rgb_propeller;	break; //!! RGB пропеллер //---RGB PROPELLER 
 
 case 92:anim_f=LinesOpposit;	effSpeed=18;	effLength=29;		effFade=252;    gColor=CRGB(112,255,255);		gDelay=0; break; //!
 
 
-//case 93:anim_f=kitt; effLength=20*16; break;		//---KITT random blink //!gDelay 	//not168 not328
+case 93:anim_f=kitt; effLength=20*16; break;		//---KITT random blink //!gDelay 	//not168 not328
 
 ////case 94:anim_f=NewKITT;	break;					 // NewKITT (circular) //!fix ret, possible crash 	//not168 not328
 
@@ -164,11 +163,11 @@ case 95:anim_f=rule30;	break;	//:/ //---CELL AUTO - RULE 30 (RED)		//!slo 	//not
 case 99:anim_f=pulse_one_color_all;	thishue = 0; break;		//:/	//---PULSE COLOR BRIGHTNESS single color	//not168 not328
 case 100:anim_f=pulse_one_color_all_rev;	thishue = 0; break;	//:/	//---PULSE COLOR SATURATION	//not168 not328
 
-//case 101:anim_f=fade_vertical;	thishue = 180; break;		//:/ //! //---VERTICAL SOMETHING (circular) bright change	//not168 not328
+// case 101:anim_f=fade_vertical;	thishue = 180; break;		//:/ //! //---VERTICAL SOMETHING (circular) bright change	//not168 not328
 
 case 102:anim_f=radiation;	thishue = 95; break;		//:/ //---RADIATION SYMBOL	//not168 not328
 
-////case 103:anim_f=white_temps; break;	//:/	//not168 not328
+case 103:anim_f=white_temps; break;	//:/	//not168 not328
 
 ////case 104:anim_f=pop_horizontal;	break;		//!fix 255 		//---POP LEFT/RIGHT moving LED	//not168 not328
 ////case 105:anim_f=quad_bright_curve;		effSpeed=0;	effLength=17; break;	//:/		//---QUADRATIC BRIGHTNESS CURVE / полумесяц	//not168 not328
@@ -197,10 +196,10 @@ case 113:anim_f=mover_lim_mark;	effSpeed=252;	effFade=239;   	indexOrBits=221;	g
 
 
 
-//case 122:anim_f=Twinkle; twinkrate=100;gDelay=10;thisfade=8;thishue=50;thissat=255;thisbri=255;randhue=1;gDelay=0; break; //:/ //demonstrates blend two animations running at same time	//not168 not328
+case 122:anim_f=Twinkle; twinkrate=100;gDelay=10;thisfade=8;thishue=50;thissat=255;thisbri=255;randhue=1;gDelay=0; break; //:/ //demonstrates blend two animations running at same time	//not168 not328
 
 case 114:anim_f=pride;effSpeed=127;	effLength=128; effLengthH=128; break;
-case 115:anim_f=colorWaves_pal;	effSpeed=127; effLength=60; currentPalette=LavaColors_p; targetPalette=OceanColors_p; break; //! start black pal
+
 case 116:anim_f=colorTwinkles;	effSpeed=16*5; effFade=40; effLength=155; effLengthH=128; gColorBg = CRGB::Black;	break; // n=indexOrBits/10  0==rnd
 case 117:anim_f=fire_pal_hot;	effSpeed=49;effLength=60;	break;
 case 118:anim_f=fire_pal_cold;	effSpeed=49;effLength=60;	break;
@@ -222,7 +221,7 @@ case 135:anim_f=matrix_ray;		effLength=24*2; currentPalette = LavaColors_p; targ
 case 136:anim_f=noise16_1;		effSpeed = 24*2; effLength=100;  currentPalette = PartyColors_p;  gDelay=5; 		break; //:)
 case 137:anim_f=noise16_2;		maxChanges = 24;  currentPalette = PartyColors_p;  	gDelay=0;		break;	//not168 not328
 case 138:anim_f=noise16_3;		maxChanges = 24;  currentPalette = PartyColors_p;  	gDelay=0; 		break;	//not168 not328
-//case 139:anim_f=one_sine_pal;	effSpeedH = 32; effLength = 192; bgH = 0; currentPalette = LavaColors_p;  maxChanges = 24;  gDelay = 0; 		break; //!(g same)	//not168 not328
+case 139:anim_f=one_sine_pal;	effSpeedH = 32; effLength = 192; bgH = 0; currentPalette = LavaColors_p;  maxChanges = 24;  gDelay = 0; 		break; //!(g same)	//not168 not328
 case 140:anim_f=one_sine_pal_demo;	gDelay = 30; maxChanges = 24; 	thishue = 0;	bgH = 0; bgHinc = 0;		break;	//not168 not328
 case 141:anim_f=palettecrossfade;	effLength=24*2-8;	gDelay = 20;  targetPalette=PartyColors_p;	break;//:)
 case 142:anim_f=plasma;		effSpeed=60; effLength=16*3;		currentPalette = OceanColors_p;	gDelay = 0; break; //:)
@@ -230,7 +229,7 @@ case 143:anim_f=rainbow_beat2;		effSpeed=171;	effLength=10*5; break; //:/	//not1
 case 144:anim_f=rainbow_march;				effSpeed=155;		effLength=73; gDelay = 5; break;	//not168 not328
 case 145:anim_f=rainbow_march_demo;	gDelay = 40;  thishue = 0; thisrot = 1; deltahue = 1;  thisdir = 0; 				break;	//not168 not328
 ////case 146:anim_f=ripple_pal;		 effLength=thisfade = 128; gDelay = 0;   currentBlending = LINEARBLEND;	 maxChanges = 24; 		break; //! longer, brighter	//not168 not328
-//case 147:anim_f=Ripples;		effLength=160; currentPalette = OceanColors_p; targetPalette = OceanColors_p; gDelay = 40; 			break; //:)	//not168 not328
+case 147:anim_f=Ripples;		effLength=160; currentPalette = OceanColors_p; targetPalette = OceanColors_p; gDelay = 40; 			break; //:)	//not168 not328
 case 148:anim_f=sawtooth;		effSpeed=60;		effLength=255;  currentPalette = PartyColors_p; targetPalette = LavaColors_p; currentBlending = LINEARBLEND; gDelay = 0;break; //:/	//not168 not328
 case 149:anim_f=serendipitous;	effSpeed=32;effLength=32;	currentBlending = LINEARBLEND; maxChanges = 24; 		gDelay = 0; 	break; //! @g	//not168 not328
 case 150:anim_f=sinelon2;		 effLength=thisfade =   32; effSpeed=0;  thissat = 255;  thisbri = 255;         thishue =   0;	currentBlending = LINEARBLEND; gDelay = 20;	break; //:/	//not168 not328
@@ -240,11 +239,11 @@ case 153:anim_f=two_sin_pal_demo;		gDelay = 0;	currentPalette = RainbowColors_p;
 
 
 //case 154:anim_f=blur_try;		currentBlending=LINEARBLEND;		break; //:/ //! crash	//not168 not328
-//case 155:anim_f=easing_test;	effFade=22; effLength=2*4; break;	//not168 not328
+case 155:anim_f=easing_test;	effFade=22; effLength=2*4; break;	//not168 not328
 case 156:anim_f=blend_test;					break;	//not168 not328
 //case 157:anim_f=every_n_example;		currentPalette = PartyColors_p; currentBlending = LINEARBLEND;   			break; //:) //! change pal, color VS speed, fade w colorization	//not168 not328
 case 158:anim_f=every_n_exampleMulti;	currentPalette = PartyColors_p; currentBlending = LINEARBLEND;   			break; //! timer2
-////case 159:anim_f=every_n_exampleC;		currentPalette = PartyColors_p; currentBlending = LINEARBLEND;   			break; //! change pal, color VS speed, fade w colorization	//not168 not328
+//case 159:anim_f=every_n_exampleC;		currentPalette = PartyColors_p; currentBlending = LINEARBLEND;   			break; //!! change pal, color VS speed, fade w colorization	//not168 not328
 case 160:anim_f=fill_colours;		 thishue = 0; deltahue = 15;			break;	//not168 not328
 case 161:anim_f=animationA;		 currentPalette = RainbowColors_p; targetPalette = ForestColors_p;  currentBlending = LINEARBLEND; 			break;	//not168 not328
 
@@ -278,8 +277,8 @@ case 175:anim_f=test_easing;												break;//!
 
 
 
-//case 176:anim_f=test_RAWcolorMath; break;//!	//:/	//not168 not328
-//177:anim_f=iterateRAWint; break;			//:/	//not168 not328
+case 176:anim_f=test_RAWcolorMath; break;//!	//:/	//not168 not328
+177:anim_f=iterateRAWint; break;			//:/	//not168 not328
 
 //case 178:anim_f=cubic_PointerArr_test; break;				//!		//not168 not328
 //case 179:anim_f=cubic_test; break;				//!		//not168 not328
@@ -325,9 +324,10 @@ case 203:anim_f=oppositeWavesBlend; effLength=22; effLengthH=133; break;// sub e
 
 
 case 204:anim_f=wave_adj;	effSpeed=168;	effLength=128;	effSpeedH=148;	effLengthH=221;	indexOrBits=10; break;
+case 115:anim_f=colorWaves_pal;	effSpeed=127; effLength=60; currentPalette=LavaColors_p; targetPalette=OceanColors_p; break; //! start black pal
 case 205:anim_f=wave_H;		break; //:)
-//case 206:anim_f=wave_H;	effSpeed=32;	effLength=99;	effSpeedH=157;	effLengthH=140;	effFade=118;    indexOrBits=27;	effRGB=9; break;
-//case 207:anim_f=wave_H;	effSpeed=32;	effLength=99;	effSpeedH=157;	effLengthH=140;	effFade=118;    indexOrBits=27;	effRGB=17; break;
+case 206:anim_f=wave_H;	effSpeed=32;	effLength=99;	effSpeedH=157;	effLengthH=140;	effFade=118;    indexOrBits=27;	effRGB=9; break;
+case 207:anim_f=wave_H;	effSpeed=32;	effLength=99;	effSpeedH=157;	effLengthH=140;	effFade=118;    indexOrBits=27;	effRGB=17; break;
 case 208:anim_f=gen_wave_H_moveAll;	effSpeed=20;	effLength=152;	effSpeedH=123;	effLengthH=70;	effFade=109;    indexOrBits=104;	gDelay=10; break;
 //case 209:anim_f=gen_wave_H_moveAll_blinkRand;	break;
 case 210:anim_f=gen_wave_H_moveAll_blinkRand;	effSpeed=161;	effLength=74;	effSpeedH=151;	effLengthH=167;	effFade=245;    indexOrBits=54; gDelay=30; break;
@@ -353,8 +353,11 @@ case 220:anim_f=text_test;	break;		//not168 not328
 case 221:anim_f=text_test_arr_RU;	break;		//not168 not328
 case 222:anim_f=text_arr_RU_greetings;	break;		//not168 not328
 #endif
+#ifdef textMATRIX_overlay
+case 223:anim_f=text_overlay_switch; /*in anim_f bTextOverlay=indexOrBits%2;  OR  bTextOverlay=!bTextOverlay;*/	break;		//not168 not328
+#endif
 
-case 223:anim_f=kit_MK;	break;		//not168 not328
+case 224:anim_f=kit_MK;	break;		//not168 not328 //!! combine thease kits
 // 224:anim_f=DemoReel101; indexOrBits=5; gDelay=5;  break;// indexOrBits/4==0 demo //!!
 // 225:anim_f=kit_wand;	effSpeed=187;	effLength=128;		effFade=126;   	indexOrBits=141; break;
 
@@ -364,7 +367,12 @@ case 226:anim_f=ems_lightsALL;		effSpeed=3;		effLength=82;	effRGB=17; break;		//
 case 227:anim_f=fillStriped;		effSpeed=45;	effLength=186;	effRGB=8; break;		//not168 not328
 case 228:anim_f=fadeEvenUneven;		effSpeed=84;	effLength=70;	effRGB=2; break; //!	//not168 not328
 ////#setX case 229:anim_f=test_easing;		 gColor=CRGB(141,0,1);	indexOrBits=93;	 break;			//not168 not328
-case 230:anim_f=sinelon;				 break;					//not168 not328
+
+#ifdef ClothSuit
+ case 230:anim_f=ClothKit; 	break;//gColor=CRGB(255,255,255);
+#endif
+
+
 case 231:anim_f=fillStriped;	effSpeed=55;	effLength=71;	effSpeedH=1;	effLengthH=4;	effFade=0;    gColor=CRGB(255,255,255);	indexOrBits=88;	break;
 case 232:anim_f=fillStriped;	effSpeed=20;	effLength=102;	effSpeedH=120;	effLengthH=79;	effFade=21;    gColor=CRGB(255,255,255);	indexOrBits=88;	gDelay=0; break; //:\ bw
 case 233:anim_f=fillStriped;	effSpeed=15;	effLength=125;	effSpeedH=31;	effLengthH=2;	effFade=70;    gColor=CRGB(255,255,255);	indexOrBits=141;	gDelay=0; break;
@@ -374,7 +382,7 @@ case 233:anim_f=fillStriped;	effSpeed=15;	effLength=125;	effSpeedH=31;	effLength
 case 234:anim_f=random_len_cell_1;				 break;					//not168 not328
 case 235:anim_f=random_len_cell_seemless;		 break;			//:)	//not168 not328
 
-//case 236:anim_f=fillRange_anim;		 break;			//!!	//not168 not328
+case 236:anim_f=fillRange_anim;		 break;			//!!	//not168 not328
 
 
 #ifdef PWM_enabled
@@ -398,6 +406,7 @@ case 243:  bMap_type=(bMap_type==0)?bMap_type_mirror_half:0; break;
 case 244:  bMap_type=(bMap_type==0)?bMap_type_history:0; break; //!!TODO
 #endif
 
+case 245:	anim_f=nodo;	 break; //not168 not328 //TODO fix last item not appear in USB app
 
 #if defined(WiFi_SEND)
 //case 247:	anim_f=test_RF;	 break;			//not168 not328
@@ -406,7 +415,7 @@ case 244:  bMap_type=(bMap_type==0)?bMap_type_history:0; break; //!!TODO
 // case 248:anim_f=demo_modeA; break;			 //! short
 // case 249:anim_f=demo_modeB; break;			 //! long
 
-//case 250:	anim_f=nodo;	 break; //not168 not328 //TODO fix last item not appear in USB app
+
 
 //eff sw with actions @ transition
 //!! eff-blur-eff

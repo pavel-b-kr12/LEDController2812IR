@@ -1,3 +1,35 @@
+//this N related to button in USB app
+#define effN_off 10 //clear, nodo()
+	
+#define effN_random_endless 248 //endless while press btn --
+#define effN_random 249 
+#define effN_animate_to_slot1 251
+#define effN_animate_SW 252 
+
+#ifdef demo_enable
+#define effN_random_demo_animated_SW 250  //effN_animate_SW & effN_random_demo_SW
+#define effN_predefined_show_seq 253
+#define effN_random_demo_fast_SW 254 
+#define effN_random_demo_SW 255 //del to disable
+#endif
+
+#ifdef remap_LEDs
+	byte bMap_type=0;
+	#define bMap_type_matrix_			241 //! have to be in sync with gui.pde / btn_matrix_zigZag_h_click  and HTML_settings.htm
+	#define bMap_type_matrix_zigZag_h	242
+	#define bMap_type_matrix_spiral_cw	243
+	#define bMap_type_matrix_labyrinth_cw	244
+	#define bMap_type_mirror_half	245
+	#define bMap_type_history	246 // every n ms shift matrix rows and fill 1st with LEDs
+	#ifdef MATRIX_ROWS
+
+	#endif
+	bool bSwapLEDs=false;
+	CRGB leds_out[NUM_LEDS];
+#endif
+
+
+
 byte aDelay=0;
 byte gDelayH=20;
 
@@ -118,8 +150,17 @@ uint16_t sampleavg = 0;                                                         
 #include "eff_set_3\firework1000.h"
 
 
-#include "eff_set_MK\kit_MK.h"
+#if defined(ClothSuit)
+ #include "eff_set_Cloth_mirror.h"
+#endif
 
+#if defined(use_ESP8266) || defined (use_ESP32)
+ #include "eff_set_MK\kit_MK.h" //use a lot of memory
+#endif
+
+#if defined(textMATRIX_overlay)
+	bool bTextOverlay=true;
+#endif
 #ifdef MATRIX_ROWS //!!##
  #include "eff_matrix.h"
 #endif
@@ -129,6 +170,7 @@ uint16_t sampleavg = 0;                                                         
 #ifdef MATRIXfonth
  #include "eff_set_matrix_RU_font.h"
 #endif
+
 
 #ifdef PWM_enabled
 #include "eff_set_PWM_Dimmer.h"
@@ -159,20 +201,6 @@ uint16_t sampleavg = 0;                                                         
 
 
 
-#ifdef remap_LEDs
-	byte bMap_type=0;
-	#define bMap_type_matrix_			241 //! have to be in sync with gui.pde / btn_matrix_zigZag_h_click  and HTML_settings.htm
-	#define bMap_type_matrix_zigZag_h	242
-	#define bMap_type_matrix_spiral_cw	243
-	#define bMap_type_matrix_labyrinth_cw	244
-	#define bMap_type_mirror_half	245
-	#define bMap_type_history	246 // every n ms shift matrix rows and fill 1st with LEDs
-	#ifdef MATRIX_ROWS
-
-	#endif
-	bool bSwapLEDs=false;
-	CRGB leds_out[NUM_LEDS];
-#endif
 
 
 #ifndef saveMem
@@ -186,29 +214,52 @@ void change_slot(byte);
 
 void randomSet()
 {
+	random16_add_entropy( random(0,255));
 												#ifdef tst2
 												Serial.println("randomSet");
 												#endif
 	//anim_f=randomEff;
 	
 	//effN=random8(1,250);
-	realEffN=random8(11,144);
-	change_slot(realEffN); //!! random8 range
+	#ifdef random_demo_is_switch //slot is effN , do not use realEffN   //!! TODO
+	#else //slot is effN_random_demo_SW, effN is realEffN
+	realEffN=random8(11,237);
+	change_slot(realEffN);
+	#endif
 	
 	effSpeed=random8(1,90); //40
 	effLength=random8(5,120); //60
-	effLength2=random8(5,120); //60
-	effRGB=random8(0,effRGB_M);
+	
+	
 	effSpeedH=random8(1,90);
 	effLengthH=random8(1,90);
-		thishue=random8();
-	#ifdef ESP32_HTML_NO_RENDER
-		gDelay=random8(5,20);
-	#else
-		gDelay=random8(0,30);
-	#endif
 
+	gDelay=random8(0,30);
+	
+	#ifndef saveMem
+	thishue=random8();
+	effLength2=random8(5,120); //effLength2 rarely used now
+	
+	byte h=random8();
+	byte s=random8();
+	if(s>20) s=127+s/2;
+	byte v=255; //random8(1,3)*127;
+	gColor=CHSV(h,s,v);
+	gColorBg=CHSV(h+64+random8(128),s,random8()); //! tst waht eff use and how it looks
+	#endif
+	
 	bCurrentEff_IsRandom_AndNotSlotN=true;
+	
+	#ifdef textMATRIX_overlay
+		text_sett(); //##
+	#endif
+	
+	indexOrBits=random8();
+	//effRGB=random8(0,effRGB_M);
+	effRGB=random8();
+	if(indexOrBits>220) indexOrBits=0;
+	else indexOrBits=indexOrBits%(effRGB_M+1);
+	
 #if defined(tst) || defined(SerialControl)|| defined(SerialSelect)|| defined(LCD2004_i2c)|| defined(keypad1602)
 	display_upd();
 #endif
@@ -245,22 +296,6 @@ void change_slot(byte effSlot)
 	#else
 		#include switch_slot_FILE_H
 	#endif
-
-//this N related to button in USB app
-#define effN_off 10 //clear, nodo()
-	
-#define effN_random_endless 248 //endless while press btn --
-#define effN_random 249 
-#define effN_animate_to_slot1 251
-#define effN_animate_SW 252 
-
-#ifdef demo_enable
-#define effN_random_demo_animated_SW 250  //effN_animate_SW & effN_random_demo_SW
-#define effN_predefined_show_seq 253
-#define effN_random_demo_fast_SW 254 
-#define effN_random_demo_SW 255 //del to disable
-#endif
-
 
 
 	case effN_random_endless: //randomEff endless when press btn left 
@@ -351,7 +386,7 @@ void change_slot(byte effSlot)
 				randomSet();
 			#else
 				FastLED.clear();
-								anim_f=fillStriped; //## if not defined default_effN_Random  is NULL
+								//anim_f=fillStriped; //## if not defined default_effN_Random  is NULL
 			#endif
 			//effN =0;
 		}
@@ -450,8 +485,14 @@ void LED_anim()
 
 if(millis()>anim_next_t)
 {
-
 	anim_next_t=millis()+gDelay;
+	
+	#ifdef mode_switch_enabled
+		if(bLEDsMirror)
+		{
+			NUM_LEDS=gNUM_LEDS/2;
+		}
+	#endif
 
 	#ifdef tstFPS
 
@@ -551,9 +592,20 @@ if(millis()>anim_next_t)
 //#ifndef only1eff
 //--------------------------------------------------------------- post processing
 re_effRGB();
-
 //#endif
-
+#ifdef textMATRIX_overlay //! can be before or after re_effRGB()
+	if(bTextOverlay)
+	{
+		#if defined(MATRIXfonth)
+			if(anim_f!=text_arr_RU_greetings) //! all eff w text VS bTextOverlay
+			{
+				text_arr_RU_greetings();
+			} //else draw as usual in anim_f()
+		#elif  defined(NUMMATRIX)
+			text_test();
+		#endif
+	}
+#endif
 
 
 #ifdef remap_LEDs
@@ -626,7 +678,7 @@ i_Square=-1;
 				else continue; //? why can't 'break' it stop on 4th size start
 
 				{
-					#ifndef bZigZag
+					#ifndef bMatrixZigZag
 						leds_out[row_s*LEDs_per_row+col_s]=leds[i];
 					#else
 						NUM_LEDS_type ii;
@@ -704,7 +756,7 @@ i_Square=-1;
 				else break;
 
 				{
-					#ifndef bZigZag
+					#ifndef bMatrixZigZag
 						leds_out[row_s*LEDs_per_row+col_s]=leds[i];
 					#else
 						NUM_LEDS_type ii;
@@ -756,6 +808,14 @@ i_Square=-1;
 	#endif
 	//--------------------------------------------------------------- 
 
+	#ifdef mode_switch_enabled
+		if(bLEDsMirror)
+		{
+			memcpy8( &leds[0],	&leds[NUM_LEDS*3], NUM_LEDS*3 );
+			NUM_LEDS=gNUM_LEDS; //!! probaly after randomSet();
+		}
+	#endif
+	
 	#if defined(LEDs_RENDER)
 		#ifndef NUMMATRIX
 			FastLED_show_DIRECTION //dir FastLED.show(); dir
@@ -776,8 +836,6 @@ else
 	//! https://github.com/FastLED/FastLED/wiki/FastLED-Temporal-Dithering
 }
 
-//EVERY_N_MILLISECONDS( 20 )
-//{
 if(millis()>animHue_next_t)
 {
 	animHue_next_t=millis()+gDelayH;

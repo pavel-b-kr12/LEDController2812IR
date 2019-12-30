@@ -21,15 +21,18 @@ boolean b_Cube=true; //set NUM_LEDS_slider to Max; Use to calculate current.
 boolean b_NUM_LEDS_adj=false;//true false //! fix adj mode especially if no adjustable set in MCU
 
 //5 30 60 120 144 150 180 300 450
-int NUM_LEDS_slider_startup=16*16;//150;//105;//60*3;//105; //145*3*4 60*8 15*8 8*8 16*16  //this is also max for draw gemetry arr DrawLEDs_pointsX 
+int NUM_LEDS_slider_startup=144; //16*16;//150;//105;//60*3;//105; //145*3*4 60*8 15*8 8*8 16*16  //this is also max for draw gemetry arr DrawLEDs_pointsX 
 int NUM_LEDS_slider_m=60;
 int NUM_LEDS_slider_M=16*16;
 
-int matrix_rowsE=8;//8 16  horizontal L-to-R //for plotPX //TODO2 vertiacal
+int matrix_leds_per_col=8; // 8 16  horizontal L-to-R //for plotPX //TODO2 vertiacal
 boolean NUM_LEDS_x8=false;// true false // have to be true if gNUM_LEDS>255 , so we can send it with 1 byte
+/* //15*16 matrix from 30/m
+int NUM_LEDS_slider_startup=15*16;
+int matrix_leds_per_col=15; 
+*/
 
-
-boolean bFlipArr_sim_to_zigZag_matrix=false; //for sim. If true - flips data before send to plot and MCU. MATRIX Plot also flip data by default plotPX.b_matrix_arr_is_zigZag
+boolean bFlipArr_sim_to_zigZag_matrix=true;//false; //for sim. If true - flips data before send to plot and MCU. MATRIX Plot also flip data by default plotPX.b_matrix_arr_is_zigZag
 
 int bSetBrightnessAtConnect=33; //-1 for not set
 
@@ -918,7 +921,7 @@ public void draw()
 		{
 			if(plotPX!=null)
 			{
-				plotPX.matrix_rowsE=matrix_rowsE; //!!
+				plotPX.matrix_leds_per_col=matrix_leds_per_col; //!!
 
 				if(bDrawLEDs_PXHistory_enabled)
 				{	
@@ -1089,8 +1092,14 @@ public void draw()
 		text(mouseX, mouseX, mouseY);		
 		text(mouseY, mouseX, mouseY+30);
 	}
-}
 
+  if(bBlurDraw)
+  {
+    //filter(BLUR,3); this is too slow
+    //!! https://forum.processing.org/two/discussion/12941/performance-of-filter
+  }
+}
+boolean bBlurDraw=false;
 
 
 // Use this method to add additional statements to customise the GUI controls
@@ -1202,6 +1211,15 @@ void keyReleased() {
 				plotPX.bDrawLEDs_on=false;
 			}
 	}
+  if (key == CODED)
+  {
+      if(keyCode == 117) bFlipArr_sim_to_zigZag_matrix=!bFlipArr_sim_to_zigZag_matrix;  //F6
+      if(keyCode == 119 && plotPX!=null) plotPX.matrix_HORIZONTAL=!plotPX.matrix_HORIZONTAL;  //F8
+
+      if(keyCode == 118) bBlurDraw=!bBlurDraw; //F7
+
+      
+  }
 }
 
 
@@ -1237,7 +1255,6 @@ void keyPressed() {
 
 						plotPX.bDrawLEDs_on=true;
 				}
-		
 			}
 		}
 	}

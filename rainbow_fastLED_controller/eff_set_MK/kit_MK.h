@@ -2,6 +2,8 @@
    based on ESP8266 FastLED WebServer: https://github.com/jasoncoon/esp8266-fastled-webserver
 */
 /*
+#define standalone
+
 //#define FASTLED_ALLOW_INTERRUPTS 1
 //#define INTERRUPT_THRESHOLD 1
 #define FASTLED_INTERRUPT_RETRY_COUNT 0

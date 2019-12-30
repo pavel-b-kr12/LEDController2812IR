@@ -7,16 +7,23 @@
 //! have to be deleted after FastLED REVERSE functions will be available. 
 
 //#define LEDp_redef				0
-#define startLoadEffN_redef 222//115 //18//220//11//71//152//71,72=CubeTest	35 218 //220=CubeCornersLight		209=mus_arduinoFFT //21//effN_test_RF //151=setColors_fill
+//#define startLoadEffN_redef 255//222//204// CubeTest	CubeCornersLight	mus_arduinoFFT	effN_test_RF setColors_fill	255=effN_random_demo_SW 254=demo fast
 
 //============================================ global options, that can be redefined below in "hadrware kits" section
 #define LEDchipType	WS2812B // WS2811
+#define tst_POW_LIM	1000
+
+//#define textMATRIX_overlay //add text after anim_f. Use slot text_overlay_switch  bTextOverlay=!bTextOverlay   default = true 
+//#define textMATRIX_overlay_substractTetAfterShow //!! 
+//#define doubleDrawBuffers_AddPrevEff  //!!TODO draw to leds, copy leds to ledsTmp,  overlay add to leds, show leds, copy ledsTmp to leds
+//#define doubleDrawBuffers_AddText		//!!
+
 //#define BlueFilter
 
 //#define offEffChangeAfter2min //### disable checkSerial(); IR, in, wifi  //e.g. for stability and sequrity
 //#define off_change_slot_After2min //e.g. for stability and sequrity
 			//#define offWiFiAfter2min //# test
-//#define mode_switch_enabled //##
+//#define mode_switch_enabled // bLEDsMirror, ...
 //#define use_ESP_WiFioff
 
 			// #define PWM_pin0	 //don't forget disable LEDs_RENDER if uses same pins also PinSequencer pins
@@ -48,7 +55,7 @@
 
 
 //============================================ hardware sets, choose one:
-//#define ESP8266_SHOW
+#define ESP8266_SHOW
 //#define ESP8266_SHOW_60x20m
 //-------------------- ESP32  in arduino IDE select DOIT ESP32 devkit
 //#define ESP32_SHOW_USBWiFi  
@@ -70,10 +77,15 @@
 //#define Cube4MCU // ESP32 server ( see code of render nodes in render_WiFi folder )
 //#define Cube3MCU_w_also_serverDraw //it also #define Cube4MCU  ,TODO probably have to split out. 
 //#define Cube3MCU_12p
+
+//#define ClothSuit_mirror
+
+
 //------- ----------------------- matrix
 //#define ESP8266_SHOW_MATRIX
 //#define ESP8266_text8x32_test //adafruit GFX
-#define ESP8266_text_RU_8x32_MATRIX //font in array .h
+//#define ESP8266_text_RU_8x32_MATRIX //font in array .h
+//#define ESP8266_text_RU_15x16_MATRIX //font in array .h
 //------- -----------------------
 
 
@@ -82,6 +94,7 @@
 
 
 #define switch_slot_FILE_H "switch_slot.h" //contains slots №, slot mean effect + settings
+//#define switch_slot_FILE_H "switch_slot_mega328.h"
 //to use only this eff without switch_slot.h file:
 //#define only1eff	case 214:anim_f=kit_wand;	effSpeed=187;	effLength=128;		effFade=126;   	indexOrBits=141; break;
 //#define only1eff	case 214:anim_f=kit_MK; break;
@@ -131,7 +144,8 @@
 	#define default_effN_Random
 #elif defined(hadrware_nano328_demo)
 	#undef switch_slot_FILE_H
-	#define switch_slot_FILE_H "switch_slot_old_Nano328.h"
+	//#define switch_slot_FILE_H "switch_slot_old_Nano328.h"
+	#define switch_slot_FILE_H "switch_slot_mega328.h"
 	
 	#define SerialControl //thease 3 option eat 7% of atm328 program storage space
 	#define SerialSpeed		1000000
@@ -391,24 +405,59 @@
 
 #elif defined(ESP8266_text_RU_8x32_MATRIX)
 	#define MATRIXfonth
+							//#define textMATRIX_overlay
 	#define WIDTH	32
 	#define HEIGHT	8
-	#define MATRIX_TYPE 0         // тип матрицы: 0 - зигзаг, 1 - параллельная
-	#define CONNECTION_ANGLE 1    // угол подключения: 0 - левый нижний, 1 - левый верхний, 2 - правый верхний, 3 - правый нижний
-	#define STRIP_DIRECTION 0     // направление ленты из угла: 0 - вправо, 1 - вверх, 2 - влево, 3 - вниз
+	#define bMatrixZigZag 1         // тип матрицы: 0 - зигзаг, 1 - параллельная
+	#define CONNECTION_ANGLE 0//0//1    // угол подключения: 0 - левый нижний, 1 - левый верхний, 2 - правый верхний, 3 - правый нижний
+	#define STRIP_DIRECTION  1//1//3//(0 for USB view. TODO use STRIP_DIRECTION in USB app )    // направление ленты из угла: 0 - вправо, 1 - вверх, 2 - влево, 3 - вниз
+	/* //for USB view w matrix_HORIZONTAL=true;
+	#define CONNECTION_ANGLE 1 
+	#define STRIP_DIRECTION  0
+	*/
 	
 	#define startLoadEffN  222
 	#define use_ESP8266
+		#define use_ESP_WiFioff
 	//#define WiFi_ControlHTMLpage
 	#define SerialControl
 	#define tstFPS
 	#define LEDs_RENDER
-	#define gNUM_LEDS 		256
+	#define gNUM_LEDS 		WIDTH*HEIGHT
 	#define NUM_LEDS_type 		uint16_t
 	#define LEDp					4
 						#define tst_BRIGHTNESS		33
 	#define gDelayMore	5	
 
+#elif defined(ESP8266_text_RU_15x16_MATRIX)
+	#define MATRIXfonth
+							//#define textMATRIX_overlay
+	#define WIDTH	16
+	#define HEIGHT	15
+	#define bMatrixZigZag 1         // тип матрицы: 0 - зигзаг, 1 - параллельная
+	#define CONNECTION_ANGLE 0//0//1    // угол подключения: 0 - левый нижний, 1 - левый верхний, 2 - правый верхний, 3 - правый нижний
+	#define STRIP_DIRECTION  1//1//3//(0 for USB view. TODO use STRIP_DIRECTION in USB app )    // направление ленты из угла: 0 - вправо, 1 - вверх, 2 - влево, 3 - вниз
+	/* //for USB view w matrix_HORIZONTAL=true;
+	#define CONNECTION_ANGLE 1 
+	#define STRIP_DIRECTION  0
+	*/
+	
+	#define startLoadEffN  222
+	#define use_ESP8266
+		#define use_ESP_WiFioff
+	//#define WiFi_ControlHTMLpage
+	#define SerialControl
+	#define tstFPS
+	#define LEDs_RENDER
+	#define gNUM_LEDS 		WIDTH*HEIGHT
+	#define NUM_LEDS_type 		uint16_t
+	#define LEDp					4
+						#define tst_BRIGHTNESS		122
+	#define gDelayMore	5	
+
+	#define demo_enable
+	byte random_demo_sw_speed_td_m=3;
+	byte random_demo_sw_speed_td_M=15;
 #elif defined(ESP32_SHOW_WiFi)
 	#define use_ESP32
 
@@ -439,12 +488,28 @@
 	#define LEDs_RENDER
 	#define gNUM_LEDS 			300// 30 60 120 144 150 180 240 300 145*12
 	#define NUM_LEDS_type 		uint16_t //byte uint16_t
+	#define save_load_enable
+	#define demo_enable
+	#define LEDp					4
+	byte random_demo_sw_speed_td_m=5; //s  //!!
+	byte random_demo_sw_speed_td_M=25;
+						#define tst_BRIGHTNESS		200	
+#elif defined(ClothSuit_mirror)
+	#define startLoadEffN	230
+	#define use_ESP8266
+	//#define WiFi_ControlHTMLpage
+	#define SerialControl
+	//#define sound_p					39
+	#define tstFPS
+	#define LEDs_RENDER
+	#define gNUM_LEDS 			2400/3/2 //=400
+	#define NUM_LEDS_type 		uint16_t //byte uint16_t
 	//#define save_load_enable
 	#define demo_enable
 	#define LEDp					4
-	byte random_demo_sw_speed_td_m=2; //s  //!!
-	byte random_demo_sw_speed_td_M=15;
-						#define tst_BRIGHTNESS		255
+	byte random_demo_sw_speed_td_m=4; //s  //!!
+	byte random_demo_sw_speed_td_M=22;
+						#define tst_BRIGHTNESS		22
 #elif defined(ESP8266_SHOW_60x20m)
 	#define startLoadEffN 151 //setColors_fill
 	#define use_ESP8266
@@ -498,7 +563,7 @@
 		#define gDelayMore	12
 	#define gNUM_LEDS 			16*16// 30 60 120 144 150 180 240 300 145*12
 	#define MATRIX_ROWS			16
-	#define bZigZag //TODO
+	#define bMatrixZigZag //TODO
 
 	#define NUM_LEDS_type 		uint16_t //byte uint16_t
 		#define save_load_enable
@@ -690,6 +755,10 @@
 	 #define adjType_LDR
 	#endif
 */
+#endif
+
+#if defined(ClothSuit_mirror)
+	#define ClothSuit
 #endif
 
 #ifdef debugSerial
@@ -1119,10 +1188,20 @@ void display_upd()
 																					//Serial.println(NUM_LEDS);Serial.println(gNUM_LEDS);
 	PRINT__
 	PRINT_settings
-
+	
+	byte tmp=0;
+	if(bCurrentEff_IsRandom_AndNotSlotN) //?same as effN>=254  //show current effN but not slot of random demo
+	{
+		tmp=effN;
+		effN=realEffN;
+	}
+	
 	Serial.write(sizeof(oostr));
 	Serial.write((const uint8_t*)&oostr, sizeof(oostr));
 
+	if(bCurrentEff_IsRandom_AndNotSlotN)
+		effN=tmp;
+	
 	if(bPause)
 	{
 		uint8_t *p;

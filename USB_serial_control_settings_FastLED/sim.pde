@@ -39,6 +39,83 @@ int blur_(int ir_l, int ir, int ir_r, int speedH, int effFade, int lengthH, int 
 	  */
 }
 
+void fadeAll(int f)
+{
+	int NUM_LEDS_sim=settingsVals.get("NUM_LEDS").value;
+	int NUM_LEDS_sim_arr_size=NUM_LEDS_sim*3;
+	for (int i=0,ir=0,ig=1,ib=2; ir<NUM_LEDS_sim_arr_size; i++,ir+=3,ig+=3,ib+=3) 
+	{
+		int c=msg_buffer[ir];
+		msg_buffer[ir]=(c>f)?c-f:0; //odd row
+
+		c=msg_buffer[ig];
+		msg_buffer[ig]=(c>f)?c-f:0;
+	  
+		c=msg_buffer[ib];
+		msg_buffer[ib]=(c>f)?c-f:0;
+	}
+}
+
+void fadeAll_move_matrix(int ff, int rowE, int matrixW)
+{
+	for (int r=0; r<rowE; r++) 
+	{
+		int f=ff;
+		for (int xx=matrixW-1; xx>0; xx--) 
+		{
+			//if(c==r) msg_buffer[(r*matrixW+c)*3]=255;
+
+			int x=r*matrixW+xx;
+
+			int c=0;
+													f=f+(int)random(-2,2);
+			c=msg_buffer[(x-1)*3+0];
+			msg_buffer[x*3+0] = (f==0) ? c: ( (c>f)?c-f:0 );
+
+			c=msg_buffer[(x-1)*3+1];
+			msg_buffer[x*3+1] = (f==0) ? c: ( (c>f)?c-f:0 );
+
+			c=msg_buffer[(x-1)*3+2];
+			msg_buffer[x*3+2] = (f==0) ? c: ( (c>f)?c-f:0 );
+		}
+	}
+}
+
+void swap_led(int n, int n1)
+{
+	swap_led_ch(n*3, n1*3); //r
+	swap_led_ch(n*3+1, n1*3+1); //g
+	swap_led_ch(n*3+2, n1*3+2); //b
+}
+void swap_led_ch(int n, int n1)
+{
+	int t=msg_buffer[n];
+	msg_buffer[n]=msg_buffer[n1];
+	msg_buffer[n1]=t;
+}
+
+void flip_zigZag_matrix(int rowE, int matrixW)
+{
+	if(bFlipArr_sim_to_zigZag_matrix)
+	{
+		//println(millis());
+				// msg_buffer[0*3+1]=255;
+				// msg_buffer[8*3]=255;
+				// msg_buffer[16*3+1]=255;
+				// msg_buffer[24*3]=255;
+		//flip odd row due zig-zag connection //also plot b_matrix_arr_is_zigZag=true by default
+		for (int r=0; r<rowE; r++) 
+		{
+		  for (int xx=0; xx<matrixW/2; xx++) 
+		  {
+			if(r%2==1)
+			{
+				swap_led(r*matrixW+xx, (r+1)*matrixW-xx-1);
+			}
+		  }
+		}
+	}
+}
 
 int pos=0;
 int pos_last=0;
@@ -66,7 +143,7 @@ void sim()
 
 
     int matrixW=plotPX.matrix_leds_per_row;
-    int rowE=plotPX.matrix_rowsE;  
+    int rowE=plotPX.matrix_leds_per_col;  
 
 	int effN=settingsVals.get("effN").valueSlider.getValueI();
 	int speed=settingsVals.get("speed").valueSlider.getValueI();
@@ -82,6 +159,7 @@ void sim()
 	int gDelay=settingsVals.get("gDelay").valueSlider.getValueI();
 	int gBrightness=settingsVals.get("gBrightness").valueSlider.getValueI();
 
+	flip_zigZag_matrix(rowE, matrixW);
       
     switch(effN)
     {
@@ -96,12 +174,70 @@ void sim()
           msg_buffer[ib]=(int)(sin(ib*4)*255);
         }
       }
+      break;      
+      case 1:
+	  {
+	  //bclear_msg_buffer_now=true;
+		//fadeAll_move_matrix(21, rowE, matrixW);
+		////fadeAll_move_matrix((int)random(17,24), rowE, matrixW); //дерганное от ранлома
+		fadeAll_move_matrix(11+mouseX/200, rowE, matrixW);
+		//fadeAll(25);
+		
+		
+	    for (int ro=0; ro<rowE; ro++) 
+        {
+			for (int c=0; c<matrixW; c++) 
+			{
+				//if(c==ro) msg_buffer[(ro*matrixW+c)*3]=255;
+						if(c>0) break;
+				
+				
+					int heatRnd=(int)random(50,255);
+					int heat=(int)(noise((float)ro,(float)millis()/200)*255);
+					heat=(int)( heat*(1-mouseY/width)+heatRnd*mouseY/width);
+					
+					int r= heat*2; if(r>255) r=255; 
+					if(heat>220) r-=heat/10;
+					
+					int g= heat*2-200;  g=  constrain(g,0,255);
+					if(heat>220) g-=heat/10;
+					
+					int b= heat*2-300;  b=  constrain(b,0,255);
+					
+
+				msg_buffer[(ro*matrixW+c)*3+0]=r;
+				msg_buffer[(ro*matrixW+c)*3+1]=g;
+				msg_buffer[(ro*matrixW+c)*3+2]=b;
+				/*
+					int heat=(int)random(50,255);
+					int heatHi=(int)random(heat);
+					
+				msg_buffer[(ro*matrixW+c)*3+0]=heat;
+				msg_buffer[(ro*matrixW+c)*3+1]=heatHi;
+				msg_buffer[(ro*matrixW+c)*3+2]=heatHi;
+				*/
+			}
+        }
+		
+/*
+        for (int ro=0; ro<rowE; ro++) 
+        {
+			for (int c=0; c<matrixW; c++) 
+			{
+				//if(c==ro) msg_buffer[(ro*matrixW+c)*3]=255;
+
+				msg_buffer[(ro*matrixW+c)*3+0]=(int) ((float)r/rowE*255);
+				msg_buffer[(ro*matrixW+c)*3+1]=(int) ( (float)c/matrixW*255 );
+				msg_buffer[(ro*matrixW+c)*3+2]=0;
+			}
+        }*/
+	  }
       break;	
 		
       case 2:
       {
         for (int i=0; i<NUM_LEDS_sim_arr_size; i++) 
-          msg_buffer[i]=i/3/matrixW%2 *255; //odd row
+          msg_buffer[i]=i/3/matrixW%2 *255; //odd px
       }
       break;
 
@@ -320,33 +456,15 @@ void sim()
 
 	rollover_msg_buffer(NUM_LEDS_sim);
 	
+	
 	      fill(0, 255, 0);
       text(msg_buffer[0], mouseX+20, mouseY+80);
       text(msg_buffer[1], mouseX+20, mouseY+100);
       text(msg_buffer[2], mouseX+20, mouseY+120);
 	  
+	flip_zigZag_matrix(rowE, matrixW);
 
-    if(bFlipArr_sim_to_zigZag_matrix)
-    {
-                // msg_buffer[0*3+1]=255;
-                // msg_buffer[8*3]=255;
-                // msg_buffer[16*3+1]=255;
-                // msg_buffer[24*3]=255;
-        //flip odd row due zig-zag connection //also plot b_matrix_arr_is_zigZag=true by default
-        for (int r=0; r<rowE; r++) 
-        {
-          for (int c=0; c<matrixW/2; c++) 
-          {
-            if(r%2==1)
-            {
-               int t=msg_buffer[(r*matrixW+c)*3];
-               msg_buffer[(r*matrixW+c)*3]=msg_buffer[((r+1)*matrixW-c-1)*3];
-               msg_buffer[((r+1)*matrixW-c-1)*3]=t;
-            }
-          }
-        }
-    }
-    
+
     if(bSendSimDataToMCU) 
       for (int i=0; i<NUM_LEDS_sim_arr_size; i++)
         myPort.write(((int)msg_buffer[i])%255);
@@ -373,4 +491,8 @@ void sim()
     bDrawPownow=plotPX.rE+plotPX.gE+plotPX.bE;
     plot_pow.push(bDrawPownow);
     bDrawPow_until_t=millis()+1000; //!! move to push
+	
+
+
+
   }

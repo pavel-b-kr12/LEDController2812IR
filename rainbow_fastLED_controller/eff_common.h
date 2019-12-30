@@ -280,6 +280,51 @@ void move_fromCenter_RemainFirst()
 
 
 
+long t_last=0;
+void moveOutAll_w_speed(byte speed)  //close to 128 is faster
+{
+	if(speed>2)
+	{
+		int s=((int)speed-128);
+		#ifdef reversemoveOutAll
+		s=-s;
+		#endif
+
+		byte spd=abs(s); //lower is faster
+		#ifdef USBShow
+		spd/=2;
+		#endif
+		if(spd<3) s=0; //no move
+
+		while(millis()-t_last > spd )
+		{
+			if((millis()-t_last)/ (1+spd) >10) //after big pause do not need to scroll
+			{
+				t_last=millis();
+			}
+			else
+			{
+				t_last+=spd;
+			}
+
+			if(s>0)
+			{
+				moveOutAllRemainFirst_ret_last__all_Right();
+				leds[0]=0;
+			}
+			else if(s<0)
+			{
+				moveOutAllRemainFirst_ret_last__all_Left();
+				leds[NUM_LEDS-1]=0;
+			}
+		}
+	}	
+}
+void moveOutAll_w_effSpeed()
+{
+ moveOutAll_w_speed(effSpeed);
+}
+
 
 void addGlitter(byte chanceOfGlitter)
 {

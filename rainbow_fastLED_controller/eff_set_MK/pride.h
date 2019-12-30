@@ -2,8 +2,9 @@
 // This function draws rainbows with an ever-changing, widely-varying set of parameters.
 void pride()
 {
-	#ifdef STANDALONE
-	const byte effSpeed=127, effLength=128, effLengthH=128;
+	#ifdef standalone
+	//const byte
+	effSpeed=127, effLength=128, effLengthH=128;
 	#endif
 	
   static uint16_t sPseudotime = 0;

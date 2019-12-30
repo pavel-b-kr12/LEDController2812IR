@@ -1,16 +1,48 @@
 
-// long loop_d=10000;
-// int PWM_v_M=4096;
+bool bLEDsMirror=false; //##!! TODO leds is draw bufer. before show copy to show-buffer (and do matrix op, itcs if need)
+
 void mode_switch()
 {
-	// loop_d=(1+effLength)*100;
+	bLEDsMirror=indexOrBits%2;
+	//TODO
+	/*
+	bTextOverlay
+	bMap_type
+	bPWM_Dimmer
 	
-	// long time=millis%loop_d;
+	rgbEff
+	rgbEff probability in random
 	
-	// NUM_LEDS_type x=constrain(map(time, 0, loop_d, 0, NUM_LEDS-1), 0, NUM_LEDS-1);//time pos marker
+	random len
 	
-	// int PW= (((float)time)/loop_d)*PWM_v_M;
-	// PW=constrain(PW,6,4090); //to avoid IR2101 burn it can't be 100%
+	
+	gColor
+	gColorBg
+	Palette sw
+	
+	*/
+	
+	/*
+	incr mode: multiple anim() adds to LEDs
+	*/
+	
+	/*
+	split stripe to independant segs:
+	
+	set NUM_LEDS
+	
+	for()
+	{
+		choose eff
+		anim()  wo show
+		copy LEDs, NUM_LEDS to show-buff
+	}
+	show show-buff
+	
+	set NUM_LEDS to gNUM_LEDS
+	
+	*/
+
 	
 	// fill_solid(leds, NUM_LEDS, CHSV(indexOrBits<128?indexOrBits:gHue,effLength,effFade));
 	// leds[x]=CRGB::Red;

@@ -1,6 +1,29 @@
 //http://fastled.io/docs/3.1/group__lib8tion.html
 //https://github.com/FastLED/FastLED/wiki/FastLED-Wave-Functions
 
+byte wave_function(NUM_LEDS_type v_arg, byte wave_type)
+{
+	byte v;
+	switch(wave_type) //!opt   to function ptr
+	{
+		case 0: v = sin8( v_arg ); break;
+		case 1: v = sin8( v_arg ); v=v*v/255; break;
+		case 2: v = sin8( v_arg ); v=(NUM_LEDS_type)(pow(((float)v)/255.,0.5)*255); break;
+
+		case 3: v = triwave8( v_arg ); break;
+		case 4: v = quadwave8( v_arg ); break;
+		case 5: v = cubicwave8( v_arg ); break;
+		
+		case 6: v= gHue; break;
+		case 9: v= v_arg;  break;
+		case 10:v= 255-(byte)v_arg;  break;
+		#define wave_function_MM	11 //so x%wave_function_MM == max case N
+	}
+	return v;
+}
+
+ //!! TODO use wave_function
+ 
 void wave_H() //!fix разрыв
 {
 	fill_solid(leds, NUM_LEDS, CHSV(indexOrBits<250?indexOrBits:gHue,effLength,effFade)); //bg
@@ -120,17 +143,9 @@ void gen_wave_H_moveAll_blinkRand() //!fix разрыв
 void gen_wave_H_v2_moveAll_blinkRand() //!fix разрыв
 {
 	moveOutAllRemainFirst();
-	byte val=0;
-	switch((indexOrBits/10)%5)
-	{
-		case 0: val= gHue; break;
-		case 1: val= sin8(millis()/(1+effSpeed));  break; //leds[210]=CRGB::Blue;
-		case 2: val= triwave8(millis()/(1+effSpeed)); break;
-		case 3: val= millis()/(1+effSpeed);  break; //leds[210]=CRGB::Red;
-		case 4: val= 255-(byte)(millis()/(1+effSpeed));  break;
-	}
-	//val=val*beatsin8(1+effLength/2,128,255)/255;
+	byte val= wave_function( millis()/(1+effSpeed), (indexOrBits/10%wave_function_MM) );
 
+	//val=val*beatsin8(1+effLength/2,128,255)/255;
 
 	leds[0]=CHSV(gColor.r + gHue/(1+effLengthH ) ,88,	val);
 	leds[0] .fadeToBlackBy( beatsin8(40+effLength,0,1+effSpeedH*0.9) );
@@ -150,30 +165,137 @@ void gen_wave_H_v2_moveAll_blinkRand() //!fix разрыв
 
 long millis_last=0;
 float posX_f=0;
-void wave_adj() //!fix разрыв
+
+uint16_t td=0;
+uint32_t t_anim_last=0;
+
+
+void wave_adj()
 {
-	float dx=((millis()-millis_last) )*(effSpeed/128.-1.);
-	posX_f+=dx;
-	millis_last=millis();
-	
-	for (NUM_LEDS_type i = 0; i < NUM_LEDS; ++i)
-	{
-		 
-		 int v_arg=(NUM_LEDS_type)posX_f +  i*effLength/16;
-		 byte v=255;
-		 
-		switch(indexOrBits%4) //!opt   to function ptr
-		{
-			case 0: v = sin8( v_arg ); break;
-			case 1: v = sin8( v_arg ); v=v*v/255; break;
-			case 2: v = sin8( v_arg ); v=(byte)(pow(((float)v)/255.,0.5)*255); break;
-			
-			case 3: v = triwave8( v_arg ); break;
-			case 4: v = quadwave8( v_arg ); break;
-			case 5: v = cubicwave8( v_arg ); break;
-		}
+	if(indexOrBits<100)
+	{ //glitch-free smooth settings adj (but not time-precise due to incriment)
+		float dx=((millis()-millis_last) )*(effSpeed/128.-1.);
+		posX_f+=dx;
 		
-		leds[i]=CHSV(effLengthH+ (sin8(millis()/200)/10-12), effSpeedH, v ); 
+		millis_last=millis();
+		
+		if(indexOrBits/11%2)
+		{ //draw all
+			for (NUM_LEDS_type i = 0; i < NUM_LEDS; ++i)
+			{
+				int v_arg=(NUM_LEDS_type)posX_f + i*effLength/16;
+				byte v=wave_function(v_arg, indexOrBits%wave_function_MM);
+				
+				byte mul=effFade/16;
+				if(mul>1)
+				{ //increase wave steep
+					
+					if(effFade%3)
+					{ //overflow
+						v*=mul;
+						v-=mul/2;
+					}
+					else
+					{
+						v=qsub8(v,256-256/mul)*mul; //!! tst change to adj accordingly w effFade
+					}
+					//!! bWaveB_pow
+				}
+				leds[i]=CHSV(effLengthH+ (sin8(millis()/200)/10-12), effSpeedH, v ); 
+			}
+		}
+		else
+		{ //gen-move (draw first)
+			//moveOutAllRemainFirst();
+			moveOutAll_w_speed(effSpeedH);
+			
+			leds[effSpeedH>128?0:NUM_LEDS-1]=CHSV(wave_function((NUM_LEDS_type)posX_f, indexOrBits%wave_function_MM),255,wave_function((NUM_LEDS_type)(posX_f*2), millis()/1000%wave_function_MM));
+		}
+	}
+	else
+	{
+		float k_len=135;
+		float k_len2=175;
+		
+		#ifdef standalone
+		bool bAnimHPurple=	!digitalRead(btn3_p);
+		bool bAnimHViolet=	!digitalRead(btn4_p);
+		bool bWaveB_pow=	!digitalRead(btn2_p);
+		bool bFadeEnd=		!digitalRead(btn_p);
+		#else
+		bool bAnimHPurple=	indexOrBits/10==11;
+		bool bAnimHViolet=	indexOrBits/10==12;
+		bool bWaveB_pow=	indexOrBits%3==0;
+		bool bFadeEnd=effFade%2;
+		#endif
+		
+		 for(NUM_LEDS_type i =0;i<NUM_LEDS;i++)
+		 {
+			 /*
+			float t=millis();
+			float t1=t/150;
+			float t1b=t/150*k_len2/k_len;
+			float t2=t/100;
+			float t2b=t/100;
+			float t3=t/4;
+			float t3b=t/4;
+			 
+			//leds[i]=( triwave8(i+millis()/8 )*sin8(millis()/100) + triwave8(i+millis()/8 )*cos8(millis()/100) )/1024;  //nwp
+			leds[i]=CHSV(190+sin8((byte)t1)/16, 205+sin8((byte)t2)/16, triwave8(i*8-(byte)t3 ) );
+			leds2[i]=CHSV(190+sin8((byte)t1b)/16, 205+sin8((byte)t2b)/16, triwave8(i*8-(byte)t3b ) );
+			*/
+
+			byte b=0;
+
+			b=triwave8(i*8-millis()/4 ) ;
+
+			#ifdef standalone
+			byte b1=triwave8((int)(i*8.0*k_len/k_len2)-millis()/4 );
+			#endif
+			byte h=211+sin8(millis()/200)/8; //as from violet to purple over 235ms*255 =1 min
+
+			if(bAnimHPurple)
+			{
+				h=190+sin8(millis()/150)/16; //as violet
+			}
+			else
+			if(bAnimHViolet)
+			{
+				h=230+sin8(millis()/150)/32; //as violet
+			}
+			
+			if(bWaveB_pow)
+			{
+				b=b*b/255;
+				#ifdef standalone
+				b1=b1*b1/255;
+				#endif
+			}
+			
+			
+			leds [i]=CHSV(h, 215+sin8(millis()/200)/16, b );
+			#ifdef standalone
+			leds2[i]=CHSV(h, 215+sin8(millis()/200)/16,  b1);
+			#endif
+		 }
+		 //i_eff++;
+			
+			if(bFadeEnd) //fade far end
+			{
+				//if( i_eff%(1+millis()/200%60)<2 )
+				{
+					for (int i = 30; i < NUM_LEDS; ++i)
+					{
+						 //leds[i].fadeToBlackBy( i );
+						 leds[i].fadeToBlackBy( map(i, 30,NUM_LEDS, 1, 250)  );
+						 #ifdef standalone
+						 leds2[i].fadeToBlackBy( map(i, 30,NUM_LEDS, 1, 250)  );
+						 #endif
+					}
+				}
+			}
+	
+		
 	}
 }
 

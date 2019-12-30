@@ -1,3 +1,20 @@
+//#define standalone
+#ifdef standalone
+#define NUM_LEDS_type 		uint16_t
+
+byte effSpeed=0;
+byte effSpeedH=0;
+byte effLength=0;
+byte effLengthH=0;
+byte effRGB=0;
+byte effFade=0;
+CRGB gColor=0;
+CRGB gColorBg=0;
+byte gDelay=5;
+byte gFade=0;
+byte indexOrBits=0;
+#endif
+
 uint8_t gHue = 0;
 
 //int il;

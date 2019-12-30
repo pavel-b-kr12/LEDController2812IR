@@ -1,4 +1,9 @@
-//!!! sw pal
+
+void fire_pal()
+{
+
+}
+
 void fire_pal_hot()
 {
   heatMap(HeatColors_p, true);
@@ -12,11 +17,11 @@ void fire_pal_cold()
 // based on FastLED example Fire2012WithPalette: https://github.com/FastLED/FastLED/blob/master/examples/Fire2012WithPalette/Fire2012WithPalette.ino
 void heatMap(CRGBPalette16 palette, bool up)
 {
-	#ifndef STANDALONE
-	byte Cooling=effSpeed;
-	byte Sparking=effLength;
-	
+	#ifndef standalone
+	byte cooling=effSpeed;
+	byte sparking=effLength;
 	#endif
+  
   fill_solid(leds, NUM_LEDS, CRGB::Black);
 
   // Add entropy to random number generator; we use a lot of it.

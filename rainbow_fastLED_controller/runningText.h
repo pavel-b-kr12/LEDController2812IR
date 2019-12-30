@@ -1,5 +1,5 @@
 //#define WIDTH 32
-//#define MATRIX_TYPE 0
+//#define bMatrixZigZag 0
 //#define HEIGHT 8
 
 // **************** НАСТРОЙКИ ****************
@@ -63,7 +63,7 @@
 #endif
 // получить номер пикселя в ленте по координатам
 uint16_t getPixelNumber(int8_t x, int8_t y) {
-  if ((THIS_Y % 2 == 0) || MATRIX_TYPE) {               // если чётная строка
+  if ((THIS_Y % 2 == 0) || !bMatrixZigZag) {               // если чётная строка
     return (THIS_Y * _WIDTH + THIS_X);
   } else {                                              // если нечётная строка
     return (THIS_Y * _WIDTH + _WIDTH - THIS_X - 1);
@@ -73,13 +73,13 @@ uint16_t getPixelNumber(int8_t x, int8_t y) {
 // интерпретатор кода символа в массиве fontHEX (для Arduino IDE 1.8.* и выше)
 uint8_t getFont(uint8_t font, uint8_t row) {
   font = font - '0' + 16;   // перевод код символа из таблицы ASCII в номер согласно нумерации массива
-  if (font <= 90) return pgm_read_byte(&(fontHEX[font][row]));     // для английских букв и символов
-  else if (font >= 112 && font <= 159) {    // и пизд*ц для русских
-    return pgm_read_byte(&(fontHEX[font - 17][row]));
+  if (font <= 90)	return pgm_read_byte(&(fontHEX[font][row]));     // для английских букв и символов
+	else if (font >= 112 && font <= 159) { //rus
+					return pgm_read_byte(&(fontHEX[font - 17][row]));
   } else if (font >= 96 && font <= 111) {
-    return pgm_read_byte(&(fontHEX[font + 47][row]));
+					return pgm_read_byte(&(fontHEX[font + 47][row]));
   }
-  return 0;
+					return 0;
 }
 
 
@@ -89,26 +89,31 @@ void drawLetter(uint8_t letter_i, uint8_t letter, int16_t text_offset, CRGB colo
   if (LH > HEIGHT) LH = HEIGHT;
   int8_t text_offset_y = (HEIGHT - LH) / 2;     // по центру матрицы по высоте
   
-  CRGB letterColor;
-  if (color.r == 0 && color.g==0&& color.b==0) letterColor = CHSV(byte(text_offset * 10), 255, 255);
-  else if (color.r == 1 && color.g==1&& color.b==1) letterColor = CHSV(byte(letter_i * 30), 255, 255);
-  else letterColor = color;
+								  CRGB letterColor;
+								  if (color.r == 0 && color.g==0&& color.b==0) letterColor = CHSV(byte(text_offset * 10), 255, 255);
+								  else if (color.r == 1 && color.g==1&& color.b==1) letterColor = CHSV(byte(letter_i * 30), 255, 255);
+								  else letterColor = color;
 
   if (text_offset < -LET_WIDTH || text_offset > WIDTH) return;
   if (text_offset < 0) start_pos = -text_offset;
   if (text_offset > (WIDTH - LET_WIDTH)) finish_pos = WIDTH - text_offset;
 
-  for (int8_t i = start_pos; i < finish_pos; i++) {
+  for (int8_t i = start_pos; i < finish_pos; i++)
+  {
     int thisByte;
     if (MIRR_V) thisByte = getFont((int8_t)letter, LET_WIDTH - 1 - i);
     else thisByte = getFont((int8_t)letter, i);
 
-    for (int8_t j = 0; j < LH; j++) {
+    for (int8_t j = 0; j < LH; j++)
+	{
       boolean thisBit;
 
       if (MIRR_H) thisBit = thisByte & (1 << j);
       else thisBit = thisByte & (1 << (LH - 1 - j));
 
+	  	// #ifdef textMATRIX_overlay //!
+			// if(bTextOverlay) 
+		// #endif
       // рисуем столбец (i - горизонтальная позиция, j - вертикальная)
       if (thisBit) leds[getPixelNumber(text_offset + i, text_offset_y + TEXT_HEIGHT + j)] = letterColor;
     }
@@ -117,7 +122,8 @@ void drawLetter(uint8_t letter_i, uint8_t letter, int16_t text_offset, CRGB colo
 
 
 void fillString(String text, CRGB color) {
-									
+		int text_len=(LET_WIDTH + SPACE)*text.length()		-LET_WIDTH*12; //!?? LET_WIDTH*16  why need 
+					text_offset=0-(millis()/110)%text_len;	//-effLength	 //!?? why need 0 (otherwice only 3 letters show and balack)		
   // if (loadingFlag) {
     // text_offset = WIDTH;   // перемотка в правый край
     // loadingFlag = false;    
@@ -135,7 +141,7 @@ void fillString(String text, CRGB color) {
 	  {
     byte i = 0, j = 0;
     while (text[i] != '\0') {
-      if ((byte)text[i] > 191) {    // работаем с русскими буквами!
+      if ((byte)text[i] > 191) {    // работаем с русскими буквами //?
         i++;
       } else
 		{
@@ -146,15 +152,13 @@ void fillString(String text, CRGB color) {
     }
     // fullTextFlag = false;
 
-    //text_offset--;
-    if (text_offset < -j * (LET_WIDTH + SPACE)) {    // строка убежала
-      text_offset = WIDTH + 3;
-      // fullTextFlag = true;
-    }
+	
+    ////// text_offset--;
 
+    // if (text_offset < -j * (LET_WIDTH + SPACE)) {    // строка убежала  //##!!! text_offset = WIDTH; 	   or %text_w
+      // text_offset = WIDTH + 3;
+      /* fullTextFlag = true;*/
+    // }
   }
 }
-
-
-
 

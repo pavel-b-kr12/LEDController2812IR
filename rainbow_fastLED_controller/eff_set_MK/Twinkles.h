@@ -1,6 +1,3 @@
-	#ifdef STANDALONE
-	const byte effSpeed=, effLength=, effLengthH=;
-	#endif
 // based on ColorTwinkles by Mark Kriegsman: https://gist.github.com/kriegsman/5408ecd397744ba0393e
 
 //#define STARTING_BRIGHTNESS 64 effLengthH/2
@@ -76,6 +73,11 @@ void colortwinkles()
 {
   EVERY_N_MILLIS(30)
   {
+	#ifdef standalone
+	//const byte
+	effSpeed=16*5; effFade=40; effLength=155; effLengthH=128; gColorBg = CRGB::Black;
+	#endif
+	  
     // Make each pixel brighter or darker, depending on
     // its 'direction' flag.
     brightenOrDarkenEachPixel( 1+effSpeed/4, effFade);

@@ -1,7 +1,3 @@
-	#ifdef STANDALONE
-	const byte effSpeed=, effLength=, effLengthH=;
-	#endif
-	
 //  TwinkleFOX by Mark Kriegsman: https://gist.github.com/kriegsman/756ea6dcae8e30845b5a
 //
 //  TwinkleFOX: Twinkling 'holiday' lights that fade in and out.
@@ -170,6 +166,11 @@ CRGB computeOneTwinkle( uint32_t ms, uint8_t salt)
 //  whichever is brighter.
 void drawTwinkles()
 {
+	#ifdef standalone
+	//const byte
+	effSpeed=16*5; effFade=40; effLength=155; effLengthH=128; gColorBg = CRGB::Black;
+	#endif
+	
   // "PRNG16" is the pseudorandom number generator
   // It MUST be reset to the same starting value each time
   // this function is called, so that the sequence of 'random'
