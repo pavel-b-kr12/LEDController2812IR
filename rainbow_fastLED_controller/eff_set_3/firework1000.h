@@ -13,7 +13,7 @@ float gravity = -.004; // m/s/s
 float sparkPos[NUM_SPARKS];
 float sparkVel[NUM_SPARKS];
 float sparkCol[NUM_SPARKS];
-#define flarePos	pos_f
+#define flarePos	posX_f
 
 
 float dying_gravity;

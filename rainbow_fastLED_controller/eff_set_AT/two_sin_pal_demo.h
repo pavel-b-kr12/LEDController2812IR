@@ -23,7 +23,7 @@
 // Most of these variables can be mucked around with. Better yet, add some form of variable input or routine to change them on the fly. 1970's here I come. . 
 
 uint8_t thathue;                                              // You can change the starting hue for other wave.
-//uint8_t thisrot;                                              // You can change how quickly the hue rotates for this wave. Currently 0.
+//uint8_t HueRot_incr;                                              // You can change how quickly the hue rotates for this wave. Currently 0.
 uint8_t thatrot;                                              // You can change how quickly the hue rotates for the other wave. Currently 0.
 uint8_t allsat;                                               // I like 'em fully saturated with colour.
 uint8_t thatdir;
@@ -42,7 +42,7 @@ void two_sin_() {
 
     thisdir ? thisphase += beatsin8(effSpeed, 2, 10) : thisphase -= beatsin8(effSpeed, 2, 10); //!check this that
     thatdir ? thatphase += beatsin8(effSpeed, 2, 10) : thatphase -= beatsin8(thatspeed, 2, 10);
-    thishue += thisrot;                                        // Hue rotation is fun for thiswave.
+    thishue += HueRot_incr;                                        // Hue rotation is fun for thiswave.
     thathue += thatrot;                                        // It's also fun for thatwave.
   
   for (int k=0; k<NUM_LEDS-1; k++) {
@@ -59,7 +59,7 @@ void two_sin_resetvars() {                       // Reset the variable back to t
 
   thishue = 0;                          // You can change the starting hue value for the first wave.
   thathue = 140;                        // You can change the starting hue for other wave.
-  thisrot = 1;                          // You can change how quickly the hue rotates for this wave. Currently 0.
+  HueRot_incr = 1;                          // You can change how quickly the hue rotates for this wave. Currently 0.
   thatrot = 1;                          // You can change how quickly the hue rotates for the other wave. Currently 0.
   allsat = 255;                         // I like 'em fully saturated with colour.
   thisdir = 0;                          // Change the direction of the first wave.
@@ -86,12 +86,12 @@ void two_sin_ChangeMe() {
   if( lastSecond != secondHand) {
     lastSecond = secondHand;
     switch (secondHand) {
-      case  0: thisrot = 1; thatrot = 1; currentPalette=PartyColors_p; targetPalette=PartyColors_p; break;
-      case  5: thisrot = 0; thatdir = 1; thatspeed = -4; currentPalette=ForestColors_p; targetPalette=OceanColors_p; break;
+      case  0: HueRot_incr = 1; thatrot = 1; currentPalette=PartyColors_p; targetPalette=PartyColors_p; break;
+      case  5: HueRot_incr = 0; thatdir = 1; thatspeed = -4; currentPalette=ForestColors_p; targetPalette=OceanColors_p; break;
       case 10: thatrot = 0; currentPalette=PartyColors_p; targetPalette=RainbowColors_p; break;
       case 15: allfreq = 16; thisdir = 1; thathue = 128; break;
       case 20: thiscutoff = 96; thatcutoff = 240; break;
-      case 25: thiscutoff = 96; thatdir = 0; thatcutoff = 96; thisrot = 1; break;
+      case 25: thiscutoff = 96; thatdir = 0; thatcutoff = 96; HueRot_incr = 1; break;
       case 30: effSpeed= -4; thisdir = 0; thatspeed= -4; break;
       case 35: thiscutoff = 128; thatcutoff = 128; break;
       case 40: effSpeed = 3; break;

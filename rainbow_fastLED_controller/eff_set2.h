@@ -66,36 +66,36 @@ void fillByPalettesBlend_moving()
 //------------------------------------------------------------------------------ fill fade
 void fillFadeChangeAll()
 {
-  fill_solid(leds, NUM_LEDS, CHSV(ihue,isat,i_eff%255));
+  fill_solid(leds, NUM_LEDS, CHSV(thishue,thissat,i_eff%255));
 
   if(i_eff%255 > effLength) //flash over effLength
   {
-    ihue=random8();
-    isat=random8();
+    thishue=random8();
+    thissat=random8();
   }
 }
 void fillFadeChangeAll_beat8()
 {
-  ibright=beat8(effSpeed);
-  fill_solid(leds, NUM_LEDS, CHSV(ihue,isat,ibright));
+  thisbri=beat8(effSpeed);
+  fill_solid(leds, NUM_LEDS, CHSV(thishue,thissat,thisbri));
 
   //if(i_eff%255 > effLength)  //other eff
-  if(ibright > effLength) //flash above effLength
+  if(thisbri > effLength) //flash above effLength
   {
-    ihue=gHue;
-    isat=random8();
+    thishue=gHue;
+    thissat=random8();
   }
 }
 
 void fillFadeChangeAll_beatsin8()
 {
-  ibright=beatsin8(effSpeed,0); //!
-  fill_solid(leds, NUM_LEDS, CHSV(ihue,isat,ibright));
+  thisbri=beatsin8(effSpeed,0); //!
+  fill_solid(leds, NUM_LEDS, CHSV(thishue,thissat,thisbri));
 
-  if(ibright <effLength) //flash under effLength
+  if(thisbri <effLength) //flash under effLength
   {
-    ihue=random8();
-    isat=random8();
+    thishue=random8();
+    thissat=random8();
   }
 }
 
@@ -103,15 +103,15 @@ void fillFadeChangeAll_beatsin8()
 
 void fadeEvenUneven()
 {
-  ibright=beatsin8(effSpeed,0,255);
-  byte ibright2=beatsin8(effSpeed,0,255,0,effLength); //w phase offset
+  thisbri=beatsin8(effSpeed,0,255);
+  byte thisbri2=beatsin8(effSpeed,0,255,0,effLength); //w phase offset
 
-  if(ibright<4)
+  if(thisbri<4)
   {
-    if(random8()<32)  ihue= gHue;
+    if(random8()<32)  thishue= gHue;
   }
   else
-  if(ibright2<4)
+  if(thisbri2<4)
   {
     if(random8()<32)  thishue= random8();
   }
@@ -119,22 +119,22 @@ void fadeEvenUneven()
   for(NUM_LEDS_type i=0;i<NUM_LEDS;i++)
   {
       leds[i] =i%2?
-      CHSV(ihue,255,ibright): 
-      CHSV(thishue,255,ibright2);
+      CHSV(thishue,255,thisbri): 
+      CHSV(thishue,255,thisbri2);
   }
 }
 void fadeEvenUnevenDif()
 {
-  if(i_eff%500==0) ihue= gHue;
+  if(i_eff%500==0) thishue= gHue;
 
   for(NUM_LEDS_type i=0;i<NUM_LEDS;i++)
   {
     if(i%2)
     {
-      leds[i] = CHSV(ihue,255,beatsin8(effLength+effSpeed/4,0));
+      leds[i] = CHSV(thishue,255,beatsin8(effLength+effSpeed/4,0));
     }
     else
-      leds[i] = CHSV(ihue+gHue,255,beatsin8(effLength,127));
+      leds[i] = CHSV(thishue+gHue,255,beatsin8(effLength,127));
   }
 }
 
@@ -177,14 +177,14 @@ void LinesOpposit()
 void painter_moving()
 {
 	// move pos for paint
-	idex=( 
+	posX=( 
 		beatsin8(5) + 
 		beatsin8(1+effSpeed/32)-
 		beatsin8(1+effSpeedH/16, 0, 1+NUM_LEDS/effLength)
 		) % NUM_LEDS;
 
 	//pant at pos 
-	leds[idex]=CHSV(colorize(),255,effLengthH>200?
+	leds[posX]=CHSV(colorize_sw_indexOrBits(),255,effLengthH>200?
 	 255:
 	 //or not paint
 	 (
@@ -201,9 +201,9 @@ void painter_H_by_Speed_moving()
 		beatsin8(effSpeedH/4, 0, 2+NUM_LEDS/effLength)
 		) % NUM_LEDS;
 
-	thishue=abs(idex_last-N)*16;
+	thishue=abs(posX_last-N)*16;
 	if(i_eff%2)
-	idex_last=N;
+	posX_last=N;
 
 	fadeToBlackBy(leds, NUM_LEDS, effFade/32);
 
@@ -235,7 +235,7 @@ void painter_beat_moving() //##crash
 
 		bool bv = beatsin8(10+effSpeed/4)<effLength;
 
-		leds[N]=CHSV(colorize(),255,bv?255:0);
+		leds[N]=CHSV(colorize_sw_indexOrBits(),255,bv?255:0);
 }
 
 void painterBlend_moving()
@@ -251,16 +251,16 @@ void painterBlend_moving()
 
 
 	// move pos for paint
-	idex=( 
+	posX=( 
 		beatsin8(2) + 
 		beatsin8(3+effSpeed/32)+
 		beatsin8(effSpeedH/16, 0, 2+NUM_LEDS/effLength)
 		) % NUM_LEDS;
 
 	if(thisdir)
-		leds[idex]=CHSV(colorize(),255,255);
+		leds[posX]=CHSV(colorize_sw_indexOrBits(),255,255);
 	else
-		leds[idex]=leds[idex]- CRGB(122,122,122); //CRGB(2,2,3);
+		leds[posX]=leds[posX]- CRGB(122,122,122); //CRGB(2,2,3);
 
 }
 
@@ -301,7 +301,7 @@ void mover_lim_mark()
   	if(leds[i].r==255) leds[i].nscale8(255);
   	else leds[i].nscale8(effFade);
   }
- if(indexOrBits%2==0 && leds[idex].r!=255) leds[idex]=0;
+ if(indexOrBits%2==0 && leds[posX].r!=255) leds[posX]=0;
 
 
  	NUM_LEDS_type lim_M=beatsin8(3+effSpeed/64, NUM_LEDS/2+1, NUM_LEDS-2);
@@ -310,27 +310,26 @@ void mover_lim_mark()
  	if(leds[lim_M].r!=255) leds[lim_M]=CRGB(0,111,0);
  	if(leds[lim_m].r!=255) leds[lim_m]=CRGB(0,111,111);
 
- 	if(idex>=lim_M)
+ 	if(posX>=lim_M)
  	{
  	 thisdir =false;  thishue=255;
  	 leds[lim_M]=CRGB::Red;
  	}
  	else
- 	if(idex<=lim_m)
+ 	if(posX<=lim_m)
  	{
  	 thisdir =true;   thishue=255;
  	  leds[lim_m]=CRGB::Red;
  	}
  	//else
  	{
- 		idex+=thisdir?1:-1;  thishue-=2; //! map(time_from_bounce, 0, 1000, 255,0)
+ 		posX+=thisdir?1:-1;  thishue-=2; //! map(time_from_bounce, 0, 1000, 255,0)
 
-    if(indexOrBits<128)
- 		 leds[idex]=CHSV(thishue,255,255);
-    else
-     leds[idex]= ColorFromPalette(HeatColors_p, thishue, map(thishue,255,0,255,100), LINEARBLEND);
+		if(indexOrBits<128)
+		 leds[posX]=CHSV(thishue,255,255);
+		else
+		 leds[posX]= ColorFromPalette(HeatColors_p, thishue, map(thishue,255,0,255,100), LINEARBLEND);
  	}
-
 }
 
 
@@ -343,7 +342,6 @@ void eff_sin_R_G_B() //!!fix not as in sim
 		leds[i].r= (sin8(i*3*effSpeed+millis()/effLength));
 		leds[i].g= (sin8(i*3*effSpeed+effLength+millis()/effLengthH));
 		leds[i].b= (sin8(i*3*effSpeed+effLength*2+millis()/effLengthH));
-
 	}
 }
 //-------------------------------------
@@ -561,8 +559,7 @@ void movers_f()
 
 float cow_m=100;
 float xx1f_last,xx1f_last1=0;
-NUM_LEDS_type pos_last=0;
-NUM_LEDS_type pos_last1=0;
+
 void meadow_cow()
 {
 	NUM_LEDS_type pos=f01toPos(xx1f);

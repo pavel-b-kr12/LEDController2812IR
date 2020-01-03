@@ -1,7 +1,6 @@
 /* inoise8_mover
  *
  * By: Andrew Tuline
- *
  * Date: February, 2017
  *
  * We've used sine waves and counting to move pixels around a strand. In this case, I'm using Perlin Noise to move a pixel up and down the strand.
@@ -15,11 +14,11 @@ xscale = effLength/4; yscale = effLength/8;
 //xscale = effLength/4; yscale = effLength/4;
 //xscale = 30; yscale = 30;
 
-  uint8_t locn = inoise8(xscale, idex16+yscale) % 256;          // Get a new pixel location from moving noise.
+  uint8_t locn = inoise8(xscale, posX16+yscale) % 256;          // Get a new pixel location from moving noise.
   uint8_t pixlen = map(locn,0,255,0,NUM_LEDS-1);                // Map that to the length of the strand.
   leds[pixlen] = ColorFromPalette(currentPalette, locn, 255, LINEARBLEND);   // Use that value for both the location as well as the palette index colour for the pixel.
 
-  idex16 += beatsin8(2+effSpeed/4,1,4);                                                // Moving along the distance (that random number we started out with). Vary it a bit with a sine wave.                                             
+  posX16 += beatsin8(2+effSpeed/4,1,4);                                                // Moving along the distance (that random number we started out with). Vary it a bit with a sine wave.                                             
 }
 
 void inoise8_mover() {

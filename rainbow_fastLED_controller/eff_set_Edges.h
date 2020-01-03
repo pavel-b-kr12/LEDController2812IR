@@ -71,8 +71,8 @@ void cubic_test()
 {
 	if(i_eff==0)
 	{
-		idex=0; 
-		set_currentPalette(idex);
+		posX=0; 
+		set_currentPalette(posX);
 	}
 
 
@@ -94,8 +94,8 @@ void cubic_test()
 
 	EVERY_N_SECONDS(16)
 	{
-	 idex++;
-	 set_currentPalette(idex);
+	 posX++;
+	 set_currentPalette(posX);
 	}
 }
 

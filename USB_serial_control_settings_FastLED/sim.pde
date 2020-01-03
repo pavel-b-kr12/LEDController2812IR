@@ -11,6 +11,44 @@ void clear_msg_buffer(int E)
 	}
 }
 
+//HSV to RGB  use colorMode(HSB, 255);  or https://docs.oracle.com/javase/8/docs/api/java/awt/Color.html#RGBtoHSB-int-int-int-float:A-
+//!opt colorHSV=CHSV(
+void msg_buffer_colorSetHSV(int pos, color c)
+{
+	msg_buffer[pos*3]= c >> 16 & 0xFF;
+	msg_buffer[pos*3+1]= c >> 8 & 0xFF;
+	msg_buffer[pos*3+2]= c >> 0 & 0xFF;
+}
+void msg_buffer_colorAddHSV(int pos, color c)
+{
+	msg_buffer[pos*3]+= c >> 16 & 0xFF;
+	msg_buffer[pos*3+1]+= c >> 8 & 0xFF;
+	msg_buffer[pos*3+2]+= c >> 0 & 0xFF;
+}
+void msg_buffer_colorIfAddHSV(int pos, color c)
+{
+	int r=msg_buffer[pos*3]+c >> 16 & 0xFF;
+	if(r<255)
+	msg_buffer[pos*3]=r;
+
+	int g=msg_buffer[pos*3+1]+c >> 8 & 0xFF;
+	if(g<255)
+	msg_buffer[pos*3+1]= g;
+
+	int b=msg_buffer[pos*3+2]+c >> 0 & 0xFF;
+	if(b<255)
+	msg_buffer[pos*3+2]+= c >> 0 & 0xFF;
+}
+void msg_buffer_colorQAdd8HSV(int pos, color c)
+{
+	msg_buffer[pos*3]+= c >> 16 & 0xFF;
+	if(msg_buffer[pos*3]>255) msg_buffer[pos*3]=255;
+	msg_buffer[pos*3+1]+=  c >> 8 & 0xFF;
+	if(msg_buffer[pos*3+1]>255) msg_buffer[pos*3+1]=255;
+	msg_buffer[pos*3+2]+=  c >> 0 & 0xFF ;
+	if(msg_buffer[pos*3+2]>255) msg_buffer[pos*3+2]=255;
+}
+
 void rollover_msg_buffer(int E) //as in FastLED
 {
     for (int i=0; i<E; i++) //clear
@@ -118,6 +156,7 @@ void flip_zigZag_matrix(int rowE, int matrixW)
 }
 
 int pos=0;
+float pos_f=0;
 int pos_last=0;
 int store=0;
 boolean bclear_msg_buffer_now=false;
@@ -158,7 +197,14 @@ void sim()
 	int indexOrBits=settingsVals.get("indexOrBits").valueSlider.getValueI();
 	int gDelay=settingsVals.get("gDelay").valueSlider.getValueI();
 	int gBrightness=settingsVals.get("gBrightness").valueSlider.getValueI();
-
+	
+	int effSpeed=speed;
+	int effSpeedH=speedH;
+	int effLength=length_;
+	int effLengthH=lengthH;
+	int effRGB=RGB_;
+	
+	
 	flip_zigZag_matrix(rowE, matrixW);
       
     switch(effN)
@@ -174,66 +220,226 @@ void sim()
           msg_buffer[ib]=(int)(sin(ib*4)*255);
         }
       }
-      break;      
-      case 1:
-	  {
-	  //bclear_msg_buffer_now=true;
-		//fadeAll_move_matrix(21, rowE, matrixW);
-		////fadeAll_move_matrix((int)random(17,24), rowE, matrixW); //дерганное от ранлома
-		fadeAll_move_matrix(11+mouseX/200, rowE, matrixW);
-		//fadeAll(25);
+      break;  
+	 case 1:
+	{
+		colorMode(HSB, 255);
+		
+		int fade=effFade;
+		int spd=effSpeed;
+		int len=effLength;
+		int len2=effLengthH;
+		
+		if(indexOrBits==1) //  /10%10==0)
+		{
+			 fade=11;
+			 spd=125;//153 //131
+			 len=146; //116 // 109
+			 len2=48; //66 // 33
+		}
+		if(indexOrBits==3) //  /10%10==0)
+		{
+			 fade=0;
+			 spd=131;
+			 len=109;
+			 len2=33;
+		}
+		
+		/*
 		
 		
-	    for (int ro=0; ro<rowE; ro++) 
-        {
-			for (int c=0; c<matrixW; c++) 
+		for(int i=0;i<14;i++)
+		{
+		 pos_f+=1/(1+pos_f%NUM_LEDS_sim/2);
+		 msg_buffer_colorAddHSV((int)(pos_f%NUM_LEDS_sim), color(millis()/10%256,211,255));
+		
+			if(indexOrBits%2==1)
 			{
-				//if(c==ro) msg_buffer[(ro*matrixW+c)*3]=255;
-						if(c>0) break;
-				
-				
-					int heatRnd=(int)random(50,255);
-					int heat=(int)(noise((float)ro,(float)millis()/200)*255);
-					heat=(int)( heat*(1-mouseY/width)+heatRnd*mouseY/width);
-					
-					int r= heat*2; if(r>255) r=255; 
-					if(heat>220) r-=heat/10;
-					
-					int g= heat*2-200;  g=  constrain(g,0,255);
-					if(heat>220) g-=heat/10;
-					
-					int b= heat*2-300;  b=  constrain(b,0,255);
-					
-
-				msg_buffer[(ro*matrixW+c)*3+0]=r;
-				msg_buffer[(ro*matrixW+c)*3+1]=g;
-				msg_buffer[(ro*matrixW+c)*3+2]=b;
-				/*
-					int heat=(int)random(50,255);
-					int heatHi=(int)random(heat);
-					
-				msg_buffer[(ro*matrixW+c)*3+0]=heat;
-				msg_buffer[(ro*matrixW+c)*3+1]=heatHi;
-				msg_buffer[(ro*matrixW+c)*3+2]=heatHi;
-				*/
+			 pos_f+=1/(1+(pos_f+10)%NUM_LEDS_sim/2);
+			 msg_buffer_colorAddHSV((int)((pos_f+10)%NUM_LEDS_sim), color(millis()/31%256,211,255));
 			}
-        }
+		}
+		*/
+		 fadeAll(5+fade);
+		for(int x=0;x<NUM_LEDS_sim;x++)
+		{
+			float tt=(float)millis()/(160) ;//(float)millis()/(120+effLength/4);
+			
+			if(indexOrBits%4==1)
+			msg_buffer_colorIfAddHSV(x, 
+				color(millis()/10%256,255,
+				sin(	pow((float)((float)NUM_LEDS_sim*len/240+(float)x*spd/240)/NUM_LEDS_sim,(8+len2)/8)*3.14*10	-	tt	)	*111)); //,(float)(2+len2)/8)*3.14*10
+			else
+				if(indexOrBits%4==2)
+						msg_buffer_colorQAdd8HSV(x, 
+				color(millis()/10%256,255,
+				sin(	pow((float)((float)NUM_LEDS_sim*len/240+(float)x*spd/240)/NUM_LEDS_sim,(8+len2)/8)*3.14*10	-	tt	)	*111));
+			else
+							if(indexOrBits%4==3)
+						msg_buffer_colorIfAddHSV(x, 
+				color(millis()/10%256,255,
+				sin(	pow((float)((float)NUM_LEDS_sim*len/240+(float)x*spd/240)/NUM_LEDS_sim,(8+len2)/8)*3.14*10	-	tt	)	*111));
+			else
+			msg_buffer_colorAddHSV(x, color(millis()/10%256,255,sin(x+millis()/len)*effSpeedH));
+		}
+		colorMode(RGB, 255);
+	}
+	break;
+	case 24:
+	{
+		colorMode(HSB, 255);
 		
-/*
-        for (int ro=0; ro<rowE; ro++) 
-        {
-			for (int c=0; c<matrixW; c++) 
+		int fade=effFade;
+		int spd=effSpeedH;
+		
+		if(indexOrBits%2==1)
+		{
+			// fade=239;
+			// spd=13;
+		}
+		
+		fadeAll(1+fade);
+		for(int i=0;i<14;i++)
+		{
+		 pos_f+=1/(1+pos_f%NUM_LEDS_sim/2);
+		 msg_buffer_colorAddHSV((int)(pos_f%NUM_LEDS_sim), color(millis()/10%256,211,255));
+		
+			if(indexOrBits%2==1)
 			{
-				//if(c==ro) msg_buffer[(ro*matrixW+c)*3]=255;
-
-				msg_buffer[(ro*matrixW+c)*3+0]=(int) ((float)r/rowE*255);
-				msg_buffer[(ro*matrixW+c)*3+1]=(int) ( (float)c/matrixW*255 );
-				msg_buffer[(ro*matrixW+c)*3+2]=0;
+			 pos_f+=1/(1+(pos_f+10)%NUM_LEDS_sim/2);
+			 msg_buffer_colorAddHSV((int)((pos_f+10)%NUM_LEDS_sim), color(millis()/31%256,211,255));
 			}
-        }*/
+		}
+		 
+		// for(int x=0;x<NUM_LEDS_sim;x++)
+		// {
+			// msg_buffer_colorAddHSV(x, color(millis()/10,spd,255));
+		// }
+		colorMode(RGB, 255);
+	}
+	break;
+	
+	case 23:
+	{
+		colorMode(HSB, 255);
+		
+		int fade=effFade;
+		int spd=effSpeedH;
+		
+		if(indexOrBits%2==1)
+		{
+			// fade=239;
+			// spd=13;
+		}
+		
+		fadeAll(1+fade);
+		for(int i=0;i<10;i++)
+		{
+		 pos++;
+		 
+		 msg_buffer_colorAddHSV((int)pow((float)(pos%pow(NUM_LEDS_sim,1.3)),0.7), color(millis()/10,222,255));
+		}
+		 
+		// for(int x=0;x<NUM_LEDS_sim;x++)
+		// {
+			// msg_buffer_colorAddHSV(x, color(millis()/10,spd,255));
+		// }
+		colorMode(RGB, 255);
+	}
+	break;
+	
+	case 22:
+	{
+		colorMode(HSB, 255);
+		
+		int fade=effFade;
+		int spd=effSpeedH;
+		
+		if(indexOrBits%2==1)
+		{
+			fade=239;
+			spd=13;
+		}
+		
+		fadeAll(1+fade);
+		 pos++;
+		 
+		 msg_buffer_colorAddHSV(pos%NUM_LEDS_sim, color(millis()/10,222,255));
+		 
+		 
+		for(int x=0;x<NUM_LEDS_sim;x++)
+		{
+			msg_buffer_colorAddHSV(x, color(millis()/10,spd,255));
+		}
+		colorMode(RGB, 255);
+	}
+	break;	  
+
+      case 21: //mover by split dir
+      { //TODO add colors w & wo overflow
+			int cType=indexOrBits;
+			bFlipArr_sim_to_zigZag_matrix=indexOrBits/20%2==1;
+			
+		  boolean dir=true;
+		  boolean bHueRot=effFade%2==0;
+		  int leds_per_seg=indexOrBits/10%2==0? (14+effLengthH): (1+millis()/300%5+effLengthH);
+		  colorMode(HSB, 255);
+		  pos++;
+		  //if(pos==NUM_LEDS_sim-1) pos=0;
+			  
+			fadeAll(1+effFade);
+			
+		  for(int x=0, seg=0;x<NUM_LEDS_sim;seg++)
+		  {
+			  for(int sx=0;sx<leds_per_seg && x<NUM_LEDS_sim; sx++, x++)
+			  {
+				  int Hadd=bHueRot?millis()/(1+effSpeed):0;
+				  switch(cType%5)
+				  {
+					  case 0: //:)
+					  if(pos%NUM_LEDS_sim==x) //!! good look only if flip_zigZag_matrix bFlipArr_sim_to_zigZag_matrix
+					  {
+						  color c = color((seg*31+Hadd)%256, (255)%256, (128+millis()/2%256/2)%256); //HSV
+						  msg_buffer_colorSetHSV(dir? (seg*leds_per_seg+sx) : ((seg+1)*leds_per_seg-sx-1), c);
+					  }
+					  break;
+					  case 1:
+					  if(pos%NUM_LEDS_sim==(dir? (seg*leds_per_seg+sx) : ((seg+1)*leds_per_seg-sx)))
+					  {
+						  color c = color((seg*(11+effLength)+Hadd)%256, 255, 255); //HSV
+						  msg_buffer_colorSetHSV(x, c); //dir? (seg*leds_per_seg+sx) : ((seg+1)*leds_per_seg-sx-1)
+					  }
+					  break;
+					  case 3:
+					  if(pos%NUM_LEDS_sim%(1+sx)+seg*sx+millis()/10%NUM_LEDS_sim==seg*leds_per_seg+sx)
+					  {
+						  color c = color((seg*31+Hadd)%256, (255)%256, (128+millis()/2%256/2)%256); //HSV
+						  msg_buffer_colorSetHSV(dir? (seg*leds_per_seg+sx) : ((seg+1)*leds_per_seg-sx+3), c);
+					  }
+					  break;
+					  case 4: //:)
+					  if(pos%NUM_LEDS_sim%(1+sx)+seg*leds_per_seg==seg*leds_per_seg+sx)
+					  {
+						  color c = color((seg*31+Hadd)%256, (255)%256, (128+millis()/2%256/2)%256); //HSV
+						  msg_buffer_colorSetHSV(dir? (seg*leds_per_seg+sx) : ((seg+1)*leds_per_seg-sx-1), c);
+					  }
+					  break;
+					  case 5:
+					  if(pos%NUM_LEDS_sim==(dir? (seg*leds_per_seg+sx) : ((seg+1)*leds_per_seg-sx+1)))
+					  {
+						  color c = color((seg*(11+effLength)+Hadd)%256, (255)%256, (128+millis()/8%256/2)%256); //HSV
+						  msg_buffer_colorSetHSV(dir? (seg*leds_per_seg+sx) : ((seg+1)*leds_per_seg-sx+1), c);
+					  }
+					  break;
+
+				  }
+			  }
+			  dir=!dir;
+		  }
+		  colorMode(RGB, 255);
 	  }
-      break;	
-		
+	  break;
+	  
       case 2:
       {
         for (int i=0; i<NUM_LEDS_sim_arr_size; i++) 
@@ -400,8 +606,67 @@ void sim()
         
       }
       break;
+
+      case 8: //:) //!use
+	  { //fire gen rand 
+	  //bclear_msg_buffer_now=true;
+		//fadeAll_move_matrix(21, rowE, matrixW);
+		////fadeAll_move_matrix((int)random(17,24), rowE, matrixW); //дерганное от ранлома
+		fadeAll_move_matrix(11+mouseX/200, rowE, matrixW);
+		//fadeAll(25);
+		
+		
+	    for (int ro=0; ro<rowE; ro++) 
+        {
+			for (int c=0; c<matrixW; c++) 
+			{
+				//if(c==ro) msg_buffer[(ro*matrixW+c)*3]=255;
+						if(c>0) break;
+				
+				
+					int heatRnd=(int)random(50,255);
+					int heat=(int)(noise((float)ro,(float)millis()/200)*255);
+					heat=(int)( heat*(1-mouseY/width)+heatRnd*mouseY/width);
+					
+					int r= heat*2; if(r>255) r=255; 
+					if(heat>220) r-=heat/10;
+					
+					int g= heat*2-200;  g=  constrain(g,0,255);
+					if(heat>220) g-=heat/10;
+					
+					int b= heat*2-300;  b=  constrain(b,0,255);
+					
+
+				msg_buffer[(ro*matrixW+c)*3+0]=r;
+				msg_buffer[(ro*matrixW+c)*3+1]=g;
+				msg_buffer[(ro*matrixW+c)*3+2]=b;
+				/*
+					int heat=(int)random(50,255);
+					int heatHi=(int)random(heat);
+					
+				msg_buffer[(ro*matrixW+c)*3+0]=heat;
+				msg_buffer[(ro*matrixW+c)*3+1]=heatHi;
+				msg_buffer[(ro*matrixW+c)*3+2]=heatHi;
+				*/
+			}
+        }
+		
+/*
+        for (int ro=0; ro<rowE; ro++) 
+        {
+			for (int c=0; c<matrixW; c++) 
+			{
+				//if(c==ro) msg_buffer[(ro*matrixW+c)*3]=255;
+
+				msg_buffer[(ro*matrixW+c)*3+0]=(int) ((float)r/rowE*255);
+				msg_buffer[(ro*matrixW+c)*3+1]=(int) ( (float)c/matrixW*255 );
+				msg_buffer[(ro*matrixW+c)*3+2]=0;
+			}
+        }*/
+	  }
+      break;
 	  
-	  	case 10: //cow
+	  	case 11: //cow
 		{
 			effFade=220+effFade;
 			length_=20+length_;
@@ -445,7 +710,41 @@ void sim()
 			}
 		}
       break;
+	  
+	  //==================================== texture generators (not for stripe)
+	  case 100: //mover by split dir
+      {
+		  int cType=indexOrBits;
 
+		  boolean dir=true;
+		  int leds_per_seg=16;
+		  colorMode(HSB, 255);
+		  for(int pos=0, h=0;pos<NUM_LEDS_sim;h++)
+		  {
+			  for(int sx=0;sx<leds_per_seg && pos<NUM_LEDS_sim; sx++, pos++)
+			  {
+				  color c = color((h*31)%256, millis()%256, millis()*11%256); //HSV
+				  switch(cType)
+				  {
+					  case 0:
+					  c = color((h*31)%256, millis()%256, millis()*11%256); //HSV
+					  break;
+					  case 1:
+					  c = color((h*31)%256, (millis()/10)%256, (millis()*11+pos)%256); //HSV
+					  break;
+					  case 2:
+					  c = color((h*effSpeed)%256, (millis()/effLength)%256, (millis()*effLengthH+pos)%256); //HSV
+					  break;
+				  }
+				  msg_buffer_colorSetHSV(pos, c);
+			  }
+			  dir=!dir;
+		  }
+		  colorMode(RGB, 255);
+	  }
+	  break;
+
+	//==================================== 
       default:
         for (int i=0; i<NUM_LEDS_sim_arr_size; i++) 
         {

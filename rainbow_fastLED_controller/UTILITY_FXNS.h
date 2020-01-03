@@ -13,25 +13,21 @@ void fillAll()
  fill_solid(leds, NUM_LEDS, gColor); 
 }
 
-void fadeall() //!
- { 
-  for(int i = 0; i < NUM_LEDS; i++) 
-  {
-      leds[i].nscale8(250); 
-  }
-}
+// void fadeall(){ 
+  // for(int i = 0; i < NUM_LEDS; i++)  leds[i].nscale8(250); 
+// }
 //fadeToBlackBy(leds, NUM_LEDS, effFade);
 
-byte colorize()
+byte colorize_sw_indexOrBits()
 {
-  if(indexOrBits>200) return idex; //* //! lerp cColor gColorBg
-  if(indexOrBits>150)   return sin8(idex*effLength); //*
-  if(indexOrBits>120)   return gHue; //*
-  if(indexOrBits>100)   return gColor.r; //*
-  if(indexOrBits>60)   return beatsin8(effSpeed); //*
-  if(indexOrBits>30)   return beatsin8(effLength); //*
-  if(indexOrBits>10)   return gColor.r+random8(effLength); //*
-  else              return random8();
+  if(indexOrBits>200)	return posX; //* //! lerp cColor gColorBg
+  if(indexOrBits>150)	return sin8(posX*effLength); //*
+  if(indexOrBits>120)	return gHue; //*
+  if(indexOrBits>100)	return gColor.r; //*
+  if(indexOrBits>60)	return beatsin8(effSpeed); //*
+  if(indexOrBits>30)	return beatsin8(effLength); //*
+  if(indexOrBits>10)	return gColor.r+random8(effLength); //*
+  else					return random8();
 }
 
 byte * Wheel(byte WheelPos) {
@@ -97,26 +93,18 @@ int antipodal_index(int i) {
 
 //---FIND ADJACENT INDEX CLOCKWISE
 int adjacent_cw(int i) {
-  int r;
-  if (i < NUM_LEDS - 1) {
-    r = i + 1;
-  }
-  else {
-    r = 0;
-  }
-  return r;
+  if (i < NUM_LEDS - 1)
+    return  i + 1;
+  else 
+    return  0;
 }
 
 //---FIND ADJACENT INDEX COUNTER-CLOCKWISE
 int adjacent_ccw(int i) {
-  int r;
-  if (i > 0) {
-    r = i - 1;
-  }
-  else {
-    r = NUM_LEDS - 1;
-  }
-  return r;
+  if (i > 0)
+     return i - 1;
+  else
+    return NUM_LEDS - 1;
 }
 
 #ifndef saveMem

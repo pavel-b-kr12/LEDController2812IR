@@ -13,14 +13,14 @@ void test_gDelay()
 	gDelay=effSpeed;
 
 	byte t=millis()%256;
-	if(t>thissat) 	ibright=t-thissat;
-	else 			ibright=255-thissat+t;
+	if(t>thissat) 	thisbri=t-thissat;
+	else 			thisbri=255-thissat+t;
 
 	thissat=t;
 
-	leds[idex] =CHSV(ibright*16,255,50+gDelay); 
+	leds[posX] =CHSV(thisbri*16,255,50+gDelay); 
 
-	idex++;	if(idex>=NUM_LEDS) idex=0;
+	posX++;	if(posX>=NUM_LEDS) posX=0;
 }
 
 void test_setTemperature() //http://fastled.io/docs/3.1/group___color_enums.html     FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
@@ -184,9 +184,9 @@ void palette_pipette() //## crash at indexOrBits>
 		}
 		else
 		{
-			if(effSpeed!=idex)
+			if(effSpeed!=posX)
 			{
-				idex=effSpeed;
+				posX=effSpeed;
 				if(effSpeed<50) currentPalette_scroll();
 			}
 		}
@@ -328,8 +328,8 @@ unsigned long transitionStart, transitionPos;
 
 void randomColor(CRGB &col)
 {
-  for (idex = 0; idex < 3; idex++)
-    col.raw[idex] = MINIMUM_BRIGHTNESS[idex] + random(256 - MINIMUM_BRIGHTNESS[idex]);
+  for (posX = 0; posX < 3; posX++)
+    col.raw[posX] = MINIMUM_BRIGHTNESS[posX] + random(256 - MINIMUM_BRIGHTNESS[posX]);
 }
 
 void all_color_transition()
@@ -356,8 +356,8 @@ void all_color_transition()
   {
   	for (int i = 0; i < NUM_LEDS; ++i)
     //in progress
-    for (idex = 0; idex < 3; idex++)
-      leds[i].raw[idex] = map(transitionPos, 0, effSpeed*64-1, colSrc.raw[idex], colDst.raw[idex]);
+    for (posX = 0; posX < 3; posX++)
+      leds[i].raw[posX] = map(transitionPos, 0, effSpeed*64-1, colSrc.raw[posX], colDst.raw[posX]);
   }
 
   //Here "colCur" is the current CRGB value of the transition
@@ -372,8 +372,8 @@ unsigned long transitionStart, transitionPos;
 void randomColor(CRGB &col[])
 {
  for (int i = 0; i < NUM_LEDS; ++i)
-  for (idex = 0; idex < 3; idex++)
-    col[i].raw[idex] = MINIMUM_BRIGHTNESS[idex] + random(256 - MINIMUM_BRIGHTNESS[idex]);
+  for (posX = 0; posX < 3; posX++)
+    col[i].raw[posX] = MINIMUM_BRIGHTNESS[posX] + random(256 - MINIMUM_BRIGHTNESS[posX]);
 }
 
 void color_transition()
@@ -400,8 +400,8 @@ void color_transition()
   {
   	for (int i = 0; i < NUM_LEDS; ++i)
     //in progress
-    for (idex = 0; idex < 3; idex++)
-      leds[i].raw[idex] = map(transitionPos, 0, effSpeed*64-1, colSrc[i].raw[idex], colDst[i].raw[idex]);
+    for (posX = 0; posX < 3; posX++)
+      leds[i].raw[posX] = map(transitionPos, 0, effSpeed*64-1, colSrc[i].raw[posX], colDst[i].raw[posX]);
   }
 
   //Here "colCur" is the current CRGB value of the transition

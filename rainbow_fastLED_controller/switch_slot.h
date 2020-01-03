@@ -42,7 +42,7 @@ case 22:anim_f=rainbowWithGlitter;		effSpeed=15;	effLength=125;	effLengthH=2;eff
 //15 5 71 7
 case 23:anim_f=rainbow_beat;			effSpeed=4;		effLength=14;break;
 
-case 24:anim_f=randomBlinkRainbow; break;
+case 24:anim_f=randomBlinkRainbow; break; //this uses FastLED.show(); so can't view in plotPX
 case 25:anim_f=randomBlinkRainbowFade;	effSpeed=99;	effLength=155; break;
 
 case 26:anim_f=rainbowSpawn_moveFromStartWithSeparators; break; //!		//not168 not328
@@ -100,16 +100,16 @@ case 63: anim_f=SnowSparkle_changeBG; gColor=CRGB(10,10,10);effLength=8; effFade
 case 64:anim_f=flicker; break;	//:/	// random_burst	//not168 not328
 
 
-case 65:anim_f=color_bounce;			effSpeed=16;	effLength=62; break;		//---CYLON v1 moving LED
-case 66:anim_f=color_bounc_HueByPos;	effSpeed=6;		effLength=42; break;		// hue by pos //!! faster for big
-case 67:anim_f=color_bounc_HueByPos;	effSpeed=45;	effLength=255; break;
+case 65:anim_f=color_bounce;			effSpeed=16;	effFade=62; break;		//---CYLON v1 moving LED
+case 66:anim_f=color_bounc_HueByPos;	effSpeed=6;		effFade=42; break;		// hue by pos //!! faster for big
+case 67:anim_f=color_bounc_HueByPos;	effSpeed=45;	effFade=255; break;
 
-case 68:anim_f=color_bounce_multiple;	effSpeed=16;	effLength=17; break;	//not168
+case 68:anim_f=color_bounce_multiple;	effSpeed=16;	effFade=17; break;	//not168
 
-case 69:anim_f=color_bounceFADE; 		effSpeed=0;		effLength=33; break;	//CYLON v2 moving LED group	//effSpeed effLength - are COLORS //not168
-case 70:anim_f=color_bounceFADE;		effSpeed=44;	effLength=1; break;		//not168
+case 69:anim_f=color_bounceFADE; 		effSpeed=0;		effFade=33; break;	//CYLON v2 moving LED group	//effSpeed effLength - are COLORS //not168
+case 70:anim_f=color_bounceFADE;		effSpeed=44;	effFade=1; break;		//not168
 
-//case 71:anim_f=CylonBounce; 			effSpeed=96;	effLength=65; break;	//!!fix cube crush	//moving group	//not168
+//case 71:anim_f=CylonBounce; 			effSpeed=96;	effFade=65; break;	//!!fix cube crush	//moving group	//not168
 
 case 72: anim_f=movers;		effFade=80; break;
 
@@ -205,18 +205,18 @@ case 117:anim_f=fire_pal_hot;	effSpeed=49;effLength=60;	break;
 case 118:anim_f=fire_pal_cold;	effSpeed=49;effLength=60;	break;
 
 
-case 123:anim_f=confetti2;		effSpeed = 8; thishue = 50; thisinc = 1; thissat = 100; thisbri = 255; huediff = 256; break;	//not168 not328
+case 123:anim_f=confetti2;		effSpeed = 8; thishue = 50; inc1 = 1; thissat = 100; thisbri = 255; huediff = 256; break;	//not168 not328
 case 124:anim_f=confetti2_demo;		 gDelay=5; break;
-case 125:anim_f=confetti_pal; 	effSpeed=(24-10)*10;	effLength = 8*8; thishue = 50; thisinc = 1; thissat = 100; thisbri = 255; huediff = 256; gDelay = 5; currentPalette=HeatColors_p; break; //! crash
+case 125:anim_f=confetti_pal; 	effSpeed=(24-10)*10;	effLength = 8*8; thishue = 50; inc1 = 1; thissat = 100; thisbri = 255; huediff = 256; gDelay = 5; currentPalette=HeatColors_p; break; //! crash
 case 126:anim_f=dot_beat;				effSpeed=99;	effLength=243;	effRGB=13; break;
 case 127:anim_f=dot_beat_area;			effSpeed=65;	effLength=173; break; //:)
 case 128:anim_f=fill_grad;					break;
 case 129:anim_f=inoise8_fire;	effSpeed=64;		effLength=140; gDelay=5;				break;	//not168 not328
-case 130:anim_f=inoise8_mover; xscale=effLength/4; yscale=effLength/4; effSpeed=80; maxChanges=24; idex=random16(12345); currentPalette=LavaColors_p; targetPalette=OceanColors_p; gDelay=5;break;//:)
-case 131:anim_f=inoise8_pal;	xscale = 30; yscale = 30; maxChanges = 24; idex = random16(12345); currentPalette = CRGBPalette16(CRGB::Black); targetPalette=OceanColors_p; gDelay=0;break;//:)
-case 132:anim_f=juggle_pal;	thisfade=2;thishue=0; thissat=255; thisbri=255; thisbeat=5;numdots=4;thisdiff=16;currentPalette=CRGBPalette16(CRGB::Black);targetPalette=RainbowColors_p;gDelay=0; break; //:)
+case 130:anim_f=inoise8_mover; xscale=effLength/4; yscale=effLength/4; effSpeed=80; maxChanges=24; posX=random16(12345); currentPalette=LavaColors_p; targetPalette=OceanColors_p; gDelay=5;break;//:)
+case 131:anim_f=inoise8_pal;	xscale = 30; yscale = 30; maxChanges = 24; posX = random16(12345); currentPalette = CRGBPalette16(CRGB::Black); targetPalette=OceanColors_p; gDelay=0;break;//:)
+case 132:anim_f=juggle_pal;	thisfade=2;thishue=0; thissat=255; thisbri=255; thisbeat=5;numdots=4;inc1=16;currentPalette=CRGBPalette16(CRGB::Black);targetPalette=RainbowColors_p;gDelay=0; break; //:)
 case 133:anim_f=lightnings;		effSpeed=160;			break; //!spd	//not168 not328
-case 134:anim_f=matrix_pal_demo; effLength=255/10*9;	thissat = 255; gDelay =  50; thisdir =   0; thisbri = 255; bgH = 0; currentBlending = LINEARBLEND;	palIndex = 95;huerot =0;break;//not168 not328
+case 134:anim_f=matrix_pal_demo; effLength=255/10*9;	thissat = 255; gDelay =  50; thisdir =   0; thisbri = 255; bgH = 0; currentBlending = LINEARBLEND;	palIndex = 95;bHuerot =0;break;//not168 not328
 case 135:anim_f=matrix_ray;		effLength=24*2; currentPalette = LavaColors_p; targetPalette = LavaColors_p;    currentBlending = LINEARBLEND;		gDelay=0;	break; //:/	//not168 not328
 case 136:anim_f=noise16_1;		effSpeed = 24*2; effLength=100;  currentPalette = PartyColors_p;  gDelay=5; 		break; //:)
 case 137:anim_f=noise16_2;		maxChanges = 24;  currentPalette = PartyColors_p;  	gDelay=0;		break;	//not168 not328
@@ -227,7 +227,7 @@ case 141:anim_f=palettecrossfade;	effLength=24*2-8;	gDelay = 20;  targetPalette=
 case 142:anim_f=plasma;		effSpeed=60; effLength=16*3;		currentPalette = OceanColors_p;	gDelay = 0; break; //:)
 case 143:anim_f=rainbow_beat2;		effSpeed=171;	effLength=10*5; break; //:/	//not168 not328
 case 144:anim_f=rainbow_march;				effSpeed=155;		effLength=73; gDelay = 5; break;	//not168 not328
-case 145:anim_f=rainbow_march_demo;	gDelay = 40;  thishue = 0; thisrot = 1; deltahue = 1;  thisdir = 0; 				break;	//not168 not328
+case 145:anim_f=rainbow_march_demo;	gDelay = 40;  thishue = 0; HueRot_incr = 1; inc1 = 1;  thisdir = 0; 				break;	//not168 not328
 ////case 146:anim_f=ripple_pal;		 effLength=thisfade = 128; gDelay = 0;   currentBlending = LINEARBLEND;	 maxChanges = 24; 		break; //! longer, brighter	//not168 not328
 case 147:anim_f=Ripples;		effLength=160; currentPalette = OceanColors_p; targetPalette = OceanColors_p; gDelay = 40; 			break; //:)	//not168 not328
 case 148:anim_f=sawtooth;		effSpeed=60;		effLength=255;  currentPalette = PartyColors_p; targetPalette = LavaColors_p; currentBlending = LINEARBLEND; gDelay = 0;break; //:/	//not168 not328
@@ -244,7 +244,7 @@ case 156:anim_f=blend_test;					break;	//not168 not328
 //case 157:anim_f=every_n_example;		currentPalette = PartyColors_p; currentBlending = LINEARBLEND;   			break; //:) //! change pal, color VS speed, fade w colorization	//not168 not328
 case 158:anim_f=every_n_exampleMulti;	currentPalette = PartyColors_p; currentBlending = LINEARBLEND;   			break; //! timer2
 //case 159:anim_f=every_n_exampleC;		currentPalette = PartyColors_p; currentBlending = LINEARBLEND;   			break; //!! change pal, color VS speed, fade w colorization	//not168 not328
-case 160:anim_f=fill_colours;		 thishue = 0; deltahue = 15;			break;	//not168 not328
+case 160:anim_f=fill_colours;		 thishue = 0; inc1 = 15;			break;	//not168 not328
 case 161:anim_f=animationA;		 currentPalette = RainbowColors_p; targetPalette = ForestColors_p;  currentBlending = LINEARBLEND; 			break;	//not168 not328
 
 
@@ -339,12 +339,13 @@ case 215:anim_f=eff_sin_R_G_B;	effSpeed=37;	effLength=85;		effLengthH=4; break;	
 case 216:anim_f=waveSmooth;	break;
 case 217:anim_f=beatWave; effSpeed=(24-10)*10;	currentPalette = RainbowColors_p;  break;  // combines coloured wave values from several beatsin8() functions
 case 218:anim_f=blendwave;		effLength=1;	break; //:/ //! //uses beats, blend and the fill gradient functions to blend a couple of waves together	//not168 not328
+case 219:anim_f=weveByledSet;		effLength=1;	break; //!! TODO
 
 //==============================================================================================================================
 
 
 #ifdef MATRIX_ROWS
-case 219:anim_f=matrix_test;	effFade=1; break;		//not168 not328
+case 219:anim_f=matrix_test;	effFade=1; break;		//not168 not328 //!! combine w
 #endif
 #ifdef NUMMATRIX
 case 220:anim_f=text_test;	break;		//not168 not328

@@ -5,7 +5,7 @@ void confetti_pal_() {                                         // random colored
   fadeToBlackBy(leds, NUM_LEDS, effLength/16);                    // Low values = slower fade.
   int pos = random8or16(NUM_LEDS);                               // Pick an LED at random.
   leds[pos] = ColorFromPalette(currentPalette, thishue + random16(huediff)/4 , thisbri, LINEARBLEND);
-  thishue = thishue + thisinc;                                // It increments here.
+  thishue = thishue + inc1;                                // It increments here.
   
 }
 
@@ -17,9 +17,9 @@ void confetti_pal_ChangeMe() {                                             // A 
   if (lastSecond != secondHand) {                             // Debounce to make sure we're not repeating an assignment.
     lastSecond = secondHand;
     switch(secondHand) {
-      case  0: targetPalette = OceanColors_p; thisinc=1; thishue=192; thissat=255; thisfade=2; huediff=255; break;  // You can change values here, one at a time , or altogether.
-      case  5: targetPalette = LavaColors_p; thisinc=2; thishue=128; thisfade=8; huediff=64; break;
-      case 10: targetPalette = ForestColors_p; thisinc=1; thishue=random16(255); thisfade=1; huediff=16; break;      // Only gets called once, and not continuously for the next several seconds. Therefore, no rainbows.
+      case  0: targetPalette = OceanColors_p; inc1=1; thishue=192; thissat=255; thisfade=2; huediff=255; break;  // You can change values here, one at a time , or altogether.
+      case  5: targetPalette = LavaColors_p; inc1=2; thishue=128; thisfade=8; huediff=64; break;
+      case 10: targetPalette = ForestColors_p; inc1=1; thishue=random16(255); thisfade=1; huediff=16; break;      // Only gets called once, and not continuously for the next several seconds. Therefore, no rainbows.
       case 15: break;                                         // Here's the matching 15 for the other one.
     }
   }

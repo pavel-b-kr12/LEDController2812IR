@@ -46,9 +46,9 @@ void serendipitous_ () {
   X = Xn;
   Y = Yn;
 
-  idex=(sin8(X)+cos8(Y))/2;                            // Guarantees maximum value of 255
+  posX=(sin8(X)+cos8(Y))/2;                            // Guarantees maximum value of 255
 
-  CRGB newcolor = ColorFromPalette(currentPalette, idex, 255, LINEARBLEND);
+  CRGB newcolor = ColorFromPalette(currentPalette, posX, 255, LINEARBLEND);
   
 //  nblend(leds[X%NUM_LEDS-1], newcolor, 224);          // Try and smooth it out a bit. Higher # means less smoothing.
   nblend(leds[map(X,0,65535,0,NUM_LEDS)], newcolor, 224); // Try and smooth it out a bit. Higher # means less smoothing.

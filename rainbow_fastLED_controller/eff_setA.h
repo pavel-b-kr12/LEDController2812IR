@@ -141,37 +141,37 @@ void rainbow_beat()
 #ifndef saveMem
 void rainbow_fade() //Hue on all or rare LEDs
 {
-  ihue+=effSpeed/4+1;
+  thishue+=effSpeed/4+1;
 
-  for(byte idex = 0 ; idex < NUM_LEDS; idex++ ) {
-    if(effLength>50 || (effLength>=10 && idex%effLength>8) || (effLength<10 && idex%effLength==0))
+  for(byte x = 0 ; x < NUM_LEDS; x++ ) {
+    if(effLength>50 || (effLength>=10 && x%effLength>8) || (effLength<10 && x%effLength==0))
     {
-      leds[idex] = CHSV(ihue, 255, 255);
+      leds[x] = CHSV(thishue, 255, 255);
     }
   }
 }
 #endif
 void rainbow_fill_slow() {
-  idex++;
-  ihue += effSpeed;
-  if (idex >= NUM_LEDS)    idex = 0;
+  posX++;
+  thishue += effSpeed;
+  if (posX >= NUM_LEDS)    posX = 0;
 
-  if(effLength>50 || (effLength>=10 && idex%effLength>8) || (effLength<10 && idex%effLength==0))
+  if(effLength>50 || (effLength>=10 && posX%effLength>8) || (effLength<10 && posX%effLength==0))
   {
-    leds[idex] = CHSV(ihue, 255, 255);
+    leds[posX] = CHSV(thishue, 255, 255);
   }
 }
 
 void rainbow_vertical() {                        //-m23-RAINBOW 'UP' THE LOOP
-  idex++;
-  if (idex > CENTER_TOP_INDEX) {
-    idex = 0;
+  posX++;
+  if (posX > CENTER_TOP_INDEX) {
+    posX = 0;
   }
 
-  int idexA = idex;
-  int idexB = horizontal_index(idexA);
-  leds[idexA] = CHSV(gHue, 255, 255);
-  leds[idexB] = CHSV(gHue, 255, 255);
+  int posXA = posX;
+  int posXB = horizontal_index(posXA);
+  leds[posXA] = CHSV(gHue, 255, 255);
+  leds[posXB] = CHSV(gHue, 255, 255);
 }
 
 //----------------------------------------------------
@@ -192,7 +192,7 @@ void rainbowSegments_shiftSin() //##
 	
 	for(NUM_LEDS_type i = 0; i < NUM_LEDS; i++)
 	{
-		if((i+beatsin8(effLength, 0, effLength))%effLength>effLength/2)
+		if((i+beatsin8(1+effLength, 0, effLength))%effLength>effLength/2)
 		leds[i] = CRGB::Black; //! Black, inverse, blink, different gHue shift or direction
 	}
 }
@@ -201,7 +201,7 @@ void rainbowSegments2()
 {
     fill_rainbow( leds, NUM_LEDS, gHue, 255/NUM_LEDS/effLength); //255/NUM_LEDS/effLength
 	
-	for(NUM_LEDS_type i = 0; i < NUM_LEDS; i+=((i+beatsin8(effLength, 0, effLength))%effLength>effLength/2)?1:effLength/2)
+	for(NUM_LEDS_type i = 0; i < NUM_LEDS; i+=((i+beatsin8(1+effLength, 0, effLength))%effLength>effLength/2)?1:effLength/2)
 	{
 		leds[i] = CRGB::Black;
 	}
@@ -218,7 +218,7 @@ void  rainbowSpawn_moveFromStartWithSeparators()
 	
 	leds[0] =CHSV(gHue,255,
 			//((i_eff+beatsin8(effLength, 0, effLength))%(effLength/2)>effLength/8)
-			((i_eff+beatsin8(effSpeed/8, 0, effLength))%effLength>effLength/4)
+			((i_eff+beatsin8(1+effSpeed/8, 0, effLength))%effLength>effLength/4)
 			?0   //black separators
 			:255
 			);
@@ -281,7 +281,7 @@ void random_burst() {                         //-m4-RANDOM INDEX/COLOR
   
   // for(NUM_LEDS_type i=0;i<effLength/10;i++)
   // {
-  // leds[random(0, NUM_LEDS)] = CHSV(ihue, thissat, 0);
+  // leds[random(0, NUM_LEDS)] = CHSV(thishue, thissat, 0);
   // }
 }
 
@@ -377,33 +377,29 @@ void confetti_density() {                                             // Random 
 		if(random8()>sin8(pos*effSpeedH/32+indexOrBits)*128/effLengthH)
 			leds[pos] += CHSV(gHue + random8(effLength), 200, 255);
 	}
-
 }
 
 void random_color_pop() {                         //-m25-RANDOM COLOR POP
   //clear();
-  leds[idex]=0;
-  idex =random8or16(NUM_LEDS);
-  leds[idex] = CHSV(random8(), 255, 255);
+  leds[posX]=0;
+  posX =random8or16(NUM_LEDS);
+  leds[posX] = CHSV(random8(), 255, 255);
 }
 
 void sinelon() {                                              // A colored dot sweeping back and forth, with fading trails.
-
   fadeToBlackBy(leds, NUM_LEDS, effLength);
   NUM_LEDS_type pos = beatsin16(effSpeed,0,NUM_LEDS-1);
   leds[pos] += CHSV(gHue, 255, 192);
-  
 } // sinelon()
 
 void bpm() {                                                  // Colored stripes pulsing at a defined Beats-Per-Minute.
-
   CRGBPalette16 palette = PartyColors_p;
   uint8_t beat = beatsin8(effLength, 64, 255);
   
   for(NUM_LEDS_type i = 0; i < NUM_LEDS; i++) { //9948
     leds[i] = ColorFromPalette(palette, gHue+(i*2), beat-gHue+(i*10)); //! effSpeedH
   }
-} // bpm()
+}
 
 void juggle() {                                               // Eight colored dots, weaving in and out of sync with each other.
 
@@ -414,6 +410,5 @@ void juggle() {                                               // Eight colored d
     leds[beatsin16(i+7,0,NUM_LEDS-1)] |= CHSV(dothue, 200, 255);
     dothue += effLength;
   }
-  
-} // juggle() https://www.youtube.com/watch?v=L-G_-l9GzOk
+} // https://www.youtube.com/watch?v=L-G_-l9GzOk
 

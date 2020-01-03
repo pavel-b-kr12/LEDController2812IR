@@ -1,6 +1,6 @@
 // ColorWavesWithPalettes by Mark Kriegsman: https://gist.github.com/kriegsman/8281905786e8b2632aeb
 // draws color waves with an ever-changing, widely-varying set of parameters, using a color palette.
-void colorwaves_( CRGB* ledarray, uint16_t numleds, CRGBPalette16& palette)
+void colorwaves_( CRGB* ledarray, NUM_LEDS_type numleds, CRGBPalette16& palette)
 {
   static uint16_t sPseudotime = 0;
   static uint16_t sLastMillis = 0;
@@ -21,7 +21,7 @@ void colorwaves_( CRGB* ledarray, uint16_t numleds, CRGBPalette16& palette)
   sHue16 += deltams * beatsin88( 400, 5, 9);
   uint16_t brightnesstheta16 = sPseudotime;
 
-  for ( uint16_t i = 0 ; i < numleds; i++) {
+  for ( NUM_LEDS_type i = 0 ; i < numleds; i++) {
     hue16 += hueinc16;
     uint8_t hue8 = hue16 / 256;
     uint16_t h16_128 = hue16 >> 7;
@@ -38,11 +38,11 @@ void colorwaves_( CRGB* ledarray, uint16_t numleds, CRGBPalette16& palette)
     uint8_t bri8 = (uint32_t)(((uint32_t)bri16) * brightdepth) / 65536;
     bri8 += (255 - brightdepth);
 
-    uint8_t index = hue8;
-    //index = triwave8( index);
-    index = scale8( index, 240);
+    uint8_t x = hue8;
+    //x = triwave8( x);
+    x = scale8( x, 240);
 
-    CRGB newcolor = ColorFromPalette( palette, index, bri8);
+    CRGB newcolor = ColorFromPalette( palette, x, bri8);
 
     uint16_t pixelnumber = i;
     pixelnumber = (numleds - 1) - pixelnumber;

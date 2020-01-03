@@ -4,7 +4,7 @@ void confetti2() {                                            // random colored 
   fadeToBlackBy(leds, NUM_LEDS, effSpeed);                    // Low values = slower fade.
   int pos = random16(NUM_LEDS);                               // Pick an LED at random.
   leds[pos] += CHSV((thishue + random16(huediff))/4 , thissat, thisbri);  // I use 12 bits for hue so that the hue increment isn't too quick.
-  thishue = thishue + thisinc;                                // It increments here.
+  thishue = thishue + inc1;                                // It increments here.
 }
 
 void confetti2_ChangeMe() {                                             // A time (rather than loop) based demo sequencer. This gives us full control over the length of each sequence.
@@ -13,9 +13,9 @@ void confetti2_ChangeMe() {                                             // A tim
   if (lastSecond != secondHand) {                             // Debounce to make sure we're not repeating an assignment.
     lastSecond = secondHand;
     switch(secondHand) {
-      case  0: thisinc=1; thishue=192; thissat=255; effSpeed=2; huediff=256; break;  // You can change values here, one at a time , or altogether.
-      case  5: thisinc=2; thishue=128; effSpeed=8; huediff=64; break;
-      case 10: thisinc=1; thishue=random16(255); effSpeed=1; huediff=16; break;      // Only gets called once, and not continuously for the next several seconds. Therefore, no rainbows.
+      case  0: inc1=1; thishue=192; thissat=255; effSpeed=2; huediff=256; break;  // You can change values here, one at a time , or altogether.
+      case  5: inc1=2; thishue=128; effSpeed=8; huediff=64; break;
+      case 10: inc1=1; thishue=random16(255); effSpeed=1; huediff=16; break;      // Only gets called once, and not continuously for the next several seconds. Therefore, no rainbows.
       case 15: break;                                                                // Here's the matching 15 for the other one.
     }
   }

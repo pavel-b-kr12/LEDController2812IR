@@ -23,13 +23,13 @@ byte myfade=255-effSpeed;
   switch (step) {
 
     case -1:                                                          // Initialize ripple variables.
-      idex = random8or16(NUM_LEDS-1); // Center of the current ripple.
+      posX = random8or16(NUM_LEDS-1); // Center of the current ripple.
       gColor = random8();
       step = 0;
       break;
 
     case 0:
-      leds[idex] = ColorFromPalette(currentPalette, gColor, myfade, currentBlending);
+      leds[posX] = ColorFromPalette(currentPalette, gColor, myfade, currentBlending);
       
       step ++;
       break;
@@ -39,8 +39,8 @@ byte myfade=255-effSpeed;
       break;
 
     default:                                                          // Middle of the ripples.
-      leds[(idex + step + NUM_LEDS) % NUM_LEDS] += ColorFromPalette(currentPalette, gColor, myfade/step*2, currentBlending);       // Simple wrap from Marc Miller
-      leds[(idex - step + NUM_LEDS) % NUM_LEDS] += ColorFromPalette(currentPalette, gColor, myfade/step*2, currentBlending);
+      leds[(posX + step + NUM_LEDS) % NUM_LEDS] += ColorFromPalette(currentPalette, gColor, myfade/step*2, currentBlending);       // Simple wrap from Marc Miller
+      leds[(posX - step + NUM_LEDS) % NUM_LEDS] += ColorFromPalette(currentPalette, gColor, myfade/step*2, currentBlending);
       step ++;                                                         // Next step.
       break;  
   } // switch step

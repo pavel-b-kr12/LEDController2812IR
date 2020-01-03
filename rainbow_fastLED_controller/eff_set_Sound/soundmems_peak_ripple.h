@@ -52,13 +52,13 @@ void rippleSnd() {
   switch (step) {
 
     case -1:                                                  // Initialize ripple variables.
-      idex = random8or16(NUM_LEDS-1); //center
-      ihue = (peakspersec*10) % 255;                        // More peaks/s = higher the hue colour.
+      posX = random8or16(NUM_LEDS-1); //center
+      thishue = (peakspersec*10) % 255;                        // More peaks/s = higher the hue colour.
       step = 0;
       break;
 
     case 0:
-      leds[idex] = CHSV(ihue, 255, 255);                  // Display the first pixel of the ripple.
+      leds[posX] = CHSV(thishue, 255, 255);                  // Display the first pixel of the ripple.
       step ++;
       break;
 
@@ -67,8 +67,8 @@ void rippleSnd() {
       break;
 
     default:                                                  // Middle of the ripples.
-      leds[(idex + step + NUM_LEDS) % NUM_LEDS] += CHSV(ihue, 255, 255/step*2);       // Simple wrap from Marc Miller.
-      leds[(idex - step + NUM_LEDS) % NUM_LEDS] += CHSV(ihue, 255, 255/step*2);
+      leds[(posX + step + NUM_LEDS) % NUM_LEDS] += CHSV(thishue, 255, 255/step*2);       // Simple wrap from Marc Miller.
+      leds[(posX - step + NUM_LEDS) % NUM_LEDS] += CHSV(thishue, 255, 255/step*2);
       step ++;                                                // Next step.
       break;  
   } // switch step

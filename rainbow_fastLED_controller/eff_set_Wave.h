@@ -28,13 +28,13 @@ void wave_H() //!fix разрыв
 {
 	fill_solid(leds, NUM_LEDS, CHSV(indexOrBits<250?indexOrBits:gHue,effLength,effFade)); //bg
 
-	//idex_f+=effSpeed/50.+0.01;
+	//posX_f+=effSpeed/50.+0.01;
 
-	idex=map(beat8or16(effSpeed),0,255,0,NUM_LEDS-1);
+	posX=map(beat8or16(effSpeed),0,255,0,NUM_LEDS-1);
 
 	for(NUM_LEDS_type i=0;i<effLengthH;i++)
 	{
-		NUM_LEDS_type x=(idex+i)%NUM_LEDS;
+		NUM_LEDS_type x=(posX+i)%NUM_LEDS;
 		leds[x]=CHSV(indexOrBits<250?indexOrBits:gHue +effSpeedH,255,	sin8(i*255/effLengthH));
 	}
 }
@@ -43,16 +43,16 @@ void gen_wave_H_moveAll() //!fix разрыв
 {
 	moveOutAllRemainFirst();
 
-	idex16+=1+effSpeed/32;//beat8or16(effLength);
-	idex16%=NUM_LEDS;
-	//idex_f+=effLength/50.+0.01;
+	posX16+=1+effSpeed/32;//beat8or16(effLength);
+	posX16%=NUM_LEDS;
+	//posX_f+=effLength/50.+0.01;
 
 	byte val=255;
 	switch(indexOrBits%4)
 	{
-		case 0: val= sin8(idex16*255/effLengthH); break;
-		case 1: val= random8(0, sin8(idex*255/effLengthH) ); break;
-		case 2: val= idex16%(2560/effLengthH); break;
+		case 0: val= sin8(posX16*255/effLengthH); break;
+		case 1: val= random8(0, sin8(posX*255/effLengthH) ); break;
+		case 2: val= posX16%(2560/effLengthH); break;
 	}
 	
 	leds[0]=CHSV(effSpeedH + ( indexOrBits<250?effSpeedH:gHue/16 ) ,255,	val);
@@ -63,32 +63,32 @@ void gen_wave_H_moveAll_blinkRand() //!fix разрыв
 {
 	moveOutAllRemainFirst();
 
-	//idex16=beat8or16(effSpeed);
-	//idex_f+=effSpeed/50.+0.01;
+	//posX16=beat8or16(effSpeed);
+	//posX_f+=effSpeed/50.+0.01;
 
 	byte val=255;
 	switch((indexOrBits/4+1)%6)
 	{
 		case 0: val= gHue; break;
 		case 1: 
-			idex16=beat8or16(effLength); 
-			val= idex16;
+			posX16=beat8or16(effLength); 
+			val= posX16;
 		break;
 		case 2:
-			idex16++;
-			val= sin8(idex16*255/effLength);
+			posX16++;
+			val= sin8(posX16*255/effLength);
 		break;
 		case 3:
-			idex16++;
-			val= random8(0, sin8(idex16*255/effLength) );
+			posX16++;
+			val= random8(0, sin8(posX16*255/effLength) );
 		break;
 		case 4:
-			idex16++;
-			val= idex16%(2560/effLength);
+			posX16++;
+			val= posX16%(2560/effLength);
 		break;
 		case 5:
-			idex16++;
-			if(idex16%256<125) val=idex16*255/effLength;
+			posX16++;
+			if(posX16%256<125) val=posX16*255/effLength;
 			else val=255;
 		break;
 	}
@@ -139,6 +139,22 @@ void gen_wave_H_moveAll_blinkRand() //!fix разрыв
 	}
 }
 
+void weveByledSet()
+{
+		for(int i = 0; i < NUM_LEDS/2; i++)
+		{   
+			// fade everything out
+			ledSet.fadeToBlackBy(2+effFade/2);
+
+			// let's set an led value
+			leds[i] = CHSV(posX++,255,255);
+
+			// now, let's first 20 leds to the top 20 leds, 
+			ledSet(NUM_LEDS/2,NUM_LEDS-1) = ledSet(NUM_LEDS/2 - 1 ,0);
+
+		}
+}
+
 
 void gen_wave_H_v2_moveAll_blinkRand() //!fix разрыв
 {
@@ -162,12 +178,6 @@ void gen_wave_H_v2_moveAll_blinkRand() //!fix разрыв
 	// }
 }
 
-
-long millis_last=0;
-float posX_f=0;
-
-uint16_t td=0;
-uint32_t t_anim_last=0;
 
 
 void wave_adj()

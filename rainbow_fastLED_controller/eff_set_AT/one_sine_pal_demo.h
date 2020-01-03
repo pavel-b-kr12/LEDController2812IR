@@ -16,7 +16,7 @@
  * 
  */
 
-// thisrot = 1;                                          // You can change how quickly the hue rotates for this wave.
+// HueRot_incr = 1;                                          // You can change how quickly the hue rotates for this wave.
 // effSpeed = 8;                                         // You can change the speed of the wave, and use negative values.
 // allfreq = 32;                                         // You can change the frequency, thus distance between bars.
 // thiscutoff = 128;                                     // You can change the cutoff value to display this wave. Lower value = longer wave.
@@ -24,13 +24,13 @@
 
 void one_sine_pal_(uint8_t colorIndex)
 {
-  idex16 += effSpeed/16;                                                     // You can change direction and speed individually.
+  posX16 += effSpeed/16;                                                     // You can change direction and speed individually.
   
    for (int k=0; k<NUM_LEDS; k++) {                                          // For each of the LED's in the strand, set a brightness based on a wave as follows:
-    int thisbri = qsuba(cubicwave8((k*allfreq)+idex16), thiscutoff);    // qsub sets a minimum value called thiscutoff. If < thiscutoff, then bright = 0. Otherwise, bright = 128 (as defined in qsub)..
+    int thisbri = qsuba(cubicwave8((k*allfreq)+posX16), thiscutoff);    // qsub sets a minimum value called thiscutoff. If < thiscutoff, then bright = 0. Otherwise, bright = 128 (as defined in qsub)..
     leds[k] = CHSV(bgH, 255, bgbri);                                     // First set a background colour, but fully saturated.
     leds[k] += ColorFromPalette(currentPalette, colorIndex + k, thisbri, currentBlending);
-    colorIndex += thisrot;
+    colorIndex += HueRot_incr;
   }
 
   bgH += bgHinc;                                                                    // You can change the background colour or remove this and leave it fixed.
@@ -54,12 +54,12 @@ void one_sine_pal_ChangeMe()
     lastSecond = secondHand;
     switch (secondHand) {
       case  0: break;
-      case  5: targetPalette=RainbowColors_p; bgH=0; bgbri=32; bgHinc=1; thisrot=1; gDelay=10; effSpeed=-4; allfreq=16; thiscutoff=128; currentBlending=NOBLEND; break;
-      case 10: targetPalette=ForestColors_p; effSpeed = 12; thisrot = 0; effSpeed = 12; gDelay = 10; thiscutoff=128; allfreq=64; bgH = 50; bgbri=15; currentBlending=LINEARBLEND; break;
-      case 15: SetupRandomColorPalette(); thisrot = 2; effSpeed = 16; break;
+      case  5: targetPalette=RainbowColors_p; bgH=0; bgbri=32; bgHinc=1; HueRot_incr=1; gDelay=10; effSpeed=-4; allfreq=16; thiscutoff=128; currentBlending=NOBLEND; break;
+      case 10: targetPalette=ForestColors_p; effSpeed = 12; HueRot_incr = 0; effSpeed = 12; gDelay = 10; thiscutoff=128; allfreq=64; bgH = 50; bgbri=15; currentBlending=LINEARBLEND; break;
+      case 15: SetupRandomColorPalette(); HueRot_incr = 2; effSpeed = 16; break;
       case 20: targetPalette=LavaColors_p; effSpeed = 4; break; allfreq = 16; bgH=50; break;
       case 25: thiscutoff = 96; effSpeed = -4; thiscutoff = 224; bgH=20; bgbri=8; break;
-      case 30: SetupRandomColorPalette(); thiscutoff = 96; thisrot = 1; break;
+      case 30: SetupRandomColorPalette(); thiscutoff = 96; HueRot_incr = 1; break;
       case 35: targetPalette = OceanColors_p; break;
       case 40: SetupSimilarColorPalette(); thiscutoff = 128; break;
       case 45: SetupSimilarColorPalette(); effSpeed = 3; break;
@@ -79,7 +79,7 @@ void one_sine_pal_demo () {
     nblendPaletteTowardPalette(currentPalette, targetPalette, maxChanges);
   }
 
-    thishue += thisrot;                                    // Motion speed
+    thishue += HueRot_incr;                                    // Motion speed
     one_sine_pal_(thishue);
 
 } 

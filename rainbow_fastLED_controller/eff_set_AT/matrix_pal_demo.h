@@ -10,26 +10,23 @@ void matrixCube2()
 				if(axi==1)
 				{
 				
-				byte s=random8();
-				byte b=random8();
-				
-				NUM_LEDS_type x= NUM_LEDS_edge*(corner_i*3+axi);
-				NUM_LEDS_type x9=NUM_LEDS_edge*(corner_i*3+axi) +(NUM_LEDS_edge-1);
-				
-				if(corner_i==0 || corner_i==2)
-				{
-					moveOutAllRemainFirst_ret_last(x9,x);//!? -1 
-					leds[x9]=CHSV(110+i_eff/64%16, s>100?255:s*2, b>240?b: b>200?b/4:0);
-				}
-				else
-				if(corner_i==1 || corner_i==3)
-				{
-					moveOutAllRemainFirst_ret_last(x,x9);//!? -1 
-					leds[x]=CHSV(110+i_eff/64%16, s>100?255:s*2, b>240?b: b>200?b/4:0);
-				}
-
-
-				
+					byte s=random8();
+					byte b=random8();
+					
+					NUM_LEDS_type x= NUM_LEDS_edge*(corner_i*3+axi);
+					NUM_LEDS_type x9=NUM_LEDS_edge*(corner_i*3+axi) +(NUM_LEDS_edge-1);
+					
+					if(corner_i==0 || corner_i==2)
+					{
+						moveOutAllRemainFirst_ret_last(x9,x);//!? -1 
+						leds[x9]=CHSV(110+i_eff/64%16, s>100?255:s*2, b>240?b: b>200?b/4:0);
+					}
+					else
+					if(corner_i==1 || corner_i==3)
+					{
+						moveOutAllRemainFirst_ret_last(x,x9);//!? -1 
+						leds[x]=CHSV(110+i_eff/64%16, s>100?255:s*2, b>240?b: b>200?b/4:0);
+					}
 				
 				}
 				
@@ -101,9 +98,7 @@ void Matrix() {                                   //-m29-ONE LINE MATRIX
 /* -------------------------------- matrix_pal_demo
  *
  * Originally By: funkboxing LED
- *
  * Modified a LOT by: Andrew Tuline
- *
  * Date: July, 2015
  * 
  * Various coloured characters going up/down the strand, a la 'The Matrix'. This highly modified version uses non-blocking
@@ -111,11 +106,11 @@ void Matrix() {                                   //-m29-ONE LINE MATRIX
  *
  */
 
-//huerot =   0;                                     // Does the hue rotate? 1 = yes
+//bHuerot =   0;                                     // Does the hue rotate? 1 = yes
 
 void matrix_() {                                               // One line matrix
 
-  if (huerot) palIndex++;
+  if (bHuerot) palIndex++;
   
   if (random8() > effLength) {
     if (thisdir == 0)
@@ -148,11 +143,11 @@ void matrix_ChangeMe() {                                             // A time (
   if (lastSecond != secondHand) {                             // Debounce to make sure we're not repeating an assignment.
     lastSecond = secondHand;
     switch(secondHand) {
-      case  0: 	gDelay=50; palIndex=95; bgH=140; bgbri=4; huerot=0; break;
-      case  5: targetPalette = OceanColors_p; thisdir=1; bgbri=0; huerot=1; break;
-      case 10: targetPalette = LavaColors_p; gDelay=30; palIndex=0; bgH=50; bgbri=8; huerot=0; break;
+      case  0: 	gDelay=50; palIndex=95; bgH=140; bgbri=4; bHuerot=0; break;
+      case  5: targetPalette = OceanColors_p; thisdir=1; bgbri=0; bHuerot=1; break;
+      case 10: targetPalette = LavaColors_p; gDelay=30; palIndex=0; bgH=50; bgbri=8; bHuerot=0; break;
       case 15: targetPalette = ForestColors_p; gDelay=80; bgbri = 16; bgH=96; palIndex=random8(); break;
-      case 20: palIndex=random8(); huerot=1; break;
+      case 20: palIndex=random8(); bHuerot=1; break;
       case 25: break;
     }
   }

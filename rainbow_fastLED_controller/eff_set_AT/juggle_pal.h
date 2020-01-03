@@ -1,7 +1,6 @@
 /* juggle_pal
  *
  * Originally by: Mark Kriegsman
- *
  * Modified By: Andrew Tuline
  *
  * Date: February, 2015
@@ -11,7 +10,7 @@
  */
 
 //uint8_t   numdots =   4;                                     // Number of dots in use.
-//uint8_t   thisdiff =  16;                                     // Incremental change in hue between each dot.
+//uint8_t   inc1 =  16;                                     // Incremental change in hue between each dot.
 
 void juggle_pal_() {                                           // Several colored dots, weaving in and out of sync with each other
 
@@ -19,7 +18,7 @@ void juggle_pal_() {                                           // Several colore
   
   for( int i = 0; i < numdots; i++) {
     leds[beatsin16(thisbeat+i+numdots,0,NUM_LEDS)] += ColorFromPalette(currentPalette, thishue , thisbri, LINEARBLEND);    // Munge the values and pick a colour from the palette
-    thishue += thisdiff;
+    thishue += inc1;
   }
   
 } 
@@ -32,9 +31,9 @@ void juggle_pal_ChangeMe() {                                             // A ti
   if (lastSecond != secondHand) {                             // Debounce to make sure we're not repeating an assignment.
     lastSecond = secondHand;
     switch(secondHand) {
-      case  0: numdots = 1; thisbeat = 20; thisdiff = 16; thisfade = 2; thishue = 0; break;                  // You can change values here, one at a time , or altogether.
-      case 10: numdots = 4; thisbeat = 10; thisdiff = 16; thisfade = 8; thishue = 128; break;
-      case 20: numdots = 8; thisbeat =  3; thisdiff =  0; thisfade = 8; thishue=random8(); break;           // Only gets called once, and not continuously for the next several seconds. Therefore, no rainbows.
+      case  0: numdots = 1; thisbeat = 20; inc1 = 16; thisfade = 2; thishue = 0; break;                  // You can change values here, one at a time , or altogether.
+      case 10: numdots = 4; thisbeat = 10; inc1 = 16; thisfade = 8; thishue = 128; break;
+      case 20: numdots = 8; thisbeat =  3; inc1 =  0; thisfade = 8; thishue=random8(); break;           // Only gets called once, and not continuously for the next several seconds. Therefore, no rainbows.
       case 30: break;
     }
   }

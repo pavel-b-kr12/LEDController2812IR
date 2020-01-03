@@ -19,10 +19,10 @@
 // effLength  // thiscutoff = 192;                                     // You can change the cutoff value to display this wave. Lower value = longer wave.
 
 void one_sine_pal(uint8_t colorIndex) {
-  idex16 += effSpeed/16;                                                     // You can change direction and speed individually.
+  posX16 += effSpeed/16;                                                     // You can change direction and speed individually.
   
   for (int k=0; k<NUM_LEDS-1; k++) {                                          // For each of the LED's in the strand, set a brightness based on a wave as follows:
-    int thisbri = qsubd(cubicwave8((k*effSpeedH)+idex16), effLength);    // qsub sets a minimum value called thiscutoff. If < effLength, then bright = 0. Otherwise, bright = 128 (as defined in qsub)..
+    int thisbri = qsubd(cubicwave8((k*effSpeedH)+posX16), effLength);    // qsub sets a minimum value called thiscutoff. If < effLength, then bright = 0. Otherwise, bright = 128 (as defined in qsub)..
     leds[k] = CHSV(bgH, 255, bgbri);                                     // First set a background colour, but fully saturated.
     leds[k] += ColorFromPalette( currentPalette, colorIndex, thisbri, LINEARBLEND);    // Let's now add the foreground colour.
     colorIndex +=3;

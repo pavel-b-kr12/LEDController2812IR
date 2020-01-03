@@ -20,19 +20,27 @@ static int serialSpeed=1000000;//1000000 921600 500000 115200 57600//this may be
 boolean b_Cube=true; //set NUM_LEDS_slider to Max; Use to calculate current.
 boolean b_NUM_LEDS_adj=false;//true false //! fix adj mode especially if no adjustable set in MCU
 
-//5 30 60 120 144 150 180 300 450
-int NUM_LEDS_slider_startup=144; //16*16;//150;//105;//60*3;//105; //145*3*4 60*8 15*8 8*8 16*16  //this is also max for draw gemetry arr DrawLEDs_pointsX 
+
 int NUM_LEDS_slider_m=60;
 int NUM_LEDS_slider_M=16*16;
 
-int matrix_leds_per_col=8; // 8 16  horizontal L-to-R //for plotPX //TODO2 vertiacal
+
 boolean NUM_LEDS_x8=false;// true false // have to be true if gNUM_LEDS>255 , so we can send it with 1 byte
-/* //15*16 matrix from 30/m
+
+//5 30 60 120 144 150 180 300 450
+/*
+int NUM_LEDS_slider_startup=144; //16*16;//150;//105;//60*3;//105; //145*3*4 60*8 15*8 8*8 16*16  //this is also max for draw gemetry arr DrawLEDs_pointsX 
+int matrix_leds_per_col=8; // 8 16  horizontal L-to-R //for plotPX //TODO2 vertiacal
+boolean bFlipArr_sim_to_zigZag_matrix=false;//for sim. If true - flips data before send to plot and MCU. MATRIX Plot also flip data by default plotPX.b_matrix_arr_is_zigZag 
+*/
+ //15*16 matrix from 30/m
 int NUM_LEDS_slider_startup=15*16;
 int matrix_leds_per_col=15; 
-*/
+boolean bFlipArr_sim_to_zigZag_matrix=true;
 
-boolean bFlipArr_sim_to_zigZag_matrix=true;//false; //for sim. If true - flips data before send to plot and MCU. MATRIX Plot also flip data by default plotPX.b_matrix_arr_is_zigZag
+
+
+//!!fix now it also affect common not a matrix draw in flip_zigZag_matrix
 
 int bSetBrightnessAtConnect=33; //-1 for not set
 
@@ -421,41 +429,25 @@ public void setup(){
     try
     {
 	if (args != null && args.length != 0){ //$ processing-java --sketch=sketchname --run argu "arg o"
-		serialSpeed=Integer.parseInt(args[0]);
-    if(args.length >1)
-        useSerialPortN=Integer.parseInt(args[1]);
+		int arg_serialSpeed=Integer.parseInt(args[0]);
+		
+		if(arg_serialSpeed==0)
+			bSim_set(true);
+		else serialSpeed=arg_serialSpeed;
+		
+		if(args.length >1)
+		{
+			useSerialPortN=Integer.parseInt(args[1]);
+			if(args.length >2)
+			NUM_LEDS_slider_startup=Integer.parseInt(args[2]);
+
+		}
 	}
  }catch(Exception e){ button_disconnect.setText("err"); }
+	if(NUM_LEDS_slider_startup>NUM_LEDS_slider_M) NUM_LEDS_slider_M=NUM_LEDS_slider_startup;
 
 
-	//-------------------------------------------
-	float rnd=random(200);
-	if ( day()==1 && month()%5==0) {gColorBg= color(200,0,0); labelColor=0;} //changeSilerTextColor(color(0));
-	else 
-	if ( day()%4==0 && rnd<10) {gColorBg= color(0,0,0);labelColor=255;} //!! also labels
-	else 
-	if ( day()%3==0 && rnd<20) {gColorBg= color(44);labelColor=255;}
-	else 
-	if ( rnd>50) gColorBg= color(200);
-	else 
-	if ( rnd>40) gColorBg= color(165.0, 173.0, 173.0);
-	else 
-	if ( rnd>30) gColorBg= color(164.0, 196.0, 196.0);
-	else 
-	if ( rnd>20) gColorBg= color(237.0, 255.0, 241.0);
-	else 
-	if ( rnd>10) gColorBg= color(226.0, 255.0, 161.0);
-	else 
-	if ( rnd>5) gColorBg= color(255.0, 216.0, 216.0);
-	else 
-	if ( rnd>3) gColorBg= color(255.0, 255.0, 168.0);
-	else 
-	if ( rnd>2) gColorBg= color(255.0, 255.0, 63.0);
-	else 
-	if ( rnd>1) gColorBg= color(4.0, 171.0, 171.0);
-	else 
-	 { gColorBg= color(0, 0, 255); labelColor=255;} 
-	//-------------------------------------------
+	colorSchema_choose();
 	createGUI();
 	customGUI();
 

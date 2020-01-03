@@ -11,7 +11,7 @@
 
 //============================================ global options, that can be redefined below in "hadrware kits" section
 #define LEDchipType	WS2812B // WS2811
-#define tst_POW_LIM	1000
+//#define tst_POW_LIM	1000
 
 //#define textMATRIX_overlay //add text after anim_f. Use slot text_overlay_switch  bTextOverlay=!bTextOverlay   default = true 
 //#define textMATRIX_overlay_substractTetAfterShow //!! 
@@ -55,7 +55,7 @@
 
 
 //============================================ hardware sets, choose one:
-#define ESP8266_SHOW
+//#define ESP8266_SHOW
 //#define ESP8266_SHOW_60x20m
 //-------------------- ESP32  in arduino IDE select DOIT ESP32 devkit
 //#define ESP32_SHOW_USBWiFi  
@@ -85,7 +85,7 @@
 //#define ESP8266_SHOW_MATRIX
 //#define ESP8266_text8x32_test //adafruit GFX
 //#define ESP8266_text_RU_8x32_MATRIX //font in array .h
-//#define ESP8266_text_RU_15x16_MATRIX //font in array .h
+#define ESP8266_text_RU_15x16_MATRIX //font in array .h
 //------- -----------------------
 
 

@@ -1,7 +1,6 @@
 /* fill_colours
  *
  * By: Andrew Tuline
- *
  * Date: July, 2015
  *
  * This example provides ways of filling the strand with colours such as:
@@ -46,8 +45,8 @@ int endpos = NUM_LEDS-1;
 //  fill_gradient(leds, NUM_LEDS, CHSV(50, 255,255), CHSV(100,255,255), LONGEST_HUES);    // up to 4 CHSV values
 
 // fill_rainbow section
-//  fill_rainbow(leds, NUM_LEDS, thishue, deltahue);            // Use FastLED's fill_rainbow routine.
+//  fill_rainbow(leds, NUM_LEDS, thishue, Hue_inc);            // Use FastLED's fill_rainbow routine.
 //  fill_solid(leds,NUM_LEDS,0);                                // Clear the strip for. . . 
-//  fill_rainbow(leds+1, NUM_LEDS-2, thishue, deltahue);        // One pixel border at each end.
+//  fill_rainbow(leds+1, NUM_LEDS-2, thishue, Hue_inc);        // One pixel border at each end.
 
 }

@@ -1,32 +1,18 @@
-/* rainbow_march
-
-By: Andrew Tuline
-
-Date: Nov, 2014
-
-Updated: June, 2018
-
-Update:
-
-1.1 Remove original delay and added EVERY_N_MILLISECONDS
-1.2 Remove EVERY_N_MILLISECONDS and use millis() for timing. Also demonstrate beat8 and beatsin8.
-
-
-Description
-
-Rainbow marching up the strand. Very basic, but oh so popular. Oh look, we don't need to add a 'wheel' routine.
-
-If you want something really funky, try generating sequences with palettes, especially palettes you can change on the flly.
-
-*/
-
 void rainbow_march() {     // The fill_rainbow call doesn't support brightness levels.
 
-  //uint8_t thishue = (millis()/8)%(256-effSpeed);             // To change the rate, add a beat or something to the result. 'gDelay' must be a fixed value.
-  uint8_t thishue = millis()*(256-effSpeed)/256;
-   
-// thishue = beat8(50);                                       // This uses a FastLED sawtooth generator. Again, the '50' should not change on the fly.
-// thishue = beatsin8(50,0,255);                              // This can change speeds on the fly. You can also add these to each other.
-  
-  fill_rainbow(leds, NUM_LEDS, thishue, effLength);            // Use FastLED's fill_rainbow routine.
+	switch(indexOrBits%5)
+	{
+		case 0: thishue = millis()*(256-effSpeed)/512; break;
+		case 1: thishue = (millis()/16)%(256-effSpeed); break;             // To change the rate, add a beat or something to the result. 'gDelay' must be a fixed value.
+		case 2: thishue = beat8(20+effSpeed/8);       break;                                 // This uses a FastLED sawtooth generator. Again, the '50' should not change on the fly.
+		case 3: thishue = beatsin8(50,30,127+effLengthH/2);   break;                            // This can change speeds on the fly. You can also add these to each other.
+		case 4: thishue = gHue; break; // (gHue incr w effSpeed)
+	}
+	if(indexOrBits>128)
+	{
+		EVERY_N_SECONDS(10)
+		indexOrBits = random8(129,255);
+	}
+	
+	fill_rainbow(leds, NUM_LEDS, thishue, effLength);            // Use FastLED's fill_rainbow routine.
 }

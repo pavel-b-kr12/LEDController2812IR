@@ -274,7 +274,7 @@ void change_slot(byte effSlot)
 
 	effRGB=0;
 	gDelay=5; //!tst //0 good always when #define gDelayMore to avoid serial bandwidth bug
-	idex=0; idex16 = 0;
+	posX=0; posX16 = 0;
 	thissat = 255;
 	thisdir = 0;
 				#ifdef tst2
@@ -839,7 +839,7 @@ else
 if(millis()>animHue_next_t)
 {
 	animHue_next_t=millis()+gDelayH;
-	gHue+=effSpeed/2; //TODO move to each eff or iEff
+	gHue+=effSpeed/2; //TODO move to each eff or iEff //!! TODO +=128-effSpeedH & upd all eff that use it
 
 	#ifdef demo_enable //no show for this hardware
 	if(brandom_demo && millis()>randomShow_next_effN_sw_t)
